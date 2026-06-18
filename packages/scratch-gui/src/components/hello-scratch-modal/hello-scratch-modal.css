@@ -1,0 +1,15 @@
+@import "../../css/colors.css";
+
+.modal-content {
+    width: 360px;
+}
+
+.body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+    padding: 2rem;
+    background: $ui-white;
+    font-size: 1rem;
+}
