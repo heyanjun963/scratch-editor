@@ -69,6 +69,7 @@ rejected by the pre-commit hook.
 ```text
 packages/
 ├── scratch-gui/            React-based editor UI
+├── scratch-blocks/         Blockly-based Scratch blocks UI
 ├── scratch-vm/             Virtual machine that runs Scratch projects
 ├── scratch-render/         WebGL renderer for the stage
 ├── scratch-svg-renderer/   SVG asset processor
@@ -82,6 +83,7 @@ scripts/                    Monorepo-level utility scripts
 | Package | Language | Bundler | Tests |
 | - | - | - | - |
 | `scratch-gui` | JavaScript / JSX (some TypeScript) | webpack | Jest |
+| `scratch-blocks` | TypeScript / JavaScript | webpack | Jest |
 | `scratch-vm` | JavaScript | webpack | Tap |
 | `scratch-render` | JavaScript | webpack | Tap |
 | `scratch-svg-renderer` | JavaScript | webpack | Tap |
