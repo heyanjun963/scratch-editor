@@ -29,7 +29,7 @@ import ModeMenu from './mode-menu.jsx';
 import AboutMenu from './about-menu.jsx';
 
 import {openTipsLibrary, openDebugModal, openHelloScratchModal} from '../../reducers/modals';
-import {setPlayer} from '../../reducers/mode';
+import {PYTHON_EDITOR_MODE, SCRATCH_EDITOR_MODE, setEditorMode, setPlayer} from '../../reducers/mode';
 import {
     isTimeTravel220022BC,
     isTimeTravel1920,
@@ -91,6 +91,16 @@ const ariaMessages = defineMessages({
         id: 'gui.menuBar.helloScratch',
         defaultMessage: 'Hello Scratch',
         description: 'accessibility text for the hello scratch button'
+    },
+    codingMode: {
+        id: 'gui.menuBar.codingMode',
+        defaultMessage: 'Coding Mode',
+        description: 'accessibility text for the coding mode button'
+    },
+    stageMode: {
+        id: 'gui.menuBar.stageMode',
+        defaultMessage: 'Stage Mode',
+        description: 'accessibility text for the stage mode button'
     },
     home: {
         id: 'gui.menuBar.home',
@@ -167,6 +177,7 @@ class MenuBar extends React.Component {
             'handleClickSeeCommunity',
             'handleClickShare',
             'handleSetMode',
+            'handleToggleEditorMode',
             'handleKeyPress',
             'handleRestoreOption',
             'getSaveToComputerHandler',
@@ -215,6 +226,9 @@ class MenuBar extends React.Component {
                 }); // queue the transition to project page
             }
         }
+    }
+    handleToggleEditorMode () {
+        this.props.onToggleEditorMode(this.props.editorMode);
     }
     handleSetMode (mode) {
         return () => {
@@ -487,6 +501,23 @@ class MenuBar extends React.Component {
                             </span>
                         </button>
                         <button
+                            aria-label={this.props.intl.formatMessage(
+                                this.props.editorMode === PYTHON_EDITOR_MODE ?
+                                    ariaMessages.stageMode :
+                                    ariaMessages.codingMode
+                            )}
+                            className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
+                            onClick={this.handleToggleEditorMode}
+                        >
+                            <span className={styles.helloScratchLabel}>
+                                <FormattedMessage
+                                    {...(this.props.editorMode === PYTHON_EDITOR_MODE ?
+                                        ariaMessages.stageMode :
+                                        ariaMessages.codingMode)}
+                                />
+                            </span>
+                        </button>
+                        <button
                             aria-label={this.props.intl.formatMessage(ariaMessages.debug)}
                             className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
                             onClick={this.props.onOpenDebugModal}
@@ -675,6 +706,7 @@ MenuBar.propTypes = {
     confirmReadyToReplaceProject: PropTypes.func,
     currentLocale: PropTypes.string.isRequired,
     enableCommunity: PropTypes.bool,
+    editorMode: PropTypes.string,
     hasActiveMembership: PropTypes.bool,
     intl: intlShape,
     isRtl: PropTypes.bool,
@@ -718,6 +750,7 @@ MenuBar.propTypes = {
     onShare: PropTypes.func,
     onStartSelectingFileUpload: PropTypes.func,
     onToggleLoginOpen: PropTypes.func,
+    onToggleEditorMode: PropTypes.func,
     platform: PropTypes.oneOf(Object.keys(PLATFORM)),
     projectTitle: PropTypes.string,
     renderLogin: PropTypes.func,
@@ -760,6 +793,7 @@ const mapStateToProps = (state, ownProps) => {
         mode1990: isTimeTravel1990(state),
         mode2020: isTimeTravel2020(state),
         modeNow: isTimeTravelNow(state),
+        editorMode: state.scratchGui.mode.editorMode,
 
         platform: state.scratchGui.platform.platform,
 
@@ -795,7 +829,10 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     onClickRemix: () => dispatch(remixProject()),
     onRequestCloseLogin: () => dispatch(closeLoginMenu()),
     onSeeCommunity: ownProps.onSeeCommunity ?? (() => dispatch(setPlayer(true))),
-    onSetTimeTravelMode: mode => dispatch(setTimeTravel(mode))
+    onSetTimeTravelMode: mode => dispatch(setTimeTravel(mode)),
+    onToggleEditorMode: editorMode => dispatch(setEditorMode(
+        editorMode === PYTHON_EDITOR_MODE ? SCRATCH_EDITOR_MODE : PYTHON_EDITOR_MODE
+    ))
 });
 
 export default compose(

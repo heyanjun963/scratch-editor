@@ -20,6 +20,7 @@ const builtinExtensions = {
     text2speech: () => require('../extensions/scratch3_text2speech'),
     translate: () => require('../extensions/scratch3_translate'),
     companyHttp: () => require('../extensions/scratch3_company_http'),
+    pythonNative: () => require('../extensions/scratch3_python_native'),
     videoSensing: () => require('../extensions/scratch3_video_sensing'),
     ev3: () => require('../extensions/scratch3_ev3'),
     makeymakey: () => require('../extensions/scratch3_makeymakey'),

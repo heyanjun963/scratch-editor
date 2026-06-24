@@ -1,12 +1,17 @@
 const SET_FULL_SCREEN = 'scratch-gui/mode/SET_FULL_SCREEN';
 const SET_PLAYER = 'scratch-gui/mode/SET_PLAYER';
 const SET_EMBEDDED = 'scratch-gui/mode/SET_EMBEDDED';
+const SET_EDITOR_MODE = 'scratch-gui/mode/SET_EDITOR_MODE';
+
+const SCRATCH_EDITOR_MODE = 'scratch';
+const PYTHON_EDITOR_MODE = 'python';
 
 const initialState = {
     showBranding: false,
     isFullScreen: false,
     isPlayerOnly: false,
-    hasEverEnteredEditor: true
+    hasEverEnteredEditor: true,
+    editorMode: SCRATCH_EDITOR_MODE
 };
 
 const reducer = function (state, action) {
@@ -31,6 +36,10 @@ const reducer = function (state, action) {
             });
         }
         return state;
+    case SET_EDITOR_MODE:
+        return Object.assign({}, state, {
+            editorMode: action.editorMode
+        });
     default:
         return state;
     }
@@ -54,11 +63,20 @@ const setEmbedded = function (isEmbedded) {
         isEmbedded: isEmbedded
     };
 };
+const setEditorMode = function (editorMode) {
+    return {
+        type: SET_EDITOR_MODE,
+        editorMode: editorMode
+    };
+};
 
 export {
     reducer as default,
     initialState as modeInitialState,
+    SCRATCH_EDITOR_MODE,
+    PYTHON_EDITOR_MODE,
     setFullScreen,
     setPlayer,
-    setEmbedded
+    setEmbedded,
+    setEditorMode
 };

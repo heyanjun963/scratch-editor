@@ -223,6 +223,13 @@
     flex-basis: 0;
 }
 
+.stage-and-target-wrapper.python-editor-mode {
+    flex: 0 0 40vw;
+    width: 40vw;
+    min-width: 25rem;
+    max-width: 50vw;
+}
+
 .target-wrapper {
     display: flex;
     flex-grow: 1;

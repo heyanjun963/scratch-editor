@@ -67,6 +67,26 @@ const companyHttpInsetIconSvg = [
 ].join('');
 const companyHttpIconURL = `data:image/svg+xml;utf8,${encodeURIComponent(companyHttpIconSvg)}`;
 const companyHttpInsetIconURL = `data:image/svg+xml;utf8,${encodeURIComponent(companyHttpInsetIconSvg)}`;
+const pythonNativeIconSvg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">',
+    '<rect width="80" height="80" rx="16" fill="#3776AB"/>',
+    '<path d="M25 23h18a10 10 0 0 1 10 10v4H31a8 8 0 0 0-8 8v10h-6A10 10 0 0 1 7 45V33a10 10 0 0 1 10-10h8z" fill="#fff"/>',
+    '<circle cx="25" cy="31" r="3" fill="#3776AB"/>',
+    '<path d="M55 57H37a10 10 0 0 1-10-10v-4h22a8 8 0 0 0 8-8V25h6a10 10 0 0 1 10 10v12a10 10 0 0 1-10 10h-8z" fill="#FFD43B"/>',
+    '<circle cx="55" cy="49" r="3" fill="#3776AB"/>',
+    '</svg>'
+].join('');
+const pythonNativeInsetIconSvg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">',
+    '<rect width="40" height="40" rx="8" fill="#3776AB"/>',
+    '<path d="M13 12h9a5 5 0 0 1 5 5v2H16a4 4 0 0 0-4 4v5H9a5 5 0 0 1-5-5v-6a5 5 0 0 1 5-5h4z" fill="#fff"/>',
+    '<circle cx="13" cy="16" r="1.5" fill="#3776AB"/>',
+    '<path d="M27 28h-9a5 5 0 0 1-5-5v-2h11a4 4 0 0 0 4-4v-5h3a5 5 0 0 1 5 5v6a5 5 0 0 1-5 5h-4z" fill="#FFD43B"/>',
+    '<circle cx="27" cy="24" r="1.5" fill="#3776AB"/>',
+    '</svg>'
+].join('');
+const pythonNativeIconURL = `data:image/svg+xml;utf8,${encodeURIComponent(pythonNativeIconSvg)}`;
+const pythonNativeInsetIconURL = `data:image/svg+xml;utf8,${encodeURIComponent(pythonNativeInsetIconSvg)}`;
 
 export default [
     {
@@ -213,6 +233,27 @@ export default [
         ),
         featured: true,
         internetConnectionRequired: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Python"
+                description="Name for the Python extension"
+                id="gui.extension.pythonNative.name"
+            />
+        ),
+        extensionId: 'pythonNative',
+        iconURL: pythonNativeIconURL,
+        insetIconURL: pythonNativeInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Generate Python from blocks."
+                description="Description for the Python extension"
+                id="gui.extension.pythonNative.description"
+            />
+        ),
+        featured: true,
+        modes: ['python']
     },
     {
         name: 'Makey Makey',

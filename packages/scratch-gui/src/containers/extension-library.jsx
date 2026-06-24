@@ -48,10 +48,12 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
-        const extensionLibraryThumbnailData = extensionLibraryContent.map(extension => ({
-            rawURL: extension.iconURL || extensionIcon,
-            ...extension
-        }));
+        const extensionLibraryThumbnailData = extensionLibraryContent
+            .filter(extension => !extension.modes || extension.modes.includes(this.props.editorMode))
+            .map(extension => ({
+                rawURL: extension.iconURL || extensionIcon,
+                ...extension
+            }));
         return (
             <LibraryComponent
                 data={extensionLibraryThumbnailData}
@@ -67,6 +69,7 @@ class ExtensionLibrary extends React.PureComponent {
 }
 
 ExtensionLibrary.propTypes = {
+    editorMode: PropTypes.string,
     intl: intlShape.isRequired,
     onCategorySelected: PropTypes.func,
     onRequestClose: PropTypes.func,

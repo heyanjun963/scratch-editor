@@ -21,6 +21,7 @@ import DragConstants from '../lib/drag-constants';
 import defineDynamicBlock from '../lib/define-dynamic-block';
 import {DEFAULT_MODE, getColorsForMode, colorModeMap} from '../lib/settings/color-mode';
 import {CAT_BLOCKS_THEME} from '../lib/settings/theme';
+import generatePythonCode from '../lib/python-codegen';
 import {
     injectExtensionBlockIcons,
     injectExtensionCategoryMode,
@@ -33,6 +34,8 @@ import {activateColorPicker} from '../reducers/color-picker';
 import {closeExtensionLibrary, openSoundRecorder, openConnectionModal} from '../reducers/modals';
 import {activateCustomProcedures, deactivateCustomProcedures} from '../reducers/custom-procedures';
 import {setConnectionModalExtensionId} from '../reducers/connection-modal';
+import {PYTHON_EDITOR_MODE} from '../reducers/mode';
+import {appendPythonConsole, updatePythonCode} from '../reducers/python-coding';
 import {updateMetrics} from '../reducers/workspace-metrics';
 import {isTimeTravel2020} from '../reducers/time-travel';
 
@@ -79,8 +82,10 @@ class Blocks extends React.Component {
             'handleExtensionAdded',
             'handleBlocksInfoUpdate',
             'onTargetsUpdate',
+            'onPythonConsole',
             'onVisualReport',
             'onWorkspaceUpdate',
+            'onPythonWorkspaceChange',
             'onWorkspaceMetricsChange',
             'setBlocks',
             'setLocale'
@@ -96,6 +101,7 @@ class Blocks extends React.Component {
             prompt: null
         };
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
+        this.onPythonWorkspaceChange = debounce(this.onPythonWorkspaceChange, 100);
         this.toolboxUpdateQueue = [];
     }
     componentDidMount () {
@@ -196,6 +202,7 @@ class Blocks extends React.Component {
             this._renderedToolboxXML !== nextProps.toolboxXML ||
             this.props.extensionLibraryVisible !== nextProps.extensionLibraryVisible ||
             this.props.customProceduresVisible !== nextProps.customProceduresVisible ||
+            this.props.editorMode !== nextProps.editorMode ||
             this.props.locale !== nextProps.locale ||
             this.props.anyModalVisible !== nextProps.anyModalVisible ||
             this.props.stageSize !== nextProps.stageSize
@@ -205,6 +212,10 @@ class Blocks extends React.Component {
         // If any modals are open, call hideChaff to close z-indexed field editors
         if (this.props.anyModalVisible && !prevProps.anyModalVisible) {
             this.ScratchBlocks.hideChaff();
+        }
+
+        if (this.props.editorMode !== prevProps.editorMode) {
+            this.onPythonWorkspaceChange();
         }
 
         // Only rerender the toolbox when the blocks are visible and the xml is
@@ -329,6 +340,7 @@ class Blocks extends React.Component {
 
     attachVM () {
         this.workspace.addChangeListener(this.props.vm.blockListener);
+        this.workspace.addChangeListener(this.onPythonWorkspaceChange);
         this.flyoutWorkspace = this.workspace
             .getFlyout()
             .getWorkspace();
@@ -346,8 +358,17 @@ class Blocks extends React.Component {
         this.props.vm.addListener('BLOCKSINFO_UPDATE', this.handleBlocksInfoUpdate);
         this.props.vm.addListener('PERIPHERAL_CONNECTED', this.handleStatusButtonUpdate);
         this.props.vm.addListener('PERIPHERAL_DISCONNECTED', this.handleStatusButtonUpdate);
+        if (this.props.vm.runtime) {
+            this.props.vm.runtime.addListener('PYTHON_NATIVE_CONSOLE', this.onPythonConsole);
+        }
     }
     detachVM () {
+        if (this.workspace) {
+            this.workspace.removeChangeListener(this.onPythonWorkspaceChange);
+        }
+        if (this.props.vm.runtime) {
+            this.props.vm.runtime.removeListener('PYTHON_NATIVE_CONSOLE', this.onPythonConsole);
+        }
         this.props.vm.removeListener('SCRIPT_GLOW_ON', this.onScriptGlowOn);
         this.props.vm.removeListener('SCRIPT_GLOW_OFF', this.onScriptGlowOff);
         this.props.vm.removeListener('BLOCK_GLOW_ON', this.onBlockGlowOn);
@@ -490,6 +511,7 @@ class Blocks extends React.Component {
         // fresh workspace and we don't want any changes made to another sprites
         // workspace to be 'undone' here.
         this.workspace.clearUndo();
+        this.onPythonWorkspaceChange();
         // Let events get flushed before readding the toolbox-updater listener
         // to avoid unneeded refreshes.
         requestAnimationFrame(() => {
@@ -517,6 +539,15 @@ class Blocks extends React.Component {
                 block.isMonitored = isVisible;
             }
         }
+    }
+    onPythonWorkspaceChange () {
+        if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
+        const code = generatePythonCode(this.workspace);
+        this.props.updatePythonCodeState(code);
+    }
+    onPythonConsole (data) {
+        if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
+        this.props.appendPythonConsoleLine(data && data.message ? data.message : String(data));
     }
     handleExtensionAdded (categoryInfo) {
         analytics.event({
@@ -668,11 +699,12 @@ class Blocks extends React.Component {
             });
     }
     render () {
-         
         const {
             anyModalVisible,
+            appendPythonConsoleLine,
             canUseCloud,
             customProceduresVisible,
+            editorMode,
             extensionLibraryVisible,
             options,
             stageSize,
@@ -688,12 +720,13 @@ class Blocks extends React.Component {
             onRequestCloseCustomProcedures,
             toolboxXML,
             updateMetrics: updateMetricsProp,
+            updatePythonCodeState,
             useCatBlocks,
             workspaceMetrics,
             colorMode,
             ...props
         } = this.props;
-         
+
         return (
             <React.Fragment>
                 <DroppableBlocks
@@ -717,6 +750,7 @@ class Blocks extends React.Component {
                 ) : null}
                 {extensionLibraryVisible ? (
                     <ExtensionLibrary
+                        editorMode={editorMode}
                         vm={vm}
                         onCategorySelected={this.handleCategorySelected}
                         onRequestClose={onRequestCloseExtensionLibrary}
@@ -763,9 +797,12 @@ Blocks.propTypes = {
     }),
     stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired,
     colorMode: PropTypes.oneOf(Object.keys(colorModeMap)),
+    editorMode: PropTypes.string,
     toolboxXML: PropTypes.string,
     updateMetrics: PropTypes.func,
     updateToolboxState: PropTypes.func,
+    appendPythonConsoleLine: PropTypes.func,
+    updatePythonCodeState: PropTypes.func,
     useCatBlocks: PropTypes.bool,
     vm: PropTypes.instanceOf(VM).isRequired,
     workspaceMetrics: PropTypes.shape({
@@ -811,6 +848,7 @@ const mapStateToProps = state => ({
     locale: state.locales.locale,
     messages: state.locales.messages,
     toolboxXML: state.scratchGui.toolbox.toolboxXML,
+    editorMode: state.scratchGui.mode.editorMode,
     customProceduresVisible: state.scratchGui.customProcedures.active,
     workspaceMetrics: state.scratchGui.workspaceMetrics,
     useCatBlocks: isTimeTravel2020(state) || state.scratchGui.settings.theme === CAT_BLOCKS_THEME
@@ -838,6 +876,12 @@ const mapDispatchToProps = dispatch => ({
     },
     updateMetrics: metrics => {
         dispatch(updateMetrics(metrics));
+    },
+    updatePythonCodeState: code => {
+        dispatch(updatePythonCode(code));
+    },
+    appendPythonConsoleLine: consoleText => {
+        dispatch(appendPythonConsole(consoleText));
     }
 });
 

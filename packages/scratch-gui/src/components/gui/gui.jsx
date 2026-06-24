@@ -32,11 +32,13 @@ import DragLayer from '../../containers/drag-layer.jsx';
 import ConnectionModal from '../../containers/connection-modal.jsx';
 import HelloScratchModal from '../../containers/hello-scratch-modal.jsx';
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
+import PythonCodingPanel from '../python-coding-panel/python-coding-panel.jsx';
 
 import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {colorModeMap} from '../../lib/settings/color-mode/index.js';
 import {DEFAULT_THEME, themeMap} from '../../lib/settings/theme/index.js';
+import {PYTHON_EDITOR_MODE} from '../../reducers/mode';
 import {AccountMenuOptionsPropTypes} from '../../lib/account-menu-options';
 
 import styles from './gui.css';
@@ -151,6 +153,7 @@ const GUIComponent = props => {
         enableCommunity,
         hasActiveMembership,
         helloScratchModalVisible,
+        editorMode,
         isCreating,
         isFetchingUserData,
         isFullScreen,
@@ -192,6 +195,8 @@ const GUIComponent = props => {
         onTelemetryModalOptIn,
         onTelemetryModalOptOut,
         onUpdateProjectThumbnail,
+        pythonCode,
+        pythonConsoleText,
         showComingSoon,
         showNewFeatureCallouts,
         soundsTabVisible,
@@ -491,6 +496,7 @@ const GUIComponent = props => {
                                             theme={theme}
                                             vm={vm}
                                             colorMode={colorMode}
+                                            editorMode={editorMode}
                                         />
                                     </Box>
                                     <ExtensionsButton
@@ -538,40 +544,53 @@ const GUIComponent = props => {
                         <Box
                             role="complementary"
                             aria-label={intl.formatMessage(ariaMessages.stageAndTarget)}
-                            className={classNames(styles.stageAndTargetWrapper, styles[stageSize])}
+                            className={classNames(
+                                styles.stageAndTargetWrapper,
+                                styles[stageSize],
+                                editorMode === PYTHON_EDITOR_MODE && styles.pythonEditorMode
+                            )}
                             element="aside"
                         >
-                            <StageWrapper
-                                isFullScreen={isFullScreen}
-                                isRendererSupported={isRendererSupported}
-                                isRtl={isRtl}
-                                isCreating={isCreating}
-                                stageSize={stageSize}
-                                vm={vm}
-                                ariaRole="region"
-                                ariaLabel={intl.formatMessage(ariaMessages.stage)}
-                                manuallySaveThumbnails={manuallySaveThumbnails}
-                                onSetManualThumbnail={onSetManualThumbnail}
-                                onSetManualThumbnailButtonClick={onSetManualThumbnailButtonClick}
-                                loading={loading}
-                                showNewFeatureCallouts={showNewFeatureCallouts}
-                                userOwnsProject={userOwnsProject}
-                                username={username}
-                                onUpdateProjectThumbnail={onUpdateProjectThumbnail}
-                            />
-                            <Box
-                                className={styles.targetWrapper}
-                                role="region"
-                                aria-label={intl.formatMessage(ariaMessages.targetPane)}
-                                element="section"
-                            >
-                                <TargetPane
-                                    stageSize={stageSize}
-                                    vm={vm}
-                                    onNewSpriteClick={onNewSpriteClick}
-                                    onNewBackdropClick={onNewLibraryBackdropClick}
+                            {editorMode === PYTHON_EDITOR_MODE ? (
+                                <PythonCodingPanel
+                                    code={pythonCode}
+                                    consoleText={pythonConsoleText}
                                 />
-                            </Box>
+                            ) : (
+                                <React.Fragment>
+                                    <StageWrapper
+                                        isFullScreen={isFullScreen}
+                                        isRendererSupported={isRendererSupported}
+                                        isRtl={isRtl}
+                                        isCreating={isCreating}
+                                        stageSize={stageSize}
+                                        vm={vm}
+                                        ariaRole="region"
+                                        ariaLabel={intl.formatMessage(ariaMessages.stage)}
+                                        manuallySaveThumbnails={manuallySaveThumbnails}
+                                        onSetManualThumbnail={onSetManualThumbnail}
+                                        onSetManualThumbnailButtonClick={onSetManualThumbnailButtonClick}
+                                        loading={loading}
+                                        showNewFeatureCallouts={showNewFeatureCallouts}
+                                        userOwnsProject={userOwnsProject}
+                                        username={username}
+                                        onUpdateProjectThumbnail={onUpdateProjectThumbnail}
+                                    />
+                                    <Box
+                                        className={styles.targetWrapper}
+                                        role="region"
+                                        aria-label={intl.formatMessage(ariaMessages.targetPane)}
+                                        element="section"
+                                    >
+                                        <TargetPane
+                                            stageSize={stageSize}
+                                            vm={vm}
+                                            onNewSpriteClick={onNewSpriteClick}
+                                            onNewBackdropClick={onNewLibraryBackdropClick}
+                                        />
+                                    </Box>
+                                </React.Fragment>
+                            )}
                         </Box>
                     </Box>
                     <DragLayer />
@@ -611,6 +630,7 @@ GUIComponent.propTypes = {
     costumeLibraryVisible: PropTypes.bool,
     costumesTabVisible: PropTypes.bool,
     debugModalVisible: PropTypes.bool,
+    editorMode: PropTypes.string,
     hasActiveMembership: PropTypes.bool,
     helloScratchModalVisible: PropTypes.bool,
     onDebugModalClose: PropTypes.func,
@@ -653,6 +673,8 @@ GUIComponent.propTypes = {
     onTelemetryModalOptOut: PropTypes.func,
     onToggleLoginOpen: PropTypes.func,
     onUpdateProjectThumbnail: PropTypes.func,
+    pythonCode: PropTypes.string,
+    pythonConsoleText: PropTypes.string,
     platform: PropTypes.oneOf(Object.keys(PLATFORM)),
     renderLogin: PropTypes.func,
     setTheme: PropTypes.func.isRequired,
@@ -708,6 +730,9 @@ const mapStateToProps = state => ({
     stageSizeMode: state.scratchGui.stageSize.stageSize,
     colorMode: state.scratchGui.settings.colorMode,
     theme: state.scratchGui.settings.theme,
+    editorMode: state.scratchGui.mode.editorMode,
+    pythonCode: state.scratchGui.pythonCoding.code,
+    pythonConsoleText: state.scratchGui.pythonCoding.consoleText,
     backpackConfigured: !!state.scratchGui.config.storage?.backpackStorage
 });
 

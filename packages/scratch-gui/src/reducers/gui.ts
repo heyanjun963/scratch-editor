@@ -19,6 +19,7 @@ import platformReducer, {platformInitialState} from './platform';
 import projectChangedReducer, {projectChangedInitialState} from './project-changed';
 import projectStateReducer, {projectStateInitialState} from './project-state';
 import projectTitleReducer, {projectTitleInitialState} from './project-title';
+import pythonCodingReducer, {pythonCodingInitialState} from './python-coding';
 import fontsLoadedReducer, {fontsLoadedInitialState} from './fonts-loaded';
 import restoreDeletionReducer, {restoreDeletionInitialState} from './restore-deletion';
 import stageSizeReducer, {stageSizeInitialState} from './stage-size';
@@ -60,6 +61,7 @@ const buildInitialState = (config: GUIConfig) => ({
     projectChanged: projectChangedInitialState,
     projectState: projectStateInitialState,
     projectTitle: projectTitleInitialState,
+    pythonCoding: pythonCodingInitialState,
     fontsLoaded: fontsLoadedInitialState,
     restoreDeletion: restoreDeletionInitialState,
     targets: targetsInitialState,
@@ -77,11 +79,13 @@ const initPlayer = function (currentState) {
         {},
         currentState,
         {mode: {
+            showBranding: currentState.mode.showBranding,
             isFullScreen: currentState.mode.isFullScreen,
             isPlayerOnly: true,
             // When initializing in player mode, make sure to reset
             // hasEverEnteredEditorMode
-            hasEverEnteredEditor: false
+            hasEverEnteredEditor: false,
+            editorMode: currentState.mode.editorMode
         }}
     );
 };
@@ -90,9 +94,11 @@ const initFullScreen = function (currentState) {
         {},
         currentState,
         {mode: {
+            showBranding: currentState.mode.showBranding,
             isFullScreen: true,
             isPlayerOnly: currentState.mode.isPlayerOnly,
-            hasEverEnteredEditor: currentState.mode.hasEverEnteredEditor
+            hasEverEnteredEditor: currentState.mode.hasEverEnteredEditor,
+            editorMode: currentState.mode.editorMode
         }}
     );
 };
@@ -105,7 +111,8 @@ const initEmbedded = function (currentState) {
             showBranding: true,
             isFullScreen: true,
             isPlayerOnly: true,
-            hasEverEnteredEditor: false
+            hasEverEnteredEditor: false,
+            editorMode: currentState.mode.editorMode
         }}
     );
 };
@@ -170,6 +177,7 @@ const guiReducer = combineReducers({
     projectChanged: projectChangedReducer,
     projectState: projectStateReducer,
     projectTitle: projectTitleReducer,
+    pythonCoding: pythonCodingReducer,
     fontsLoaded: fontsLoadedReducer,
     restoreDeletion: restoreDeletionReducer,
     targets: targetReducer,

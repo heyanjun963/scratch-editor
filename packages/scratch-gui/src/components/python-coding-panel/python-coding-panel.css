@@ -1,0 +1,56 @@
+@import "../../css/colors.css";
+@import "../../css/units.css";
+
+.python-coding-panel {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+    height: 100%;
+    background: $ui-white;
+    border-left: 1px solid $ui-black-transparent;
+}
+
+.editor-header,
+.console-header {
+    flex: 0 0 auto;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: $text-primary;
+    background: $ui-tertiary;
+    border-bottom: 1px solid $ui-black-transparent;
+}
+
+.console-header {
+    border-top: 1px solid $ui-black-transparent;
+}
+
+.code-area,
+.console-area {
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    border: 0;
+    outline: none;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0;
+}
+
+.code-area {
+    flex: 1 1 70%;
+    min-height: 0;
+    padding: 0.75rem;
+    color: #222;
+    background: #fff;
+}
+
+.console-area {
+    flex: 0 0 28%;
+    min-height: 7rem;
+    padding: 0.75rem;
+    color: #e6edf3;
+    background: #111418;
+}
