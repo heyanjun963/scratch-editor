@@ -587,7 +587,7 @@ const transformStrokeWidths = function (svgTag, windowRef, bboxForTesting) {
 
             const currentMatrix = Matrix.compose(matrix, _parseTransform(element));
             _applyTransformToClipPath(element, currentMatrix);
-            
+
             // If any child nodes don't take attributes, leave the attributes
             // at the parent level.
             for (let i = 0; i < element.childNodes.length; i++) {

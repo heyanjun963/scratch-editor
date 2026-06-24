@@ -11,6 +11,8 @@
 3. [公司产品改版作战手册](./03-company-product-change-playbook.md)
 4. [本地开发运行手册](./04-local-dev-runbook.md)
 5. [新手学习路线图](./05-learning-roadmap.md)
+6. [scratch-blocks 模块导读](./08-scratch-blocks-module-guide.md)
+7. [scratch-vm 模块导读](./09-scratch-vm-module-guide.md)
 
 ## 先抓住一句话
 
@@ -54,4 +56,3 @@ http://localhost:8601/
 ```
 
 首次跑这个 monorepo 时，需要先安装依赖、生成 `scratch-gui` 的 microbit 资源，并构建几个内部包。详细步骤见 [本地开发运行手册](./04-local-dev-runbook.md)。
-
