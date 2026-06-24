@@ -49,6 +49,25 @@ import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 import faceSensingIconURL from './faceSensing/faceSensing.png';
 import faceSensingInsetIconURL from './faceSensing/faceSensing-small.svg';
 
+const companyHttpIconSvg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">',
+    '<rect width="80" height="80" rx="16" fill="#0FBD8C"/>',
+    '<path d="M20 30h40M20 40h32M20 50h40" stroke="#fff" stroke-width="6" stroke-linecap="round"/>',
+    '<path d="M54 18l8 8-8 8" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" ',
+    'stroke-linejoin="round"/>',
+    '</svg>'
+].join('');
+const companyHttpInsetIconSvg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">',
+    '<rect width="40" height="40" rx="8" fill="#0FBD8C"/>',
+    '<path d="M10 15h20M10 20h16M10 25h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/>',
+    '<path d="M28 9l4 4-4 4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" ',
+    'stroke-linejoin="round"/>',
+    '</svg>'
+].join('');
+const companyHttpIconURL = `data:image/svg+xml;utf8,${encodeURIComponent(companyHttpIconSvg)}`;
+const companyHttpInsetIconURL = `data:image/svg+xml;utf8,${encodeURIComponent(companyHttpInsetIconSvg)}`;
+
 export default [
     {
         name: (
@@ -169,6 +188,27 @@ export default [
                 defaultMessage="Translate text into many languages."
                 description="Description for the Translate extension"
                 id="gui.extension.translate.description"
+            />
+        ),
+        featured: true,
+        internetConnectionRequired: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Company HTTP"
+                description="Name for the Company HTTP extension"
+                id="gui.extension.companyHttp.name"
+            />
+        ),
+        extensionId: 'companyHttp',
+        iconURL: companyHttpIconURL,
+        insetIconURL: companyHttpInsetIconURL,
+        description: (
+            <FormattedMessage
+                defaultMessage="Request URLs and ask DeepSeek."
+                description="Description for the Company HTTP extension"
+                id="gui.extension.companyHttp.description"
             />
         ),
         featured: true,
