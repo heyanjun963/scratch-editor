@@ -28,6 +28,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production npm run --workspaces build",
     "clean": "npm run --workspaces clean",
+    "desktop": "node desktop/start.js",
     "prepare": "husky install",
     "refresh-gh-workflow": "ts-node scripts/update-gha-workflows.ts",
     "start": "npm --workspace @scratch/scratch-gui start",
@@ -47,6 +48,7 @@
     "@semantic-release/git": "10.0.1",
     "conventional-changelog-angular": "8.3.1",
     "cross-env": "7.0.3",
+    "electron": "^42.0.1",
     "globals": "16.5.0",
     "husky": "8.0.3",
     "npm": "10.9.8",

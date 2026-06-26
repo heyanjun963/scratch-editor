@@ -1,0 +1,420 @@
+const {BrowserWindow, Menu, WebContentsView, app, dialog, session, shell, systemPreferences} = require('electron');
+const fs = require('fs');
+const path = require('path');
+const {pathToFileURL} = require('url');
+
+const defaultSize = {width: 1280, height: 800};
+const titleBarHeight = 40;
+const port = process.env.PORT || 8601;
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const allowedExternalProtocols = ['http:', 'https:', 'mailto:'];
+
+const devToolKey = process.platform === 'darwin' ?
+    {alt: true, control: false, meta: true, shift: false, code: 'KeyI'} :
+    {alt: false, control: true, meta: false, shift: true, code: 'KeyI'};
+
+let mainWindow = null;
+let shellView = null;
+let activeTabId = null;
+let nextTabIndex = 1;
+
+const tabs = new Map();
+const editorViews = new Map();
+const editorWebContentsIds = new Set();
+
+app.commandLine.appendSwitch('host-resolver-rules', 'MAP device-manager.scratch.mit.edu 127.0.0.1');
+
+process.on('uncaughtException', error => {
+    console.error('[desktop-main] Uncaught exception');
+    console.error(error);
+});
+
+process.on('unhandledRejection', error => {
+    console.error('[desktop-main] Unhandled rejection');
+    console.error(error);
+});
+
+const getAppUrl = () => {
+    if (process.env.SCRATCH_DESKTOP_URL) {
+        return process.env.SCRATCH_DESKTOP_URL;
+    }
+
+    if (isDevelopment) {
+        return `http://127.0.0.1:${port}/`;
+    }
+
+    return pathToFileURL(path.join(__dirname, '..', 'packages', 'scratch-gui', 'build', 'index.html')).toString();
+};
+
+const getShellUrl = () => pathToFileURL(path.join(__dirname, 'shell', 'index.html')).toString();
+
+const createEditorUrl = tab => {
+    const url = new URL(getAppUrl());
+    url.searchParams.set('desktopTabId', tab.id);
+    url.searchParams.set('desktopMode', tab.mode);
+    return url.toString();
+};
+
+const getTabList = () => Array.from(tabs.values()).map(tab => ({
+    id: tab.id,
+    title: tab.title,
+    mode: tab.mode,
+    dirty: tab.dirty,
+    loading: tab.loading,
+    crashed: tab.crashed,
+    active: tab.id === activeTabId
+}));
+
+const broadcastTabsChanged = () => {
+    if (!shellView || shellView.webContents.isDestroyed()) return;
+    shellView.webContents.send('tabs:changed', {
+        tabs: getTabList(),
+        activeTabId
+    });
+};
+
+const getContentSize = () => {
+    if (!mainWindow) return {width: defaultSize.width, height: defaultSize.height};
+    const bounds = mainWindow.getContentBounds();
+    return {width: bounds.width, height: bounds.height};
+};
+
+const getEditorBounds = () => {
+    const {width, height} = getContentSize();
+    return {
+        x: 0,
+        y: titleBarHeight,
+        width,
+        height: Math.max(0, height - titleBarHeight)
+    };
+};
+
+const hiddenEditorBounds = () => ({
+    x: -10000,
+    y: titleBarHeight,
+    width: 10,
+    height: 10
+});
+
+const layoutViews = () => {
+    if (!mainWindow || !shellView) return;
+    const {width} = getContentSize();
+    shellView.setBounds({
+        x: 0,
+        y: 0,
+        width,
+        height: titleBarHeight
+    });
+
+    for (const [tabId, editorView] of editorViews) {
+        editorView.setBounds(tabId === activeTabId ? getEditorBounds() : hiddenEditorBounds());
+    }
+};
+
+const askForMediaAccess = mediaType => {
+    if (systemPreferences.askForMediaAccess) {
+        return systemPreferences.askForMediaAccess(mediaType);
+    }
+    return true;
+};
+
+const showPermissionWarning = (browserWindow, permissionType) => {
+    const label = permissionType === 'microphone' ? 'Microphone' : 'Camera';
+    dialog.showMessageBox(browserWindow, {
+        type: 'warning',
+        title: `${label} Permission Denied`,
+        message: `${label} permission was denied. Scratch may not be able to use related features.`
+    });
+};
+
+const handlePermissionRequest = async (webContents, permission, callback, details) => {
+    if (!mainWindow || !editorWebContentsIds.has(webContents.id)) return callback(false);
+    if (!details.isMainFrame || permission !== 'media') return callback(false);
+
+    let askForMicrophone = false;
+    let askForCamera = false;
+    for (const mediaType of details.mediaTypes) {
+        if (mediaType === 'audio') askForMicrophone = true;
+        else if (mediaType === 'video') askForCamera = true;
+        else return callback(false);
+    }
+
+    if (askForMicrophone && !(await askForMediaAccess('microphone'))) {
+        showPermissionWarning(mainWindow, 'microphone');
+        return callback(false);
+    }
+
+    if (askForCamera && !(await askForMediaAccess('camera'))) {
+        showPermissionWarning(mainWindow, 'camera');
+        return callback(false);
+    }
+
+    return callback(true);
+};
+
+const handleProjectDownload = (browserWindow, downloadItem) => {
+    const filename = downloadItem.getFilename();
+    const userChosenPath = dialog.showSaveDialogSync(browserWindow, {
+        defaultPath: filename,
+        filters: [
+            {name: 'Scratch Project', extensions: ['sb3']},
+            {name: 'All Files', extensions: ['*']}
+        ]
+    });
+
+    if (!userChosenPath) {
+        downloadItem.cancel();
+        return;
+    }
+
+    const tempPath = path.join(app.getPath('temp'), path.basename(userChosenPath));
+    downloadItem.setSavePath(tempPath);
+    downloadItem.once('done', (_event, state) => {
+        if (state !== 'completed') return;
+        fs.rename(tempPath, userChosenPath, error => {
+            if (!error) {
+                return;
+            }
+            if (error.code === 'EXDEV') {
+                fs.copyFile(tempPath, userChosenPath, copyError => {
+                    fs.unlink(tempPath, () => {});
+                    if (!copyError) return;
+                    dialog.showMessageBox(browserWindow, {
+                        type: 'error',
+                        title: 'Failed to save project',
+                        message: `Save failed:\n${userChosenPath}`,
+                        detail: copyError.message
+                    });
+                });
+                return;
+            }
+            dialog.showMessageBox(browserWindow, {
+                type: 'error',
+                title: 'Failed to save project',
+                message: `Save failed:\n${userChosenPath}`,
+                detail: error.message
+            });
+        });
+    });
+};
+
+const registerDevToolsShortcut = webContents => {
+    webContents.on('before-input-event', (event, input) => {
+        if (input.code === devToolKey.code &&
+            input.alt === devToolKey.alt &&
+            input.control === devToolKey.control &&
+            input.meta === devToolKey.meta &&
+            input.shift === devToolKey.shift &&
+            input.type === 'keyDown' &&
+            !input.isAutoRepeat &&
+            !input.isComposing) {
+            event.preventDefault();
+            webContents.openDevTools({mode: 'detach', activate: true});
+        }
+    });
+};
+
+const registerExternalLinkPolicy = webContents => {
+    webContents.setWindowOpenHandler(({url}) => {
+        let protocol = '';
+        try {
+            protocol = new URL(url).protocol;
+        } catch {
+            return {action: 'deny'};
+        }
+
+        if (allowedExternalProtocols.includes(protocol)) {
+            shell.openExternal(url);
+        }
+        return {action: 'deny'};
+    });
+};
+
+const createShellView = () => {
+    const view = new WebContentsView({
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false,
+            preload: path.join(__dirname, 'preload.js')
+        }
+    });
+
+    registerDevToolsShortcut(view.webContents);
+    registerExternalLinkPolicy(view.webContents);
+    view.webContents.loadURL(getShellUrl());
+    view.webContents.once('did-finish-load', broadcastTabsChanged);
+    return view;
+};
+
+const createEditorView = tab => {
+    const view = new WebContentsView({
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false
+        }
+    });
+
+    const webContentsId = view.webContents.id;
+    editorWebContentsIds.add(webContentsId);
+    registerDevToolsShortcut(view.webContents);
+    registerExternalLinkPolicy(view.webContents);
+
+    view.webContents.once('did-finish-load', () => {
+        tab.loading = false;
+        broadcastTabsChanged();
+    });
+
+    view.webContents.on('render-process-gone', (_event, details) => {
+        tab.loading = false;
+        tab.crashed = true;
+        tab.crashReason = details.reason;
+        broadcastTabsChanged();
+    });
+
+    view.webContents.on('destroyed', () => {
+        editorWebContentsIds.delete(webContentsId);
+    });
+
+    view.webContents.loadURL(createEditorUrl(tab));
+    return view;
+};
+
+const activateTab = tabId => {
+    if (!tabs.has(tabId)) return null;
+    activeTabId = tabId;
+    layoutViews();
+    broadcastTabsChanged();
+    return {tabs: getTabList(), activeTabId};
+};
+
+const createTab = ({mode = 'scratch', title} = {}) => {
+    if (!mainWindow) return null;
+    const id = `tab-${Date.now()}-${nextTabIndex}`;
+    const tab = {
+        id,
+        title: title || `新建项目 ${nextTabIndex}`,
+        mode,
+        dirty: false,
+        loading: true,
+        crashed: false
+    };
+    nextTabIndex++;
+
+    const editorView = createEditorView(tab);
+    tabs.set(id, tab);
+    editorViews.set(id, editorView);
+    mainWindow.contentView.addChildView(editorView);
+    activateTab(id);
+    return {tabs: getTabList(), activeTabId};
+};
+
+const closeTab = tabId => {
+    if (!tabs.has(tabId)) return {tabs: getTabList(), activeTabId};
+    const view = editorViews.get(tabId);
+    if (view) {
+        mainWindow.contentView.removeChildView(view);
+        editorViews.delete(tabId);
+        editorWebContentsIds.delete(view.webContents.id);
+        if (!view.webContents.isDestroyed()) {
+            view.webContents.close();
+        }
+    }
+
+    tabs.delete(tabId);
+    if (activeTabId === tabId) {
+        activeTabId = tabs.size ? Array.from(tabs.keys())[tabs.size - 1] : null;
+    }
+    if (!activeTabId) {
+        createTab({mode: 'scratch'});
+    } else {
+        layoutViews();
+        broadcastTabsChanged();
+    }
+    return {tabs: getTabList(), activeTabId};
+};
+
+const registerTabIpc = () => {
+    const {ipcMain} = require('electron');
+    ipcMain.handle('tabs:list', () => ({
+        tabs: getTabList(),
+        activeTabId
+    }));
+    ipcMain.handle('tabs:create', (_event, options) => createTab(options));
+    ipcMain.handle('tabs:activate', (_event, tabId) => activateTab(tabId));
+    ipcMain.handle('tabs:close', (_event, tabId) => closeTab(tabId));
+};
+
+const createMainWindow = () => {
+    const windowOptions = process.platform === 'darwin' ? {
+        titleBarStyle: 'hiddenInset',
+        trafficLightPosition: {x: 12, y: 11}
+    } : {
+        titleBarStyle: 'hidden',
+        titleBarOverlay: {
+            color: '#e8e8e8',
+            symbolColor: '#202124',
+            height: titleBarHeight
+        }
+    };
+
+    const browserWindow = new BrowserWindow({
+        width: defaultSize.width,
+        height: defaultSize.height,
+        useContentSize: true,
+        show: false,
+        title: 'Scratch Editor Desktop',
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false
+        },
+        ...windowOptions
+    });
+
+    if (!browserWindow.contentView) {
+        throw new Error('Electron BrowserWindow.contentView is unavailable. WebContentsView tabs require Electron 30+.');
+    }
+
+    shellView = createShellView();
+    shellView.webContents.once('did-finish-load', () => {
+        if (!browserWindow.isDestroyed() && !browserWindow.isVisible()) {
+            console.log('[desktop-main] Shell loaded, showing main window');
+            browserWindow.show();
+        }
+    });
+    browserWindow.contentView.addChildView(shellView);
+    browserWindow.on('resize', layoutViews);
+    browserWindow.on('maximize', layoutViews);
+    browserWindow.on('unmaximize', layoutViews);
+    browserWindow.on('restore', layoutViews);
+
+    return browserWindow;
+};
+
+if (process.platform !== 'darwin') {
+    Menu.setApplicationMenu(null);
+}
+
+app.on('window-all-closed', () => {
+    app.quit();
+});
+
+app.whenReady().then(() => {
+    console.log('[desktop-main] Electron app is ready');
+    session.defaultSession.setPermissionRequestHandler(handlePermissionRequest);
+    session.defaultSession.on('will-download', (_event, downloadItem) => {
+        if (mainWindow) handleProjectDownload(mainWindow, downloadItem);
+    });
+    registerTabIpc();
+    mainWindow = createMainWindow();
+    mainWindow.on('closed', () => {
+        mainWindow = null;
+        shellView = null;
+        activeTabId = null;
+        tabs.clear();
+        editorViews.clear();
+        editorWebContentsIds.clear();
+    });
+    layoutViews();
+    createTab({mode: 'scratch'});
+});

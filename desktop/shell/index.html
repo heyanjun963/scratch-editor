@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta
+        http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scratch Editor Desktop Shell</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header class="titlebar">
+        <button class="home-button" type="button" title="主页" aria-label="主页">
+            <span class="home-icon">⌂</span>
+        </button>
+        <nav class="tab-strip" id="tabStrip" aria-label="编辑器标签页"></nav>
+        <button class="new-tab-button" id="newTabButton" type="button" title="新建标签页" aria-label="新建标签页">
+            +
+        </button>
+        <div class="drag-fill"></div>
+        <div class="window-controls-spacer" aria-hidden="true"></div>
+    </header>
+    <script src="./shell.js"></script>
+</body>
+</html>

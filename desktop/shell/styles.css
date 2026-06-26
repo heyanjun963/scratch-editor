@@ -1,0 +1,184 @@
+:root {
+    --titlebar-height: 40px;
+    --tab-height: 34px;
+    --border-color: #c8c8c8;
+    --shell-bg: #e8e8e8;
+    --tab-bg: #f7f7f7;
+    --tab-inactive-bg: #dddddd;
+    --tab-hover-bg: #eeeeee;
+    --text-color: #222222;
+    --muted-text-color: #656565;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: var(--titlebar-height);
+    margin: 0;
+    overflow: hidden;
+    color: var(--text-color);
+    background: var(--shell-bg);
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+}
+
+.titlebar {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    height: var(--titlebar-height);
+    padding: 5px 0 0 6px;
+    background: var(--shell-bg);
+    app-region: drag;
+    -webkit-app-region: drag;
+    user-select: none;
+}
+
+.home-button,
+.new-tab-button,
+.tab,
+.tab-close {
+    app-region: no-drag;
+    -webkit-app-region: no-drag;
+}
+
+.home-button,
+.new-tab-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: var(--tab-height);
+    margin: 0 2px 0 0;
+    border: 0;
+    border-radius: 0;
+    color: var(--text-color);
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+    cursor: default;
+}
+
+.home-button:hover,
+.new-tab-button:hover {
+    background: var(--tab-hover-bg);
+}
+
+.home-icon {
+    transform: translateY(-1px);
+    font-size: 17px;
+}
+
+.tab-strip {
+    display: flex;
+    align-items: flex-end;
+    min-width: 0;
+    max-width: calc(100vw - 230px);
+    height: var(--tab-height);
+    overflow: hidden;
+}
+
+.tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 210px;
+    min-width: 120px;
+    max-width: 230px;
+    height: var(--tab-height);
+    padding: 0 8px 0 12px;
+    border: 1px solid transparent;
+    border-bottom: 0;
+    color: var(--muted-text-color);
+    background: var(--tab-inactive-bg);
+    cursor: default;
+}
+
+.tab + .tab {
+    margin-left: 1px;
+}
+
+.tab:hover {
+    background: var(--tab-hover-bg);
+}
+
+.tab.active {
+    z-index: 1;
+    color: var(--text-color);
+    border-color: var(--border-color);
+    background: var(--tab-bg);
+}
+
+.tab.loading .tab-title::after {
+    content: " · 加载中";
+    color: var(--muted-text-color);
+}
+
+.tab.crashed .tab-title::after {
+    content: " · 已崩溃";
+    color: #a80000;
+}
+
+.tab-dirty {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #606060;
+    flex: 0 0 auto;
+}
+
+.tab-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 1 auto;
+}
+
+.tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 0;
+    color: var(--muted-text-color);
+    background: transparent;
+    font-size: 16px;
+    line-height: 1;
+    cursor: default;
+    flex: 0 0 auto;
+}
+
+.tab-close:hover {
+    color: var(--text-color);
+    background: #d6d6d6;
+}
+
+.drag-fill {
+    min-width: 20px;
+    flex: 1 1 auto;
+    height: var(--tab-height);
+}
+
+.window-controls-spacer {
+    width: 138px;
+    height: var(--titlebar-height);
+    flex: 0 0 auto;
+}
+
+@media (max-width: 760px) {
+    .tab {
+        width: 150px;
+        min-width: 110px;
+    }
+
+    .tab-strip {
+        max-width: calc(100vw - 190px);
+    }
+}
