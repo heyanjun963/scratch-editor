@@ -38,7 +38,7 @@ import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {colorModeMap} from '../../lib/settings/color-mode/index.js';
 import {DEFAULT_THEME, themeMap} from '../../lib/settings/theme/index.js';
-import {PYTHON_EDITOR_MODE} from '../../reducers/mode';
+import {PYTHON_EDITOR_MODE, SCRATCH_EDITOR_MODE, setEditorMode} from '../../reducers/mode';
 import {AccountMenuOptionsPropTypes} from '../../lib/account-menu-options';
 
 import styles from './gui.css';
@@ -113,6 +113,13 @@ const ariaMessages = defineMessages({
 // Cache this value to only retrieve it once the first time.
 // Assume that it doesn't change for a session.
 let isRendererSupported = null;
+
+const getDesktopEditorMode = () => {
+    if (typeof window === 'undefined') return null;
+    const desktopMode = new URLSearchParams(window.location.search).get('desktopMode');
+    if (!desktopMode) return null;
+    return desktopMode === 'code' ? PYTHON_EDITOR_MODE : SCRATCH_EDITOR_MODE;
+};
 
 const GUIComponent = props => {
     const intl = useIntl();
@@ -235,6 +242,13 @@ const GUIComponent = props => {
             props.setTheme(DEFAULT_THEME);
         }
     }, [theme, hasActiveMembership, props.setTheme]);
+
+    useEffect(() => {
+        const desktopEditorMode = getDesktopEditorMode();
+        if (desktopEditorMode && desktopEditorMode !== editorMode) {
+            props.setEditorMode(desktopEditorMode);
+        }
+    }, [editorMode, props.setEditorMode]);
 
     const tabClassNames = {
         tabs: styles.tabs,
@@ -682,6 +696,7 @@ GUIComponent.propTypes = {
     showNewFeatureCallouts: PropTypes.bool,
     soundsTabVisible: PropTypes.bool,
     stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),
+    setEditorMode: PropTypes.func.isRequired,
     setPlatform: PropTypes.func,
     targetIsStage: PropTypes.bool,
     telemetryModalVisible: PropTypes.bool,
@@ -738,6 +753,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     setPlatform: platform => dispatch(setPlatform(platform)),
+    setEditorMode: editorMode => dispatch(setEditorMode(editorMode)),
     setTheme: theme => dispatch(setTheme(theme))
 });
 

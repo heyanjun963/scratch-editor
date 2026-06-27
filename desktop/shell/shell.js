@@ -1,5 +1,6 @@
 const tabsApi = window.scratchDesktopTabs;
 const tabStrip = document.getElementById('tabStrip');
+const homeButton = document.getElementById('homeButton');
 const newTabButton = document.getElementById('newTabButton');
 
 let currentTabs = [];
@@ -7,6 +8,7 @@ let activeTabId = null;
 
 const renderTabs = () => {
     tabStrip.replaceChildren();
+    homeButton.classList.toggle('active', activeTabId === null);
 
     for (const tab of currentTabs) {
         const tabButton = document.createElement('button');
@@ -63,9 +65,11 @@ const loadTabs = async () => {
 };
 
 newTabButton.addEventListener('click', () => {
-    tabsApi.create({
-        mode: 'scratch'
-    });
+    tabsApi.showHome();
+});
+
+homeButton.addEventListener('click', () => {
+    tabsApi.showHome();
 });
 
 tabsApi.onChanged(applyTabsPayload);

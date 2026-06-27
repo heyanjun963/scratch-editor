@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta
+        http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scratch Editor Home</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <main class="app-home">
+        <aside class="sidebar" aria-label="Project navigation">
+            <div class="brand">
+                <div class="brand-mark">S</div>
+                <div class="brand-name">Scratch Editor</div>
+            </div>
+            <button class="nav-item active" type="button">
+                <span class="nav-icon">＋</span>
+                <span>新建项目</span>
+            </button>
+            <button class="nav-item disabled" type="button" disabled>
+                <span class="nav-icon">□</span>
+                <span>打开项目</span>
+            </button>
+        </aside>
+        <section class="content" aria-labelledby="homeTitle">
+            <div class="content-header">
+                <p class="eyebrow">程序设计</p>
+                <h1 id="homeTitle">选择编辑器模式</h1>
+                <p class="summary">创建项目时确定模式。舞台模式和代码模式会分别保留在独立标签页中。</p>
+            </div>
+            <div class="mode-grid" aria-label="Editor modes">
+                <button class="mode-card" type="button" data-mode="stage">
+                    <span class="mode-index">C1</span>
+                    <span class="mode-copy">
+                        <span class="mode-title">默认舞台模式</span>
+                        <span class="mode-subtitle">使用积木编程控制舞台</span>
+                    </span>
+                    <span class="mode-art stage-art" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </span>
+                    <span class="mode-arrow" aria-hidden="true">→</span>
+                </button>
+                <button class="mode-card" type="button" data-mode="code">
+                    <span class="mode-index">C2</span>
+                    <span class="mode-copy">
+                        <span class="mode-title">代码模式</span>
+                        <span class="mode-subtitle">拖动积木生成 Python 代码</span>
+                    </span>
+                    <span class="mode-art code-art" aria-hidden="true">Py</span>
+                    <span class="mode-arrow" aria-hidden="true">→</span>
+                </button>
+            </div>
+        </section>
+    </main>
+    <script src="./home.js"></script>
+</body>
+</html>

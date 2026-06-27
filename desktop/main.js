@@ -16,6 +16,7 @@ const devToolKey = process.platform === 'darwin' ?
 
 let mainWindow = null;
 let shellView = null;
+let homeView = null;
 let activeTabId = null;
 let nextTabIndex = 1;
 
@@ -48,6 +49,23 @@ const getAppUrl = () => {
 };
 
 const getShellUrl = () => pathToFileURL(path.join(__dirname, 'shell', 'index.html')).toString();
+const getHomeUrl = () => pathToFileURL(path.join(__dirname, 'home', 'index.html')).toString();
+
+const editorModes = {
+    stage: {
+        mode: 'stage',
+        titlePrefix: 'New Stage Project'
+    },
+    code: {
+        mode: 'code',
+        titlePrefix: 'New Python Project'
+    }
+};
+
+const normalizeEditorMode = mode => {
+    if (mode === 'code') return editorModes.code.mode;
+    return editorModes.stage.mode;
+};
 
 const createEditorUrl = tab => {
     const url = new URL(getAppUrl());
@@ -106,6 +124,10 @@ const layoutViews = () => {
         width,
         height: titleBarHeight
     });
+
+    if (homeView) {
+        homeView.setBounds(activeTabId === null ? getEditorBounds() : hiddenEditorBounds());
+    }
 
     for (const [tabId, editorView] of editorViews) {
         editorView.setBounds(tabId === activeTabId ? getEditorBounds() : hiddenEditorBounds());
@@ -247,6 +269,21 @@ const createShellView = () => {
     return view;
 };
 
+const createHomeView = () => {
+    const view = new WebContentsView({
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false,
+            preload: path.join(__dirname, 'preload.js')
+        }
+    });
+
+    registerDevToolsShortcut(view.webContents);
+    registerExternalLinkPolicy(view.webContents);
+    view.webContents.loadURL(getHomeUrl());
+    return view;
+};
+
 const createEditorView = tab => {
     const view = new WebContentsView({
         webPreferences: {
@@ -288,13 +325,22 @@ const activateTab = tabId => {
     return {tabs: getTabList(), activeTabId};
 };
 
+const showHome = () => {
+    activeTabId = null;
+    layoutViews();
+    broadcastTabsChanged();
+    return {tabs: getTabList(), activeTabId};
+};
+
 const createTab = ({mode = 'scratch', title} = {}) => {
     if (!mainWindow) return null;
+    const editorMode = normalizeEditorMode(mode);
+    const modeConfig = editorModes[editorMode];
     const id = `tab-${Date.now()}-${nextTabIndex}`;
     const tab = {
         id,
-        title: title || `新建项目 ${nextTabIndex}`,
-        mode,
+        title: title || `${modeConfig.titlePrefix} ${nextTabIndex}`,
+        mode: editorMode,
         dirty: false,
         loading: true,
         crashed: false
@@ -326,7 +372,7 @@ const closeTab = tabId => {
         activeTabId = tabs.size ? Array.from(tabs.keys())[tabs.size - 1] : null;
     }
     if (!activeTabId) {
-        createTab({mode: 'scratch'});
+        showHome();
     } else {
         layoutViews();
         broadcastTabsChanged();
@@ -343,6 +389,7 @@ const registerTabIpc = () => {
     ipcMain.handle('tabs:create', (_event, options) => createTab(options));
     ipcMain.handle('tabs:activate', (_event, tabId) => activateTab(tabId));
     ipcMain.handle('tabs:close', (_event, tabId) => closeTab(tabId));
+    ipcMain.handle('home:show', () => showHome());
 };
 
 const createMainWindow = () => {
@@ -383,6 +430,10 @@ const createMainWindow = () => {
         }
     });
     browserWindow.contentView.addChildView(shellView);
+
+    homeView = createHomeView();
+    browserWindow.contentView.addChildView(homeView);
+
     browserWindow.on('resize', layoutViews);
     browserWindow.on('maximize', layoutViews);
     browserWindow.on('unmaximize', layoutViews);
@@ -410,11 +461,12 @@ app.whenReady().then(() => {
     mainWindow.on('closed', () => {
         mainWindow = null;
         shellView = null;
+        homeView = null;
         activeTabId = null;
         tabs.clear();
         editorViews.clear();
         editorWebContentsIds.clear();
     });
     layoutViews();
-    createTab({mode: 'scratch'});
+    showHome();
 });

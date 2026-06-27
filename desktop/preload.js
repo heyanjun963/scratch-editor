@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('scratchDesktopTabs', {
     create: options => ipcRenderer.invoke('tabs:create', options),
     activate: tabId => ipcRenderer.invoke('tabs:activate', tabId),
     close: tabId => ipcRenderer.invoke('tabs:close', tabId),
+    showHome: () => ipcRenderer.invoke('home:show'),
     onChanged: handler => {
         const listener = (_event, payload) => handler(payload);
         ipcRenderer.on('tabs:changed', listener);

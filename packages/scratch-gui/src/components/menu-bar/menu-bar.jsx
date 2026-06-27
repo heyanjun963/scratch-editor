@@ -115,6 +115,10 @@ const ariaMessages = defineMessages({
 });
 
 const getScratchLogo = platform => (platform === PLATFORM.ANDROID ? scratchLogoAndroid : scratchLogo);
+const isDesktopModeLocked = () => (
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('desktopMode')
+);
 
 const MenuBarItemTooltip = ({
     children,
@@ -500,23 +504,25 @@ class MenuBar extends React.Component {
                                 <FormattedMessage {...ariaMessages.helloScratch} />
                             </span>
                         </button>
-                        <button
-                            aria-label={this.props.intl.formatMessage(
-                                this.props.editorMode === PYTHON_EDITOR_MODE ?
-                                    ariaMessages.stageMode :
-                                    ariaMessages.codingMode
-                            )}
-                            className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
-                            onClick={this.handleToggleEditorMode}
-                        >
-                            <span className={styles.helloScratchLabel}>
-                                <FormattedMessage
-                                    {...(this.props.editorMode === PYTHON_EDITOR_MODE ?
+                        {isDesktopModeLocked() ? null : (
+                            <button
+                                aria-label={this.props.intl.formatMessage(
+                                    this.props.editorMode === PYTHON_EDITOR_MODE ?
                                         ariaMessages.stageMode :
-                                        ariaMessages.codingMode)}
-                                />
-                            </span>
-                        </button>
+                                        ariaMessages.codingMode
+                                )}
+                                className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
+                                onClick={this.handleToggleEditorMode}
+                            >
+                                <span className={styles.helloScratchLabel}>
+                                    <FormattedMessage
+                                        {...(this.props.editorMode === PYTHON_EDITOR_MODE ?
+                                            ariaMessages.stageMode :
+                                            ariaMessages.codingMode)}
+                                    />
+                                </span>
+                            </button>
+                        )}
                         <button
                             aria-label={this.props.intl.formatMessage(ariaMessages.debug)}
                             className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}

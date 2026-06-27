@@ -1,0 +1,246 @@
+:root {
+    --brand: #ffb11b;
+    --brand-dark: #f08c00;
+    --ink: #222222;
+    --muted: #7b8490;
+    --line: #dedede;
+    --panel: #ffffff;
+    --page: #f7f7f7;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    color: var(--ink);
+    background: var(--page);
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+.app-home {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    width: 100%;
+    height: 100vh;
+    background: var(--page);
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 16px;
+    border-right: 1px solid var(--line);
+    background: #ffffff;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    margin-bottom: 16px;
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    color: #ffffff;
+    background: var(--brand-dark);
+    font-weight: 700;
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 6px;
+    color: var(--ink);
+    background: transparent;
+    font-size: 15px;
+    text-align: left;
+}
+
+.nav-item.active {
+    background: #fff3da;
+}
+
+.nav-item.disabled {
+    color: #b5b5b5;
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+}
+
+.content {
+    min-width: 0;
+    overflow: auto;
+    padding: 42px 40px;
+}
+
+.content-header {
+    max-width: 760px;
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: var(--brand-dark);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+h1 {
+    margin: 0 0 10px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.summary {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(280px, 420px));
+    gap: 0;
+    align-items: stretch;
+}
+
+.mode-card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 220px;
+    padding: 28px 30px;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: var(--panel);
+    text-align: left;
+}
+
+.mode-card + .mode-card {
+    border-left: 0;
+}
+
+.mode-card:hover {
+    background: #fffaf0;
+}
+
+.mode-index {
+    color: #dddddd;
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.mode-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 220px;
+}
+
+.mode-title {
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.mode-subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.mode-arrow {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    color: #777777;
+    font-size: 20px;
+}
+
+.mode-art {
+    position: absolute;
+    right: 38px;
+    bottom: 28px;
+}
+
+.stage-art {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stage-art span {
+    display: block;
+    width: 76px;
+    height: 14px;
+    border-radius: 4px;
+}
+
+.stage-art span:nth-child(1) {
+    background: #4a9ff5;
+}
+
+.stage-art span:nth-child(2) {
+    width: 92px;
+    background: #ffcc3d;
+}
+
+.stage-art span:nth-child(3) {
+    width: 64px;
+    background: #8e66ff;
+}
+
+.code-art {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 74px;
+    height: 74px;
+    border-radius: 18px;
+    color: #ffffff;
+    background: #3776ab;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+@media (max-width: 900px) {
+    .app-home {
+        grid-template-columns: 210px minmax(0, 1fr);
+    }
+
+    .mode-grid {
+        grid-template-columns: minmax(280px, 420px);
+    }
+
+    .mode-card + .mode-card {
+        border-left: 1px solid var(--line);
+        border-top: 0;
+    }
+}

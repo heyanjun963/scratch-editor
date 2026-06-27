@@ -64,7 +64,8 @@ body {
 }
 
 .home-button:hover,
-.new-tab-button:hover {
+.new-tab-button:hover,
+.home-button.active {
     background: var(--tab-hover-bg);
 }
 
