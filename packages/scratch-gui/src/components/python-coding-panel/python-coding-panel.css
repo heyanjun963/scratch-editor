@@ -22,6 +22,48 @@
     border-bottom: 1px solid $ui-black-transparent;
 }
 
+.editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.editor-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.action-button {
+    height: 1.75rem;
+    padding: 0 0.625rem;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-primary;
+    background: $ui-white;
+    cursor: pointer;
+}
+
+.action-button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.status-row {
+    flex: 0 0 auto;
+    padding: 0.375rem 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.6875rem;
+    color: $text-primary-transparent;
+    background: $ui-white;
+    border-bottom: 1px solid $ui-black-transparent;
+}
+
 .console-header {
     border-top: 1px solid $ui-black-transparent;
 }

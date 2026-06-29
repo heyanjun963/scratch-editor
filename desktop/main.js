@@ -2,6 +2,7 @@ const {BrowserWindow, Menu, WebContentsView, app, dialog, session, shell, system
 const fs = require('fs');
 const path = require('path');
 const {pathToFileURL} = require('url');
+const PythonRunner = require('./python-runner');
 
 const defaultSize = {width: 1280, height: 800};
 const titleBarHeight = 40;
@@ -19,10 +20,12 @@ let shellView = null;
 let homeView = null;
 let activeTabId = null;
 let nextTabIndex = 1;
+let pythonRunner = null;
 
 const tabs = new Map();
 const editorViews = new Map();
 const editorWebContentsIds = new Set();
+const editorWebContentsTabIds = new Map();
 
 app.commandLine.appendSwitch('host-resolver-rules', 'MAP device-manager.scratch.mit.edu 127.0.0.1');
 
@@ -294,12 +297,14 @@ const createEditorView = tab => {
     const view = new WebContentsView({
         webPreferences: {
             contextIsolation: true,
-            nodeIntegration: false
+            nodeIntegration: false,
+            preload: getDesktopAssetPath('preload.js')
         }
     });
 
     const webContentsId = view.webContents.id;
     editorWebContentsIds.add(webContentsId);
+    editorWebContentsTabIds.set(webContentsId, tab.id);
     registerDevToolsShortcut(view.webContents);
     registerExternalLinkPolicy(view.webContents);
 
@@ -325,6 +330,7 @@ const createEditorView = tab => {
 
     view.webContents.on('destroyed', () => {
         editorWebContentsIds.delete(webContentsId);
+        editorWebContentsTabIds.delete(webContentsId);
     });
 
     view.webContents.loadURL(createEditorUrl(tab));
@@ -371,11 +377,15 @@ const createTab = ({mode = 'scratch', title} = {}) => {
 
 const closeTab = tabId => {
     if (!tabs.has(tabId)) return {tabs: getTabList(), activeTabId};
+    if (pythonRunner) {
+        pythonRunner.stop(tabId);
+    }
     const view = editorViews.get(tabId);
     if (view) {
         mainWindow.contentView.removeChildView(view);
         editorViews.delete(tabId);
         editorWebContentsIds.delete(view.webContents.id);
+        editorWebContentsTabIds.delete(view.webContents.id);
         if (!view.webContents.isDestroyed()) {
             view.webContents.close();
         }
@@ -394,6 +404,14 @@ const closeTab = tabId => {
     return {tabs: getTabList(), activeTabId};
 };
 
+const getSenderTabId = event => {
+    const tabId = editorWebContentsTabIds.get(event.sender.id);
+    if (!tabId || !tabs.has(tabId)) {
+        throw new Error('Python actions are only available from editor tabs.');
+    }
+    return tabId;
+};
+
 const registerTabIpc = () => {
     const {ipcMain} = require('electron');
     ipcMain.handle('tabs:list', () => ({
@@ -404,6 +422,23 @@ const registerTabIpc = () => {
     ipcMain.handle('tabs:activate', (_event, tabId) => activateTab(tabId));
     ipcMain.handle('tabs:close', (_event, tabId) => closeTab(tabId));
     ipcMain.handle('home:show', () => showHome());
+};
+
+const registerPythonIpc = () => {
+    const {ipcMain} = require('electron');
+    ipcMain.handle('python:run', async (event, options = {}) => {
+        const tabId = getSenderTabId(event);
+        if (options.tabId && options.tabId !== tabId) {
+            throw new Error('Python tab id does not match the requesting editor tab.');
+        }
+        return pythonRunner.run({
+            tabId,
+            code: options.code,
+            sender: event.sender
+        });
+    });
+    ipcMain.handle('python:stop', event => pythonRunner.stop(getSenderTabId(event)));
+    ipcMain.handle('python:status', event => pythonRunner.getStatus(getSenderTabId(event)));
 };
 
 const createMainWindow = () => {
@@ -461,18 +496,26 @@ if (process.platform !== 'darwin') {
 }
 
 app.on('window-all-closed', () => {
+    if (pythonRunner) {
+        pythonRunner.stopAll();
+    }
     app.quit();
 });
 
 app.whenReady().then(() => {
     console.log('[desktop-main] Electron app is ready');
+    pythonRunner = new PythonRunner({app});
     session.defaultSession.setPermissionRequestHandler(handlePermissionRequest);
     session.defaultSession.on('will-download', (_event, downloadItem) => {
         if (mainWindow) handleProjectDownload(mainWindow, downloadItem);
     });
     registerTabIpc();
+    registerPythonIpc();
     mainWindow = createMainWindow();
     mainWindow.on('closed', () => {
+        if (pythonRunner) {
+            pythonRunner.stopAll();
+        }
         mainWindow = null;
         shellView = null;
         homeView = null;
@@ -480,6 +523,7 @@ app.whenReady().then(() => {
         tabs.clear();
         editorViews.clear();
         editorWebContentsIds.clear();
+        editorWebContentsTabIds.clear();
     });
     layoutViews();
     showHome();

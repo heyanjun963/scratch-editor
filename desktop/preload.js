@@ -12,3 +12,19 @@ contextBridge.exposeInMainWorld('scratchDesktopTabs', {
         return () => ipcRenderer.removeListener('tabs:changed', listener);
     }
 });
+
+contextBridge.exposeInMainWorld('scratchDesktopPython', {
+    run: options => ipcRenderer.invoke('python:run', options),
+    stop: tabId => ipcRenderer.invoke('python:stop', tabId),
+    getStatus: tabId => ipcRenderer.invoke('python:status', tabId),
+    onOutput: handler => {
+        const listener = (_event, payload) => handler(payload);
+        ipcRenderer.on('python:output', listener);
+        return () => ipcRenderer.removeListener('python:output', listener);
+    },
+    onExit: handler => {
+        const listener = (_event, payload) => handler(payload);
+        ipcRenderer.on('python:exit', listener);
+        return () => ipcRenderer.removeListener('python:exit', listener);
+    }
+});

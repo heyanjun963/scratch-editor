@@ -71,6 +71,7 @@
 | `12-desktop-browser-tabs-plan.md` | 浏览器式多 Tab 方案 | 已部分实现，仍缺保存和资源管理 |
 | `13-desktop-home-mode-entry-plan.md` | 首页模式入口方案 | 已实现 MVP |
 | `14-project-progress-and-commercial-gap.md` | 当前总进度和商用差距 | 新增总控文档 |
+| `16-phase-b-python-file-and-run-plan.md` | 阶段 B：Python 文件生成与本机运行 | 已实现初版，待人工验证 |
 
 后续建议：新增功能前先更新本文的“商用差距表”和“下一阶段路线”，再写细分方案。
 
@@ -458,9 +459,9 @@ desktop/security.md
 | 首页模式入口 | 已提交 MVP | 可配置产品首页 | P1 |
 | 多 Tab | 已提交 MVP | 未保存提醒、恢复、内存管理 | P1 |
 | Python 代码生成 | Demo | 可维护 generator，覆盖核心语法 | P0 |
-| Python 文件输出 | 未开始 | 生成并保存 `.py` | P0 |
-| 本机 Python 执行 | 未开始 | Electron 主进程运行 Python | P0 |
-| Terminal | 未开始 | xterm.js + node-pty | P0 |
+| Python 文件输出 | 已实现初版 | 生成并保存 `.py`，后续接项目保存 | P0 |
+| 本机 Python 执行 | 已实现初版 | Electron 主进程运行 Python，待人工验证 | P0 |
+| Terminal | 未开始 | xterm.js + node-pty，阶段 C 处理 | P0 |
 | 项目保存恢复 | 未开始 | 公司项目格式和最近项目 | P0 |
 | 自定义扩展 | Demo | 公司规范扩展包 | P1 |
 | 硬件连接 | 未开始 | 串口/USB/烧录能力 | P1 |
@@ -523,6 +524,8 @@ npm run desktop:dist
 - 关闭最后一个 Tab 是否回到首页。
 
 ### 阶段 B：Python 文件和运行
+
+当前状态：已实现初版，待桌面端人工验证。
 
 目标：把“生成文本”升级为“生成 `.py` 文件并运行”。
 

@@ -31,8 +31,8 @@ import Alerts from '../../containers/alerts.jsx';
 import DragLayer from '../../containers/drag-layer.jsx';
 import ConnectionModal from '../../containers/connection-modal.jsx';
 import HelloScratchModal from '../../containers/hello-scratch-modal.jsx';
+import PythonCodingPanel from '../../containers/python-coding-panel.jsx';
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
-import PythonCodingPanel from '../python-coding-panel/python-coding-panel.jsx';
 
 import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
@@ -202,8 +202,6 @@ const GUIComponent = props => {
         onTelemetryModalOptIn,
         onTelemetryModalOptOut,
         onUpdateProjectThumbnail,
-        pythonCode,
-        pythonConsoleText,
         showComingSoon,
         showNewFeatureCallouts,
         soundsTabVisible,
@@ -220,6 +218,7 @@ const GUIComponent = props => {
         vm,
         ...componentProps
     } = omit(props, 'dispatch', 'setPlatform');
+    const isPythonEditorMode = editorMode === PYTHON_EDITOR_MODE;
     if (children) {
         return <Box {...componentProps}>{children}</Box>;
     }
@@ -407,7 +406,7 @@ const GUIComponent = props => {
                             <Tabs
                                 forceRenderTabPanel
                                 className={tabClassNames.tabs}
-                                selectedIndex={activeTabIndex}
+                                selectedIndex={isPythonEditorMode ? 0 : activeTabIndex}
                                 selectedTabClassName={tabClassNames.tabSelected}
                                 selectedTabPanelClassName={tabClassNames.tabPanelSelected}
                                 onSelect={onActivateTab}
@@ -446,46 +445,50 @@ const GUIComponent = props => {
                                                 id="gui.gui.codeTab"
                                             />
                                         </Tab>
-                                        <Tab
-                                            className={tabClassNames.tab}
-                                            onClick={onActivateCostumesTab}
-                                            role="tab"
-                                            tabIndex="0"
-                                        >
-                                            <img
-                                                draggable={false}
-                                                src={costumesIcon}
-                                            />
-                                            {targetIsStage ? (
-                                                <FormattedMessage
-                                                    defaultMessage="Backdrops"
-                                                    description="Button to get to the backdrops panel"
-                                                    id="gui.gui.backdropsTab"
+                                        {!isPythonEditorMode ? (
+                                            <Tab
+                                                className={tabClassNames.tab}
+                                                onClick={onActivateCostumesTab}
+                                                role="tab"
+                                                tabIndex="0"
+                                            >
+                                                <img
+                                                    draggable={false}
+                                                    src={costumesIcon}
                                                 />
-                                            ) : (
-                                                <FormattedMessage
-                                                    defaultMessage="Costumes"
-                                                    description="Button to get to the costumes panel"
-                                                    id="gui.gui.costumesTab"
+                                                {targetIsStage ? (
+                                                    <FormattedMessage
+                                                        defaultMessage="Backdrops"
+                                                        description="Button to get to the backdrops panel"
+                                                        id="gui.gui.backdropsTab"
+                                                    />
+                                                ) : (
+                                                    <FormattedMessage
+                                                        defaultMessage="Costumes"
+                                                        description="Button to get to the costumes panel"
+                                                        id="gui.gui.costumesTab"
+                                                    />
+                                                )}
+                                            </Tab>
+                                        ) : null}
+                                        {!isPythonEditorMode ? (
+                                            <Tab
+                                                className={tabClassNames.tab}
+                                                onClick={onActivateSoundsTab}
+                                                role="tab"
+                                                tabIndex="0"
+                                            >
+                                                <img
+                                                    draggable={false}
+                                                    src={soundsIcon}
                                                 />
-                                            )}
-                                        </Tab>
-                                        <Tab
-                                            className={tabClassNames.tab}
-                                            onClick={onActivateSoundsTab}
-                                            role="tab"
-                                            tabIndex="0"
-                                        >
-                                            <img
-                                                draggable={false}
-                                                src={soundsIcon}
-                                            />
-                                            <FormattedMessage
-                                                defaultMessage="Sounds"
-                                                description="Button to get to the sounds panel"
-                                                id="gui.gui.soundsTab"
-                                            />
-                                        </Tab>
+                                                <FormattedMessage
+                                                    defaultMessage="Sounds"
+                                                    description="Button to get to the sounds panel"
+                                                    id="gui.gui.soundsTab"
+                                                />
+                                            </Tab>
+                                        ) : null}
                                     </TabList>
                                 </Box>
                                 <TabPanel
@@ -502,7 +505,7 @@ const GUIComponent = props => {
                                             key={`${blocksId}/${colorMode}/${theme}`}
                                             canUseCloud={canUseCloud}
                                             grow={1}
-                                            isVisible={blocksTabVisible}
+                                            isVisible={isPythonEditorMode || blocksTabVisible}
                                             options={{
                                                 media: `${basePath}static/${colorModeMap[colorMode].blocksMediaFolder}/`
                                             }}
@@ -521,32 +524,36 @@ const GUIComponent = props => {
                                         <Watermark />
                                     </Box>
                                 </TabPanel>
-                                <TabPanel
-                                    className={tabClassNames.tabPanel}
-                                    role="tabpanel"
-                                >
-                                    {costumesTabVisible ? <CostumeTab
-                                        ariaLabel={targetIsStage ? intl.formatMessage(ariaMessages.backdropsPanel) :
-                                            intl.formatMessage(ariaMessages.costumesPanel)}
-                                        ariaRole="region"
-                                        vm={vm}
-                                        onNewLibraryBackdropClick={onNewLibraryBackdropClick}
-                                        onNewLibraryCostumeClick={onNewLibraryCostumeClick}
-                                    /> : null}
-                                </TabPanel>
-                                <TabPanel
-                                    className={tabClassNames.tabPanel}
-                                    role="tabpanel"
-                                >
-                                    {soundsTabVisible ?
-                                        <SoundTab
-                                            ariaLabel={intl.formatMessage(ariaMessages.soundsPanel)}
+                                {!isPythonEditorMode ? (
+                                    <TabPanel
+                                        className={tabClassNames.tabPanel}
+                                        role="tabpanel"
+                                    >
+                                        {costumesTabVisible ? <CostumeTab
+                                            ariaLabel={targetIsStage ? intl.formatMessage(ariaMessages.backdropsPanel) :
+                                                intl.formatMessage(ariaMessages.costumesPanel)}
                                             ariaRole="region"
                                             vm={vm}
+                                            onNewLibraryBackdropClick={onNewLibraryBackdropClick}
+                                            onNewLibraryCostumeClick={onNewLibraryCostumeClick}
                                         /> : null}
-                                </TabPanel>
+                                    </TabPanel>
+                                ) : null}
+                                {!isPythonEditorMode ? (
+                                    <TabPanel
+                                        className={tabClassNames.tabPanel}
+                                        role="tabpanel"
+                                    >
+                                        {soundsTabVisible ?
+                                            <SoundTab
+                                                ariaLabel={intl.formatMessage(ariaMessages.soundsPanel)}
+                                                ariaRole="region"
+                                                vm={vm}
+                                            /> : null}
+                                    </TabPanel>
+                                ) : null}
                             </Tabs>
-                            {backpackVisible && backpackConfigured ? (
+                            {!isPythonEditorMode && backpackVisible && backpackConfigured ? (
                                 <Backpack
                                     host={backpackHost}
                                     ariaRole="region"
@@ -566,10 +573,7 @@ const GUIComponent = props => {
                             element="aside"
                         >
                             {editorMode === PYTHON_EDITOR_MODE ? (
-                                <PythonCodingPanel
-                                    code={pythonCode}
-                                    consoleText={pythonConsoleText}
-                                />
+                                <PythonCodingPanel />
                             ) : (
                                 <React.Fragment>
                                     <StageWrapper
@@ -687,8 +691,6 @@ GUIComponent.propTypes = {
     onTelemetryModalOptOut: PropTypes.func,
     onToggleLoginOpen: PropTypes.func,
     onUpdateProjectThumbnail: PropTypes.func,
-    pythonCode: PropTypes.string,
-    pythonConsoleText: PropTypes.string,
     platform: PropTypes.oneOf(Object.keys(PLATFORM)),
     renderLogin: PropTypes.func,
     setTheme: PropTypes.func.isRequired,
@@ -746,8 +748,6 @@ const mapStateToProps = state => ({
     colorMode: state.scratchGui.settings.colorMode,
     theme: state.scratchGui.settings.theme,
     editorMode: state.scratchGui.mode.editorMode,
-    pythonCode: state.scratchGui.pythonCoding.code,
-    pythonConsoleText: state.scratchGui.pythonCoding.consoleText,
     backpackConfigured: !!state.scratchGui.config.storage?.backpackStorage
 });
 

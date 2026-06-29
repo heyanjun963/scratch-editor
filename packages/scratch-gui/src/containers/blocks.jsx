@@ -57,6 +57,16 @@ const DroppableBlocks = DropAreaHOC([
     DragConstants.BACKPACK_CODE
 ])(BlocksComponent);
 
+const pythonNativeExtensionId = 'pythonNative';
+
+const makePythonToolboxXML = categoriesXML => [
+    '<xml style="display: none">',
+    ...categoriesXML
+        .filter(categoryInfo => categoryInfo.id === pythonNativeExtensionId)
+        .map(categoryInfo => categoryInfo.xml),
+    '</xml>'
+].join('\n');
+
 class Blocks extends React.Component {
     constructor (props) {
         super(props);
@@ -81,6 +91,8 @@ class Blocks extends React.Component {
             'handleMonitorsUpdate',
             'handleExtensionAdded',
             'handleBlocksInfoUpdate',
+            'ensurePythonNativeExtension',
+            'refreshToolboxXML',
             'onTargetsUpdate',
             'onPythonConsole',
             'onVisualReport',
@@ -103,6 +115,7 @@ class Blocks extends React.Component {
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.onPythonWorkspaceChange = debounce(this.onPythonWorkspaceChange, 100);
         this.toolboxUpdateQueue = [];
+        this.loadingPythonNativeExtension = false;
     }
     componentDidMount () {
         this.ScratchBlocks = VMScratchBlocks(this.props.vm, this.props.useCatBlocks);
@@ -183,6 +196,7 @@ class Blocks extends React.Component {
         this.workspace.getToolbox().selectItemByPosition(0);
 
         this.attachVM();
+        this.ensurePythonNativeExtension();
         // Only update blocks/vm locale when visible to avoid sizing issues
         // If locale changes while not visible it will get handled in didUpdate
         if (this.props.isVisible) {
@@ -215,6 +229,8 @@ class Blocks extends React.Component {
         }
 
         if (this.props.editorMode !== prevProps.editorMode) {
+            this.ensurePythonNativeExtension();
+            this.requestToolboxUpdate();
             this.onPythonWorkspaceChange();
         }
 
@@ -450,6 +466,9 @@ class Blocks extends React.Component {
                 this.props.vm.runtime.getBlocksXML(target),
                 this.props.colorMode
             );
+            if (this.props.editorMode === PYTHON_EDITOR_MODE) {
+                return makePythonToolboxXML(dynamicBlocksXML);
+            }
             return makeToolboxXML(false, target.isStage, target.id, dynamicBlocksXML,
                 targetCostumes[targetCostumes.length - 1].name,
                 stageCostumes[stageCostumes.length - 1].name,
@@ -631,6 +650,30 @@ class Blocks extends React.Component {
     handleBlocksInfoUpdate (categoryInfo) {
         // @todo Later we should replace this to avoid all the warnings from redefining blocks.
         this.handleExtensionAdded(categoryInfo);
+    }
+    refreshToolboxXML () {
+        const toolboxXML = this.getToolboxXML();
+        if (toolboxXML) {
+            this.props.updateToolboxState(toolboxXML);
+        }
+    }
+    ensurePythonNativeExtension () {
+        if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
+        if (this.loadingPythonNativeExtension) return;
+        if (this.props.vm.extensionManager.isExtensionLoaded(pythonNativeExtensionId)) {
+            this.refreshToolboxXML();
+            return;
+        }
+
+        this.loadingPythonNativeExtension = true;
+        this.props.vm.extensionManager.loadExtensionURL(pythonNativeExtensionId)
+            .catch(error => {
+                log.error(error);
+            })
+            .finally(() => {
+                this.loadingPythonNativeExtension = false;
+                this.refreshToolboxXML();
+            });
     }
     handleCategorySelected (categoryId) {
         const extension = extensionData.find(ext => ext.extensionId === categoryId);
