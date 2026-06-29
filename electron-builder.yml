@@ -1,0 +1,26 @@
+directories:
+  output: desktop-dist
+appId: com.company.scratch-editor
+productName: Scratch Editor
+asar: true
+files:
+  - package.json
+  - desktop/**/*
+  - packages/scratch-gui/build/**/*
+extraMetadata:
+  main: desktop/main.js
+win:
+  target:
+    - nsis
+    - dir
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: "Scratch Editor ${version} Setup.${ext}"
+mac:
+  target:
+    - dmg
+linux:
+  target:
+    - AppImage

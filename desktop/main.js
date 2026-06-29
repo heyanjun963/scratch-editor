@@ -7,7 +7,7 @@ const defaultSize = {width: 1280, height: 800};
 const titleBarHeight = 40;
 const port = process.env.PORT || 8601;
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = !app.isPackaged && process.env.NODE_ENV !== 'production';
 const allowedExternalProtocols = ['http:', 'https:', 'mailto:'];
 
 const devToolKey = process.platform === 'darwin' ?
@@ -45,11 +45,17 @@ const getAppUrl = () => {
         return `http://127.0.0.1:${port}/`;
     }
 
-    return pathToFileURL(path.join(__dirname, '..', 'packages', 'scratch-gui', 'build', 'index.html')).toString();
+    return pathToFileURL(path.join(app.getAppPath(), 'packages', 'scratch-gui', 'build', 'index.html')).toString();
 };
 
-const getShellUrl = () => pathToFileURL(path.join(__dirname, 'shell', 'index.html')).toString();
-const getHomeUrl = () => pathToFileURL(path.join(__dirname, 'home', 'index.html')).toString();
+const getDesktopAssetPath = (...segments) => (
+    isDevelopment ?
+        path.join(__dirname, ...segments) :
+        path.join(app.getAppPath(), 'desktop', ...segments)
+);
+
+const getShellUrl = () => pathToFileURL(getDesktopAssetPath('shell', 'index.html')).toString();
+const getHomeUrl = () => pathToFileURL(getDesktopAssetPath('home', 'index.html')).toString();
 
 const editorModes = {
     stage: {
@@ -258,7 +264,7 @@ const createShellView = () => {
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
-            preload: path.join(__dirname, 'preload.js')
+            preload: getDesktopAssetPath('preload.js')
         }
     });
 
@@ -274,7 +280,7 @@ const createHomeView = () => {
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
-            preload: path.join(__dirname, 'preload.js')
+            preload: getDesktopAssetPath('preload.js')
         }
     });
 
@@ -299,6 +305,14 @@ const createEditorView = tab => {
 
     view.webContents.once('did-finish-load', () => {
         tab.loading = false;
+        broadcastTabsChanged();
+    });
+
+    view.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+        tab.loading = false;
+        tab.crashed = true;
+        tab.crashReason = `${errorCode}: ${errorDescription}`;
+        console.error('[desktop-main] Editor failed to load', validatedURL, tab.crashReason);
         broadcastTabsChanged();
     });
 

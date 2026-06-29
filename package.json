@@ -14,6 +14,12 @@
   },
   "license": "AGPL-3.0-only",
   "author": "Scratch Foundation",
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ],
   "workspaces": [
     "packages/task-herder",
     "packages/scratch-storage",
@@ -29,6 +35,11 @@
     "build": "cross-env NODE_ENV=production npm run --workspaces build",
     "clean": "npm run --workspaces clean",
     "desktop": "node desktop/start.js",
+    "desktop:build": "cross-env NODE_ENV=production npm run desktop:build:gui",
+    "desktop:build:gui": "node desktop/build-gui.js",
+    "desktop:clean": "node desktop/clean-dist.js",
+    "desktop:dist": "npm run desktop:clean && npm run desktop:build && electron-builder --config electron-builder.yml",
+    "desktop:pack": "npm run desktop:clean && npm run desktop:build && electron-builder --config electron-builder.yml --dir",
     "prepare": "husky install",
     "refresh-gh-workflow": "ts-node scripts/update-gha-workflows.ts",
     "start": "npm --workspace @scratch/scratch-gui start",
@@ -49,6 +60,7 @@
     "conventional-changelog-angular": "8.3.1",
     "cross-env": "7.0.3",
     "electron": "^42.0.1",
+    "electron-builder": "^26.0.12",
     "globals": "16.5.0",
     "husky": "8.0.3",
     "npm": "10.9.8",
