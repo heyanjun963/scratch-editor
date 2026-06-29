@@ -15,6 +15,7 @@ const PythonCodingPanel = ({
     isRunning,
     lastExitCode,
     onClearConsole,
+    onTerminalInput,
     onTerminalResize,
     onRun,
     onStop,
@@ -129,6 +130,7 @@ const PythonCodingPanel = ({
         </Box>
         <PythonTerminal
             ref={terminalRef}
+            onInput={onTerminalInput}
             onResize={onTerminalResize}
         />
     </Box>
@@ -142,6 +144,7 @@ PythonCodingPanel.propTypes = {
     isRunning: PropTypes.bool,
     lastExitCode: PropTypes.number,
     onClearConsole: PropTypes.func,
+    onTerminalInput: PropTypes.func,
     onTerminalResize: PropTypes.func,
     onRun: PropTypes.func,
     onStop: PropTypes.func,
@@ -159,6 +162,7 @@ PythonCodingPanel.defaultProps = {
     isRunning: false,
     lastExitCode: null,
     onClearConsole: null,
+    onTerminalInput: null,
     onTerminalResize: null,
     onRun: null,
     onStop: null,

@@ -61,6 +61,11 @@ const getDesktopPythonApi = () => {
     return window.scratchDesktopPython || null;
 };
 
+const getDesktopTerminalApi = () => {
+    if (typeof window === 'undefined') return null;
+    return window.scratchDesktopTerminal || null;
+};
+
 const getDesktopTabId = () => {
     if (typeof window === 'undefined') return null;
     const params = new URLSearchParams(window.location.search);
@@ -86,8 +91,13 @@ const PythonCodingPanel = props => {
     const terminalRef = useRef(null);
     const [hasConsoleOutput, setHasConsoleOutput] = useState(false);
     const desktopPythonApi = getDesktopPythonApi();
+    const desktopTerminalApi = getDesktopTerminalApi();
     const desktopTabId = getDesktopTabId();
-    const desktopApiAvailable = Boolean(desktopPythonApi);
+    const desktopApiAvailable = Boolean(desktopTerminalApi || desktopPythonApi);
+    const terminalSizeRef = useRef({
+        cols: 80,
+        rows: 24
+    });
 
     const writeTerminal = useCallback(text => {
         if (terminalRef.current) {
@@ -112,6 +122,43 @@ const PythonCodingPanel = props => {
     }, [onClearConsole]);
 
     useEffect(() => {
+        if (!desktopTerminalApi) return undefined;
+        const removeDataListener = desktopTerminalApi.onData(data => {
+            if (data.tabId !== desktopTabId) return;
+            if (data.data) {
+                writeTerminal(data.data);
+            }
+        });
+        const removeExitListener = desktopTerminalApi.onExit(data => {
+            if (data.tabId !== desktopTabId) return;
+            onSetRunning(false);
+            onSetExitCode(data.exitCode);
+            if (data.scriptPath) {
+                onSetScriptPath(data.scriptPath);
+            }
+            writeTerminalLine(data.signal ?
+                intl.formatMessage(messages.stoppedBySignal, {signal: data.signal}) :
+                intl.formatMessage(messages.finished, {exitCode: data.exitCode})
+            );
+        });
+
+        return () => {
+            removeDataListener();
+            removeExitListener();
+        };
+    }, [
+        desktopTerminalApi,
+        desktopTabId,
+        intl,
+        onSetExitCode,
+        onSetRunning,
+        onSetScriptPath,
+        writeTerminal,
+        writeTerminalLine
+    ]);
+
+    useEffect(() => {
+        if (desktopTerminalApi) return undefined;
         if (!desktopPythonApi) return undefined;
         const removeOutputListener = desktopPythonApi.onOutput(data => {
             if (data.tabId !== desktopTabId) return;
@@ -139,6 +186,7 @@ const PythonCodingPanel = props => {
     }, [
         desktopPythonApi,
         desktopTabId,
+        desktopTerminalApi,
         intl,
         onSetExitCode,
         onSetRunning,
@@ -148,7 +196,7 @@ const PythonCodingPanel = props => {
     ]);
 
     const handleRun = useCallback(async () => {
-        if (!desktopPythonApi) {
+        if (!desktopApiAvailable) {
             writeTerminalLine(intl.formatMessage(messages.noDesktopPython));
             return;
         }
@@ -164,10 +212,17 @@ const PythonCodingPanel = props => {
         writeTerminalLine(intl.formatMessage(messages.starting));
 
         try {
-            const result = await desktopPythonApi.run({
-                tabId: desktopTabId,
-                code
-            });
+            const result = desktopTerminalApi ?
+                await desktopTerminalApi.startPython({
+                    tabId: desktopTabId,
+                    code,
+                    cols: terminalSizeRef.current.cols,
+                    rows: terminalSizeRef.current.rows
+                }) :
+                await desktopPythonApi.run({
+                    tabId: desktopTabId,
+                    code
+                });
             if (result.scriptPath) {
                 onSetScriptPath(result.scriptPath);
                 writeTerminalLine(intl.formatMessage(messages.scriptPath, {
@@ -182,7 +237,9 @@ const PythonCodingPanel = props => {
         }
     }, [
         code,
+        desktopApiAvailable,
         desktopPythonApi,
+        desktopTerminalApi,
         desktopTabId,
         handleClearConsole,
         intl,
@@ -194,14 +251,37 @@ const PythonCodingPanel = props => {
     ]);
 
     const handleStop = useCallback(async () => {
-        if (!desktopPythonApi) return;
-        await desktopPythonApi.stop(desktopTabId);
+        if (desktopTerminalApi) {
+            await desktopTerminalApi.stop();
+        } else if (desktopPythonApi) {
+            await desktopPythonApi.stop(desktopTabId);
+        } else {
+            return;
+        }
         writeTerminalLine(intl.formatMessage(messages.stopped));
     }, [
         desktopPythonApi,
+        desktopTerminalApi,
         desktopTabId,
         intl,
         writeTerminalLine
+    ]);
+
+    const handleTerminalInput = useCallback(data => {
+        if (!desktopTerminalApi || !isRunning) return;
+        desktopTerminalApi.input(data);
+    }, [
+        desktopTerminalApi,
+        isRunning
+    ]);
+
+    const handleTerminalResize = useCallback(size => {
+        terminalSizeRef.current = size;
+        if (!desktopTerminalApi || !isRunning) return;
+        desktopTerminalApi.resize(size);
+    }, [
+        desktopTerminalApi,
+        isRunning
     ]);
 
     return (
@@ -217,6 +297,8 @@ const PythonCodingPanel = props => {
             onClearConsole={handleClearConsole}
             onRun={handleRun}
             onStop={handleStop}
+            onTerminalInput={handleTerminalInput}
+            onTerminalResize={handleTerminalResize}
         />
     );
 };

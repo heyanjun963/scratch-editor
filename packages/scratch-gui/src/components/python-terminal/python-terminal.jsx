@@ -11,12 +11,23 @@ import styles from './python-terminal.css';
 const normalizeTerminalText = text => String(text || '').replace(/\r?\n/g, '\r\n');
 
 const PythonTerminal = forwardRef(({
+    onInput,
     onResize
 }, ref) => {
     const hostRef = useRef(null);
     const terminalRef = useRef(null);
     const fitAddonRef = useRef(null);
+    const inputHandlerRef = useRef(onInput);
+    const resizeHandlerRef = useRef(onResize);
     const resizeObserverRef = useRef(null);
+
+    useEffect(() => {
+        inputHandlerRef.current = onInput;
+    }, [onInput]);
+
+    useEffect(() => {
+        resizeHandlerRef.current = onResize;
+    }, [onResize]);
 
     const fit = () => {
         const fitAddon = fitAddonRef.current;
@@ -25,8 +36,8 @@ const PythonTerminal = forwardRef(({
 
         try {
             fitAddon.fit();
-            if (onResize) {
-                onResize({
+            if (resizeHandlerRef.current) {
+                resizeHandlerRef.current({
                     cols: terminal.cols,
                     rows: terminal.rows
                 });
@@ -74,6 +85,11 @@ const PythonTerminal = forwardRef(({
         const fitAddon = new FitAddon();
         terminal.loadAddon(fitAddon);
         terminal.open(hostRef.current);
+        const inputDisposable = terminal.onData(data => {
+            if (inputHandlerRef.current) {
+                inputHandlerRef.current(data);
+            }
+        });
 
         terminalRef.current = terminal;
         fitAddonRef.current = fitAddon;
@@ -92,6 +108,7 @@ const PythonTerminal = forwardRef(({
                 resizeObserverRef.current.disconnect();
                 resizeObserverRef.current = null;
             }
+            inputDisposable.dispose();
             terminal.dispose();
             terminalRef.current = null;
             fitAddonRef.current = null;
@@ -111,10 +128,12 @@ const PythonTerminal = forwardRef(({
 PythonTerminal.displayName = 'PythonTerminal';
 
 PythonTerminal.propTypes = {
+    onInput: PropTypes.func,
     onResize: PropTypes.func
 };
 
 PythonTerminal.defaultProps = {
+    onInput: null,
     onResize: null
 };
 

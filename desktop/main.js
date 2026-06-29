@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const {pathToFileURL} = require('url');
 const PythonRunner = require('./python-runner');
+const TerminalRunner = require('./terminal-runner');
 
 const defaultSize = {width: 1280, height: 800};
 const titleBarHeight = 40;
@@ -21,6 +22,7 @@ let homeView = null;
 let activeTabId = null;
 let nextTabIndex = 1;
 let pythonRunner = null;
+let terminalRunner = null;
 
 const tabs = new Map();
 const editorViews = new Map();
@@ -380,6 +382,9 @@ const closeTab = tabId => {
     if (pythonRunner) {
         pythonRunner.stop(tabId);
     }
+    if (terminalRunner) {
+        terminalRunner.stop(tabId);
+    }
     const view = editorViews.get(tabId);
     if (view) {
         mainWindow.contentView.removeChildView(view);
@@ -441,6 +446,27 @@ const registerPythonIpc = () => {
     ipcMain.handle('python:status', event => pythonRunner.getStatus(getSenderTabId(event)));
 };
 
+const registerTerminalIpc = () => {
+    const {ipcMain} = require('electron');
+    ipcMain.handle('terminal:startPython', async (event, options = {}) => {
+        const tabId = getSenderTabId(event);
+        if (options.tabId && options.tabId !== tabId) {
+            throw new Error('Terminal tab id does not match the requesting editor tab.');
+        }
+        return terminalRunner.startPython({
+            tabId,
+            code: options.code,
+            cols: options.cols,
+            rows: options.rows,
+            sender: event.sender
+        });
+    });
+    ipcMain.handle('terminal:input', (event, data) => terminalRunner.input(getSenderTabId(event), data));
+    ipcMain.handle('terminal:resize', (event, size) => terminalRunner.resize(getSenderTabId(event), size));
+    ipcMain.handle('terminal:stop', event => terminalRunner.stop(getSenderTabId(event)));
+    ipcMain.handle('terminal:status', event => terminalRunner.getStatus(getSenderTabId(event)));
+};
+
 const createMainWindow = () => {
     const windowOptions = process.platform === 'darwin' ? {
         titleBarStyle: 'hiddenInset',
@@ -499,22 +525,30 @@ app.on('window-all-closed', () => {
     if (pythonRunner) {
         pythonRunner.stopAll();
     }
+    if (terminalRunner) {
+        terminalRunner.stopAll();
+    }
     app.quit();
 });
 
 app.whenReady().then(() => {
     console.log('[desktop-main] Electron app is ready');
     pythonRunner = new PythonRunner({app});
+    terminalRunner = new TerminalRunner({pythonRunner});
     session.defaultSession.setPermissionRequestHandler(handlePermissionRequest);
     session.defaultSession.on('will-download', (_event, downloadItem) => {
         if (mainWindow) handleProjectDownload(mainWindow, downloadItem);
     });
     registerTabIpc();
     registerPythonIpc();
+    registerTerminalIpc();
     mainWindow = createMainWindow();
     mainWindow.on('closed', () => {
         if (pythonRunner) {
             pythonRunner.stopAll();
+        }
+        if (terminalRunner) {
+            terminalRunner.stopAll();
         }
         mainWindow = null;
         shellView = null;

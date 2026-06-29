@@ -3,6 +3,8 @@ directories:
 appId: com.company.scratch-editor
 productName: Scratch Editor
 asar: true
+asarUnpack:
+  - node_modules/node-pty/**/*
 files:
   - package.json
   - desktop/**/*

@@ -449,3 +449,60 @@ npm run desktop
 17. 预期：
     - 两个 Tab 的输出分别显示在各自终端；
     - 切换 Tab 时不出现明显白屏或异常。
+
+## 2026-06-29 C2 实施记录
+
+本轮开始实施 C2：`node-pty` 交互式终端。
+
+### 已实现
+
+1. 安装 `node-pty@1.1.0`。
+2. 新增 `desktop/terminal-runner.js`。
+3. Electron 主进程注册：
+   - `terminal:startPython`
+   - `terminal:input`
+   - `terminal:resize`
+   - `terminal:stop`
+   - `terminal:status`
+4. preload 暴露 `window.scratchDesktopTerminal`。
+5. Python 编码面板优先使用 PTY 运行 Python。
+6. xterm 输入会转发到 PTY。
+7. xterm resize 会转发到 PTY。
+8. 关闭 Tab 或窗口时会销毁对应 PTY。
+9. electron-builder 增加 `asarUnpack`，避免 `node-pty` 原生模块被打包进 asar 后无法加载。
+10. Windows 下 PTY 启动 Python 前，会先通过 `sys.executable` 反查真实 `python.exe` 路径，避免 `py -3` 这类短命令在 ConPTY 中报 `File not found`。
+11. xterm 的输入和 resize 回调使用最新 React props，避免组件首次挂载时捕获 `isRunning=false`，导致运行后用户输入没有转发给 PTY。
+
+### 当前观察
+
+本机 Node 环境下，`node-pty` 可以成功启动 PowerShell 并输出 `pty-ok`。
+
+补充验证：本机 Node 环境下已经成功通过 `TerminalRunner` 启动 Python 脚本，脚本包含 `input()`，向 PTY 写入 `hyj` 后返回 `hello hyj`，退出码为 `0`。该验证说明主进程侧的 PTY 输入、输出和解释器解析链路已经可用。
+
+Windows 下测试 PTY 退出时，控制台额外打印过一次：
+
+```text
+AttachConsole failed
+```
+
+这来自 `node-pty` 的 Windows ConPTY helper。需要在 Electron 桌面端里继续观察：
+
+- 是否只出现在独立 Node 验证脚本；
+- 是否影响 Electron 内运行；
+- 是否影响打包版。
+
+### C2 人工验证重点
+
+1. 运行包含 `input()` 的 Python 代码。
+2. 预期：终端可输入内容，按 Enter 后 Python 继续执行。
+3. 运行长时间脚本。
+4. 在终端按 Ctrl+C。
+5. 预期：Python 被中断，终端出现退出状态。
+6. 调整窗口大小。
+7. 预期：终端输出换行正常，输入光标位置正常。
+8. 同时打开两个代码模式 Tab，各运行一个等待输入的脚本。
+9. 预期：输入和输出不串 Tab。
+10. 关闭正在运行的 Tab。
+11. 预期：对应 PTY 被销毁，后台没有残留 Python。
+12. 执行 `npm run desktop:pack`。
+13. 预期：打包目录版本能启动，终端不报 `node-pty` 原生模块加载失败。

@@ -4,6 +4,7 @@ const path = require('path');
 
 const pythonWorkspaceDirName = 'python-workspaces';
 const pythonVersionTimeout = 3000;
+const pythonProbeTimeout = 3000;
 
 class PythonRunner {
     constructor ({app}) {
@@ -158,6 +159,37 @@ class PythonRunner {
             child.on('close', exitCode => {
                 clearTimeout(timer);
                 resolve(exitCode === 0);
+            });
+        });
+    }
+
+    runPythonProbe ({command, args}, probeArgs) {
+        return new Promise((resolve, reject) => {
+            const child = spawn(command, [...args, ...probeArgs], {
+                shell: false,
+                windowsHide: true
+            });
+            const chunks = [];
+            const errors = [];
+            const timer = setTimeout(() => {
+                child.kill();
+                reject(new Error(`Python probe timed out for ${command}.`));
+            }, pythonProbeTimeout);
+
+            child.stdout.on('data', chunk => chunks.push(chunk));
+            child.stderr.on('data', chunk => errors.push(chunk));
+            child.on('error', error => {
+                clearTimeout(timer);
+                reject(error);
+            });
+            child.on('close', exitCode => {
+                clearTimeout(timer);
+                if (exitCode !== 0) {
+                    const message = Buffer.concat(errors).toString('utf8').trim();
+                    reject(new Error(message || `Python probe failed for ${command}.`));
+                    return;
+                }
+                resolve(Buffer.concat(chunks).toString('utf8').trim());
             });
         });
     }

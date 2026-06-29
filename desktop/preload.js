@@ -28,3 +28,21 @@ contextBridge.exposeInMainWorld('scratchDesktopPython', {
         return () => ipcRenderer.removeListener('python:exit', listener);
     }
 });
+
+contextBridge.exposeInMainWorld('scratchDesktopTerminal', {
+    startPython: options => ipcRenderer.invoke('terminal:startPython', options),
+    input: data => ipcRenderer.invoke('terminal:input', data),
+    resize: size => ipcRenderer.invoke('terminal:resize', size),
+    stop: () => ipcRenderer.invoke('terminal:stop'),
+    getStatus: () => ipcRenderer.invoke('terminal:status'),
+    onData: handler => {
+        const listener = (_event, payload) => handler(payload);
+        ipcRenderer.on('terminal:data', listener);
+        return () => ipcRenderer.removeListener('terminal:data', listener);
+    },
+    onExit: handler => {
+        const listener = (_event, payload) => handler(payload);
+        ipcRenderer.on('terminal:exit', listener);
+        return () => ipcRenderer.removeListener('terminal:exit', listener);
+    }
+});
