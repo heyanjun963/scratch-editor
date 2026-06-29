@@ -3,20 +3,23 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
 import Box from '../box/box.jsx';
+import PythonTerminal from '../python-terminal/python-terminal.jsx';
 
 import styles from './python-coding-panel.css';
 
 const PythonCodingPanel = ({
     code,
-    consoleText,
     desktopApiAvailable,
     error,
+    hasConsoleOutput,
     isRunning,
     lastExitCode,
     onClearConsole,
+    onTerminalResize,
     onRun,
     onStop,
-    scriptPath
+    scriptPath,
+    terminalRef
 }) => (
     <Box
         className={styles.pythonCodingPanel}
@@ -57,7 +60,7 @@ const PythonCodingPanel = ({
                 </button>
                 <button
                     className={styles.actionButton}
-                    disabled={!consoleText}
+                    disabled={!hasConsoleOutput}
                     type="button"
                     onClick={onClearConsole}
                 >
@@ -124,39 +127,43 @@ const PythonCodingPanel = ({
                 id="gui.pythonCoding.consoleHeader"
             />
         </Box>
-        <textarea
-            readOnly
-            className={styles.consoleArea}
-            spellCheck={false}
-            value={consoleText}
+        <PythonTerminal
+            ref={terminalRef}
+            onResize={onTerminalResize}
         />
     </Box>
 );
 
 PythonCodingPanel.propTypes = {
     code: PropTypes.string,
-    consoleText: PropTypes.string,
     desktopApiAvailable: PropTypes.bool,
     error: PropTypes.string,
+    hasConsoleOutput: PropTypes.bool,
     isRunning: PropTypes.bool,
     lastExitCode: PropTypes.number,
     onClearConsole: PropTypes.func,
+    onTerminalResize: PropTypes.func,
     onRun: PropTypes.func,
     onStop: PropTypes.func,
-    scriptPath: PropTypes.string
+    scriptPath: PropTypes.string,
+    terminalRef: PropTypes.shape({
+        current: PropTypes.any
+    })
 };
 
 PythonCodingPanel.defaultProps = {
     code: '',
-    consoleText: '',
     desktopApiAvailable: false,
     error: null,
+    hasConsoleOutput: false,
     isRunning: false,
     lastExitCode: null,
     onClearConsole: null,
+    onTerminalResize: null,
     onRun: null,
     onStop: null,
-    scriptPath: null
+    scriptPath: null,
+    terminalRef: null
 };
 
 export default PythonCodingPanel;

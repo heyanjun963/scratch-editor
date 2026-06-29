@@ -68,8 +68,7 @@
     border-top: 1px solid $ui-black-transparent;
 }
 
-.code-area,
-.console-area {
+.code-area {
     width: 100%;
     box-sizing: border-box;
     resize: none;
@@ -87,12 +86,4 @@
     padding: 0.75rem;
     color: #222;
     background: #fff;
-}
-
-.console-area {
-    flex: 0 0 28%;
-    min-height: 7rem;
-    padding: 0.75rem;
-    color: #e6edf3;
-    background: #111418;
 }
