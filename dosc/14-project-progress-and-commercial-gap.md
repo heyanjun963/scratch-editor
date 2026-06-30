@@ -73,6 +73,8 @@
 | `14-project-progress-and-commercial-gap.md` | 当前总进度和商用差距 | 新增总控文档 |
 | `16-phase-b-python-file-and-run-plan.md` | 阶段 B：Python 文件生成与本机运行 | 已实现初版，待人工验证 |
 | `17-phase-c-terminal-productization-plan.md` | 阶段 C：Terminal 产品化 | C2 已完成代码接入，待人工验证 |
+| `18-phase-d-project-save-restore-plan.md` | 阶段 D：项目保存和恢复 | 改为复用原版 `.sb3` 保存/加载链路 |
+| `19-python-block-category-and-syntax-plan.md` | Python 积木分类和语法完善 | 新增分类体系和语法补齐方案 |
 
 后续建议：新增功能前先更新本文的“商用差距表”和“下一阶段路线”，再写细分方案。
 
@@ -460,10 +462,11 @@ desktop/security.md
 | 首页模式入口 | 已提交 MVP | 可配置产品首页 | P1 |
 | 多 Tab | 已提交 MVP | 未保存提醒、恢复、内存管理 | P1 |
 | Python 代码生成 | Demo | 可维护 generator，覆盖核心语法 | P0 |
+| Python 积木分类 | Demo | 控制、运算符、文本、变量、列表、Python 等分类 | P0 |
 | Python 文件输出 | 已实现初版 | 生成并保存 `.py`，后续接项目保存 | P0 |
 | 本机 Python 执行 | 已实现初版 | Electron 主进程运行 Python，待人工验证 | P0 |
 | Terminal | C2 待验证 | xterm.js 已接入，node-pty 交互终端已完成代码接入，待人工验证 input/Ctrl+C/打包版 | P0 |
-| 项目保存恢复 | 未开始 | 公司项目格式和最近项目 | P0 |
+| 项目保存恢复 | 待验证原版能力 | 复用 `.sb3` 保存/加载，必要时扩展 metadata | P0 |
 | 自定义扩展 | Demo | 公司规范扩展包 | P1 |
 | 硬件连接 | 未开始 | 串口/USB/烧录能力 | P1 |
 | 安全 IPC | Demo | 白名单和参数校验 | P0 |
@@ -575,15 +578,17 @@ npm run desktop:dist
 
 ### 阶段 D：项目保存和恢复
 
+当前状态：原版已有 `.sb3` 保存和加载能力，不再新增自定义 JSON 项目格式。
+
 目标：从 Demo 进入真正可用。
 
 任务：
 
-1. 定义公司项目格式。
-2. 保存 `sb3`、`main.py`、metadata。
-3. 打开项目恢复 Tab。
-4. 最近项目列表。
-5. dirty 状态和关闭提醒。
+1. 复用原版“保存到电脑 / 从电脑加载”。
+2. 验证 Python 扩展积木是否能随 `.sb3` 保存和恢复。
+3. 打开 `.sb3` 后重新触发 Python codegen。
+4. 如需额外保存编辑器模式或 Tab 信息，优先研究 `.sb3` metadata 扩展点。
+5. 后续再补最近项目列表、dirty 状态和关闭提醒。
 
 验收：
 

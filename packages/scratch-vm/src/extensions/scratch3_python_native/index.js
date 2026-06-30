@@ -102,8 +102,24 @@ class Scratch3PythonNativeBlocks {
                     })
                 },
                 {
+                    opcode: 'input',
+                    blockType: BlockType.REPORTER,
+                    text: formatMessage({
+                        id: 'pythonNative.input',
+                        default: 'input [PROMPT]',
+                        description: 'Python input block'
+                    }),
+                    arguments: {
+                        PROMPT: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'name: '
+                        }
+                    }
+                },
+                {
                     opcode: 'setVariable',
                     blockType: BlockType.COMMAND,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.setVariable',
                         default: 'set [NAME] to [VALUE]',
@@ -123,6 +139,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'getVariable',
                     blockType: BlockType.REPORTER,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.getVariable',
                         default: 'variable [NAME]',
@@ -138,6 +155,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'arithmetic',
                     blockType: BlockType.REPORTER,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.arithmetic',
                         default: '[A] [OP] [B]',
@@ -162,6 +180,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'compare',
                     blockType: BlockType.BOOLEAN,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.compare',
                         default: '[A] [OP] [B]',
@@ -186,6 +205,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'join',
                     blockType: BlockType.REPORTER,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.join',
                         default: 'join [A] and [B]',
@@ -220,6 +240,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'toString',
                     blockType: BlockType.REPORTER,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.toString',
                         default: 'string [VALUE]',
@@ -235,6 +256,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'makeList',
                     blockType: BlockType.REPORTER,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.makeList',
                         default: 'list [A] [B] [C]',
@@ -258,6 +280,7 @@ class Scratch3PythonNativeBlocks {
                 {
                     opcode: 'length',
                     blockType: BlockType.REPORTER,
+                    hideFromPalette: true,
                     text: formatMessage({
                         id: 'pythonNative.length',
                         default: 'length of [VALUE]',
@@ -353,6 +376,12 @@ class Scratch3PythonNativeBlocks {
         const value = new Date().toLocaleTimeString();
         this.emitConsole(`[time] ${value}`);
         return value;
+    }
+
+    input (args) {
+        const prompt = Cast.toString(args.PROMPT);
+        this.emitConsole(`[input] ${prompt}`);
+        return '';
     }
 
     setVariable (args) {

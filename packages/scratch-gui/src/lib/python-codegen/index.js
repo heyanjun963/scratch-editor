@@ -1,6 +1,24 @@
-const pythonNativePrefix = 'pythonNative_';
+const prefixByCategory = {
+    control: 'pythonControl_',
+    operators: 'pythonOperators_',
+    text: 'pythonText_',
+    variables: 'pythonVariables_',
+    list: 'pythonList_',
+    native: 'pythonNative_'
+};
 
 const quotePythonString = value => JSON.stringify(String(value));
+
+const literalToPython = value => {
+    const stringValue = String(value);
+    if (/^-?(?:\d+|\d*\.\d+)$/.test(stringValue.trim())) {
+        return stringValue.trim();
+    }
+    if (/^(?:true|false)$/i.test(stringValue.trim())) {
+        return stringValue.trim().toLowerCase() === 'true' ? 'True' : 'False';
+    }
+    return quotePythonString(value);
+};
 
 const indent = level => '    '.repeat(level);
 
@@ -38,60 +56,92 @@ const getStackBlocks = topBlock => {
     return blocks;
 };
 
-const valueToPython = (block, inputName, fallback = '', imports = new Set()) => {
-    const inputBlock = getInputBlock(block, inputName);
-    if (!inputBlock) return quotePythonString(getFieldValue(block, [inputName], fallback));
+const isType = (block, category, opcode) => block && block.type === `${prefixByCategory[category]}${opcode}`;
 
-    switch (inputBlock.type) {
-    case `${pythonNativePrefix}getVariable`:
-        return normalizePythonName(getFieldValue(inputBlock, ['NAME'], 'x'));
-    case `${pythonNativePrefix}arithmetic`:
+const isAnyType = (block, pairs) => pairs.some(([category, opcode]) => isType(block, category, opcode));
+
+const expressionFromSelf = (block, imports, fallback = '') => {
+    switch (block.type) {
+    case `${prefixByCategory.variables}getVariable`:
+    case `${prefixByCategory.native}getVariable`:
+        return normalizePythonName(getFieldValue(block, ['NAME'], 'x'));
+    case `${prefixByCategory.operators}arithmetic`:
+    case `${prefixByCategory.native}arithmetic`:
         return `(${
-            numberToPython(inputBlock, 'A', '1', imports)
-        } ${getFieldValue(inputBlock, ['OP'], '+')} ${
-            numberToPython(inputBlock, 'B', '2', imports)
+            numberToPython(block, 'A', '1', imports)
+        } ${getFieldValue(block, ['OP'], '+')} ${
+            numberToPython(block, 'B', '2', imports)
         })`;
-    case `${pythonNativePrefix}compare`:
+    case `${prefixByCategory.operators}compare`:
+    case `${prefixByCategory.native}compare`:
         return `(${
-            valueToPython(inputBlock, 'A', '1', imports)
-        } ${getFieldValue(inputBlock, ['OP'], '==')} ${
-            valueToPython(inputBlock, 'B', '1', imports)
+            valueToPython(block, 'A', '1', imports)
+        } ${getFieldValue(block, ['OP'], '==')} ${
+            valueToPython(block, 'B', '1', imports)
         })`;
-    case `${pythonNativePrefix}join`:
-        return `(str(${valueToPython(inputBlock, 'A', 'hello', imports)}) + str(${
-            valueToPython(inputBlock, 'B', 'python', imports)
+    case `${prefixByCategory.operators}logic`:
+        return `(${
+            booleanToPython(block, 'A', 'True', imports)
+        } ${getFieldValue(block, ['OP'], 'and')} ${
+            booleanToPython(block, 'B', 'False', imports)
+        })`;
+    case `${prefixByCategory.operators}not`:
+        return `(not ${booleanToPython(block, 'VALUE', 'False', imports)})`;
+    case `${prefixByCategory.text}literal`:
+        return quotePythonString(getFieldValue(block, ['TEXT'], fallback));
+    case `${prefixByCategory.text}join`:
+    case `${prefixByCategory.native}join`:
+        return `(str(${valueToPython(block, 'A', 'hello', imports)}) + str(${
+            valueToPython(block, 'B', 'python', imports)
         }))`;
-    case `${pythonNativePrefix}toNumber`:
-        return `float(${valueToPython(inputBlock, 'VALUE', '0', imports)})`;
-    case `${pythonNativePrefix}toString`:
-        return `str(${valueToPython(inputBlock, 'VALUE', '', imports)})`;
-    case `${pythonNativePrefix}makeList`:
+    case `${prefixByCategory.native}toNumber`:
+        return `float(${valueToPython(block, 'VALUE', '0', imports)})`;
+    case `${prefixByCategory.text}toString`:
+    case `${prefixByCategory.native}toString`:
+        return `str(${valueToPython(block, 'VALUE', '', imports)})`;
+    case `${prefixByCategory.list}makeList`:
+    case `${prefixByCategory.native}makeList`:
         return `[${
-            valueToPython(inputBlock, 'A', 'a', imports)
+            valueToPython(block, 'A', 'a', imports)
         }, ${
-            valueToPython(inputBlock, 'B', 'b', imports)
+            valueToPython(block, 'B', 'b', imports)
         }, ${
-            valueToPython(inputBlock, 'C', 'c', imports)
+            valueToPython(block, 'C', 'c', imports)
         }]`;
-    case `${pythonNativePrefix}length`:
-        return `len(${valueToPython(inputBlock, 'VALUE', 'hello', imports)})`;
-    case `${pythonNativePrefix}randomInteger`:
+    case `${prefixByCategory.text}length`:
+    case `${prefixByCategory.native}length`:
+        return `len(${valueToPython(block, 'VALUE', 'hello', imports)})`;
+    case `${prefixByCategory.list}getItem`:
+        return `${normalizePythonName(getFieldValue(block, ['NAME'], 'items'))}[${
+            numberToPython(block, 'INDEX', '0', imports)
+        }]`;
+    case `${prefixByCategory.list}length`:
+        return `len(${normalizePythonName(getFieldValue(block, ['NAME'], 'items'))})`;
+    case `${prefixByCategory.native}randomInteger`:
         imports.add('random');
         return `random.randint(${
-            numberToPython(inputBlock, 'A', '1', imports)
+            numberToPython(block, 'A', '1', imports)
         }, ${
-            numberToPython(inputBlock, 'B', '10', imports)
+            numberToPython(block, 'B', '10', imports)
         })`;
-    case `${pythonNativePrefix}currentTime`:
+    case `${prefixByCategory.native}currentTime`:
         imports.add('time');
         return 'time.strftime("%H:%M:%S")';
+    case `${prefixByCategory.native}input`:
+        return `input(${valueToPython(block, 'PROMPT', 'input: ', imports)})`;
     case 'math_number':
-        return getFieldValue(inputBlock, ['NUM'], fallback);
+        return getFieldValue(block, ['NUM'], fallback);
     case 'text':
-        return quotePythonString(getFieldValue(inputBlock, ['TEXT'], fallback));
+        return quotePythonString(getFieldValue(block, ['TEXT'], fallback));
     default:
-        return quotePythonString(getFieldValue(inputBlock, ['TEXT', 'NUM', 'VALUE'], fallback));
+        return quotePythonString(getFieldValue(block, ['TEXT', 'NUM', 'VALUE'], fallback));
     }
+};
+
+const valueToPython = (block, inputName, fallback = '', imports = new Set()) => {
+    const inputBlock = getInputBlock(block, inputName);
+    if (!inputBlock) return literalToPython(getFieldValue(block, [inputName], fallback));
+    return expressionFromSelf(inputBlock, imports, fallback);
 };
 
 const numberToPython = (block, inputName, fallback = '0', imports = new Set()) => {
@@ -105,57 +155,88 @@ const booleanToPython = (block, inputName, fallback = 'True', imports = new Set(
         const value = getFieldValue(block, [inputName], fallback);
         return String(value).toLowerCase() === 'false' ? 'False' : 'True';
     }
-    return valueToPython(block, inputName, fallback, imports);
+    return expressionFromSelf(inputBlock, imports, fallback);
 };
 
 const generateExpressionLine = (block, imports) => {
-    switch (block.type) {
-    case `${pythonNativePrefix}getVariable`:
-        return normalizePythonName(getFieldValue(block, ['NAME'], 'x'));
-    case `${pythonNativePrefix}arithmetic`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', '0', imports);
-    case `${pythonNativePrefix}compare`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', 'True', imports);
-    case `${pythonNativePrefix}join`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', '', imports);
-    case `${pythonNativePrefix}toNumber`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', '0', imports);
-    case `${pythonNativePrefix}toString`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', '', imports);
-    case `${pythonNativePrefix}makeList`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', '', imports);
-    case `${pythonNativePrefix}length`:
-        return valueToPython({getInputTargetBlock: name => (name === 'VALUE' ? block : null)}, 'VALUE', '', imports);
-    case `${pythonNativePrefix}randomInteger`:
-        imports.add('random');
-        return `random.randint(${numberToPython(block, 'A', '1', imports)}, ${numberToPython(block, 'B', '10', imports)})`;
-    case `${pythonNativePrefix}currentTime`:
-        imports.add('time');
-        return 'time.strftime("%H:%M:%S")';
-    default:
-        return `# Unsupported block: ${block.type}`;
+    if (isAnyType(block, [
+        ['variables', 'getVariable'],
+        ['operators', 'arithmetic'],
+        ['operators', 'compare'],
+        ['operators', 'logic'],
+        ['operators', 'not'],
+        ['text', 'literal'],
+        ['text', 'join'],
+        ['text', 'length'],
+        ['text', 'toString'],
+        ['list', 'makeList'],
+        ['list', 'getItem'],
+        ['list', 'length'],
+        ['native', 'getVariable'],
+        ['native', 'arithmetic'],
+        ['native', 'compare'],
+        ['native', 'join'],
+        ['native', 'toNumber'],
+        ['native', 'toString'],
+        ['native', 'makeList'],
+        ['native', 'length'],
+        ['native', 'randomInteger'],
+        ['native', 'currentTime'],
+        ['native', 'input']
+    ])) {
+        return expressionFromSelf(block, imports);
     }
+    return `# Unsupported block: ${block.type}`;
 };
 
 const generateStatementLines = (block, imports, level = 0) => {
     switch (block.type) {
-    case `${pythonNativePrefix}print`:
+    case `${prefixByCategory.native}print`:
         return [`${indent(level)}print(${valueToPython(block, 'TEXT', 'hello python', imports)})`];
-    case `${pythonNativePrefix}sleep`:
+    case `${prefixByCategory.native}sleep`:
         imports.add('time');
         return [`${indent(level)}time.sleep(${numberToPython(block, 'SECS', '1', imports)})`];
-    case `${pythonNativePrefix}setVariable`:
+    case `${prefixByCategory.variables}setVariable`:
+    case `${prefixByCategory.native}setVariable`:
         return [`${indent(level)}${normalizePythonName(getFieldValue(block, ['NAME'], 'x'))} = ${
             valueToPython(block, 'VALUE', '0', imports)
         }`];
-    case `${pythonNativePrefix}ifThen`: {
+    case `${prefixByCategory.variables}changeVariable`: {
+        const name = normalizePythonName(getFieldValue(block, ['NAME'], 'x'));
+        return [`${indent(level)}${name} = ${name} + ${
+            numberToPython(block, 'VALUE', '1', imports)
+        }`];
+    }
+    case `${prefixByCategory.list}append`:
+        return [`${indent(level)}${normalizePythonName(getFieldValue(block, ['NAME'], 'items'))}.append(${
+            valueToPython(block, 'VALUE', 'apple', imports)
+        })`];
+    case `${prefixByCategory.control}ifThen`:
+    case `${prefixByCategory.native}ifThen`: {
         const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
         return [
             `${indent(level)}if ${booleanToPython(block, 'CONDITION', 'True', imports)}:`,
             ...(body.length ? body : [`${indent(level + 1)}pass`])
         ];
     }
-    case `${pythonNativePrefix}forRange`: {
+    case `${prefixByCategory.control}ifElse`: {
+        const ifBody = generateSubstack(block, 'SUBSTACK', imports, level + 1);
+        const elseBody = generateSubstack(block, 'SUBSTACK2', imports, level + 1);
+        return [
+            `${indent(level)}if ${booleanToPython(block, 'CONDITION', 'True', imports)}:`,
+            ...(ifBody.length ? ifBody : [`${indent(level + 1)}pass`]),
+            `${indent(level)}else:`,
+            ...(elseBody.length ? elseBody : [`${indent(level + 1)}pass`])
+        ];
+    }
+    case `${prefixByCategory.control}repeat`: {
+        const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
+        return [
+            `${indent(level)}for i in range(${numberToPython(block, 'TIMES', '5', imports)}):`,
+            ...(body.length ? body : [`${indent(level + 1)}pass`])
+        ];
+    }
+    case `${prefixByCategory.native}forRange`: {
         const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
         return [
             `${indent(level)}for ${normalizePythonName(getFieldValue(block, ['VAR'], 'i'))} in range(${
@@ -166,6 +247,24 @@ const generateStatementLines = (block, imports, level = 0) => {
             ...(body.length ? body : [`${indent(level + 1)}pass`])
         ];
     }
+    case `${prefixByCategory.control}forever`: {
+        const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
+        return [
+            `${indent(level)}while True:`,
+            ...(body.length ? body : [`${indent(level + 1)}pass`])
+        ];
+    }
+    case `${prefixByCategory.control}while`: {
+        const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
+        return [
+            `${indent(level)}while ${booleanToPython(block, 'CONDITION', 'True', imports)}:`,
+            ...(body.length ? body : [`${indent(level + 1)}pass`])
+        ];
+    }
+    case `${prefixByCategory.control}break`:
+        return [`${indent(level)}break`];
+    case `${prefixByCategory.control}continue`:
+        return [`${indent(level)}continue`];
     default:
         return [`${indent(level)}${generateExpressionLine(block, imports)}`];
     }
@@ -181,7 +280,7 @@ const generateStack = (topBlock, imports) => {
     const stack = getStackBlocks(topBlock);
     if (stack.length === 0) return [];
 
-    if (topBlock.type === 'event_whenflagclicked') {
+    if (topBlock.type === 'event_whenflagclicked' || isType(topBlock, 'control', 'main')) {
         const body = stack.slice(1).flatMap(block => generateStatementLines(block, imports, 1));
         return [
             'def start_main():',

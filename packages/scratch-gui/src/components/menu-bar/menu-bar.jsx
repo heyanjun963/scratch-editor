@@ -27,6 +27,7 @@ import FileMenu from './file-menu.jsx';
 import EditMenu from './edit-menu.jsx';
 import ModeMenu from './mode-menu.jsx';
 import AboutMenu from './about-menu.jsx';
+import PythonMenuBar from './python-menu-bar.jsx';
 
 import {openTipsLibrary, openDebugModal, openHelloScratchModal} from '../../reducers/modals';
 import {PYTHON_EDITOR_MODE, SCRATCH_EDITOR_MODE, setEditorMode, setPlayer} from '../../reducers/mode';
@@ -337,6 +338,32 @@ class MenuBar extends React.Component {
         );
 
         const menuOpts = this.props.accountMenuOptions;
+        const isPythonMenuMode = this.props.editorMode === PYTHON_EDITOR_MODE;
+
+        if (isPythonMenuMode) {
+            return (
+                <PythonMenuBar
+                    ariaLabel={this.props.ariaLabel}
+                    ariaRole={this.props.ariaRole}
+                    canChangeLanguage={this.props.canChangeLanguage}
+                    canChangeColorMode={this.props.canChangeColorMode}
+                    canChangeTheme={this.props.canChangeTheme}
+                    canCreateCopy={this.props.canCreateCopy}
+                    canManageFiles={this.props.canManageFiles}
+                    canRemix={this.props.canRemix}
+                    canSave={this.props.canSave}
+                    className={this.props.className}
+                    getSaveToComputerHandler={this.getSaveToComputerHandler}
+                    handleClickNew={this.handleClickNew}
+                    hasActiveMembership={this.props.hasActiveMembership}
+                    isRtl={this.props.isRtl}
+                    onClickRemix={this.props.onClickRemix}
+                    onClickSave={this.props.onClickSave}
+                    onStartSelectingFileUpload={this.props.onStartSelectingFileUpload}
+                    remixMessage={remixMessage}
+                />
+            );
+        }
 
         return (
             <Box
@@ -350,21 +377,23 @@ class MenuBar extends React.Component {
             >
                 <div className={styles.mainMenu}>
                     <div className={styles.fileGroup}>
-                        <button
-                            aria-label={this.props.intl.formatMessage(ariaMessages.home)}
-                            className={classNames(styles.menuBarItem)}
-                            onClick={this.props.onClickLogo}
-                        >
-                            <img
-                                id="logo_img"
-                                alt="Scratch"
-                                className={classNames(styles.scratchLogo, {
-                                    [styles.clickable]: typeof this.props.onClickLogo !== 'undefined'
-                                })}
-                                draggable={false}
-                                src={getScratchLogo(this.props.platform)}
-                            />
-                        </button>
+                        {isPythonMenuMode ? null : (
+                            <button
+                                aria-label={this.props.intl.formatMessage(ariaMessages.home)}
+                                className={classNames(styles.menuBarItem)}
+                                onClick={this.props.onClickLogo}
+                            >
+                                <img
+                                    id="logo_img"
+                                    alt="Scratch"
+                                    className={classNames(styles.scratchLogo, {
+                                        [styles.clickable]: typeof this.props.onClickLogo !== 'undefined'
+                                    })}
+                                    draggable={false}
+                                    src={getScratchLogo(this.props.platform)}
+                                />
+                            </button>
+                        )}
                         {(this.props.canChangeColorMode || this.props.canChangeLanguage || this.props.canChangeTheme) &&
                         (<SettingsMenu
                             canChangeLanguage={this.props.canChangeLanguage}
@@ -388,13 +417,15 @@ class MenuBar extends React.Component {
                             remixMessage={remixMessage}
                             depth={1}
                         />)}
-                        <EditMenu
-                            isRtl={this.props.isRtl}
-                            onRestoreOption={this.handleRestoreOption}
-                            restoreOptionMessage={this.restoreOptionMessage}
-                            depth={1}
-                        />
-                        {this.props.isTotallyNormal && (<ModeMenu
+                        {isPythonMenuMode ? null : (
+                            <EditMenu
+                                isRtl={this.props.isRtl}
+                                onRestoreOption={this.handleRestoreOption}
+                                restoreOptionMessage={this.restoreOptionMessage}
+                                depth={1}
+                            />
+                        )}
+                        {!isPythonMenuMode && this.props.isTotallyNormal && (<ModeMenu
                             onSetMode={this.handleSetMode}
                             modeNow={this.props.modeNow}
                             mode2020={this.props.mode2020}
@@ -402,7 +433,7 @@ class MenuBar extends React.Component {
                             depth={1}
                         />)}
                     </div>
-                    {this.props.canEditTitle ? (
+                    {isPythonMenuMode ? null : (this.props.canEditTitle ? (
                         <div className={classNames(styles.menuBarItem, styles.growable)}>
                             <MenuBarItemTooltip
                                 enable
@@ -422,273 +453,285 @@ class MenuBar extends React.Component {
                             username={this.props.authorUsername}
                             avatarBadge={this.props.authorAvatarBadge}
                         />
-                    ) : null)}
-                    <div className={classNames(styles.menuBarItem)}>
-                        {this.props.canShare ? (
-                            (this.props.isShowingProject || this.props.isUpdating) && (
-                                <ProjectWatcher
-                                    onDoneUpdating={this.props.onSeeCommunity}
-                                    isShared={this.props.isShared}
-                                >
-                                    {
-                                        waitForUpdate => (
-                                            <ShareButton
-                                                className={styles.menuBarButton}
-                                                isShared={this.props.isShared}
-                                                /* eslint-disable react/jsx-no-bind */
-                                                onClick={() => {
-                                                    this.handleClickShare(waitForUpdate);
-                                                }}
-                                                /* eslint-enable react/jsx-no-bind */
-                                            />
-                                        )
-                                    }
-                                </ProjectWatcher>
-                            )
-                        ) : (
-                            this.props.showComingSoon ? (
-                                <MenuBarItemTooltip id="share-button">
-                                    <ShareButton className={styles.menuBarButton} />
-                                </MenuBarItemTooltip>
-                            ) : []
-                        )}
-                        {this.props.canRemix ? remixButton : []}
-                    </div>
-                    <div className={classNames(styles.menuBarItem, styles.communityButtonWrapper)}>
-                        {this.props.enableCommunity ? (
-                            (this.props.isShowingProject || this.props.isUpdating) && (
-                                <ProjectWatcher onDoneUpdating={this.props.onSeeCommunity}>
-                                    {
-                                        waitForUpdate => (
-                                            <CommunityButton
-                                                className={styles.menuBarButton}
-                                                /* eslint-disable react/jsx-no-bind */
-                                                onClick={() => {
-                                                    this.handleClickSeeCommunity(waitForUpdate);
-                                                }}
-                                                /* eslint-enable react/jsx-no-bind */
-                                            />
-                                        )
-                                    }
-                                </ProjectWatcher>
-                            )
-                        ) : (this.props.showComingSoon ? (
-                            <MenuBarItemTooltip id="community-button">
-                                <CommunityButton className={styles.menuBarButton} />
-                            </MenuBarItemTooltip>
-                        ) : [])}
-                    </div>
-                    <Divider className={classNames(styles.divider)} />
-                    <div className={styles.fileGroup}>
-                        <button
-                            aria-label={this.props.intl.formatMessage(ariaMessages.tutorials)}
-                            className={
-                                classNames(styles.menuBarItem, styles.noOffset, styles.hoverable, 'tutorials-button')
-                            }
-                            onClick={this.props.onOpenTipLibrary}
-                        >
-                            <img
-                                className={styles.helpIcon}
-                                src={helpIcon}
-                            />
-                            <span className={styles.tutorialsLabel}>
-                                <FormattedMessage {...ariaMessages.tutorials} />
-                            </span>
-                        </button>
-                        <button
-                            aria-label={this.props.intl.formatMessage(ariaMessages.helloScratch)}
-                            className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
-                            onClick={this.props.onOpenHelloScratchModal}
-                        >
-                            <span className={styles.helloScratchLabel}>
-                                <FormattedMessage {...ariaMessages.helloScratch} />
-                            </span>
-                        </button>
-                        {isDesktopModeLocked() ? null : (
-                            <button
-                                aria-label={this.props.intl.formatMessage(
-                                    this.props.editorMode === PYTHON_EDITOR_MODE ?
-                                        ariaMessages.stageMode :
-                                        ariaMessages.codingMode
-                                )}
-                                className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
-                                onClick={this.handleToggleEditorMode}
-                            >
-                                <span className={styles.helloScratchLabel}>
-                                    <FormattedMessage
-                                        {...(this.props.editorMode === PYTHON_EDITOR_MODE ?
-                                            ariaMessages.stageMode :
-                                            ariaMessages.codingMode)}
-                                    />
-                                </span>
-                            </button>
-                        )}
-                        <button
-                            aria-label={this.props.intl.formatMessage(ariaMessages.debug)}
-                            className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
-                            onClick={this.props.onOpenDebugModal}
-                        >
-                            <img
-                                className={styles.helpIcon}
-                                src={debugIcon}
-                            />
-                            <span className={styles.debugLabel}>
-                                <FormattedMessage {...ariaMessages.debug} />
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* show the proper UI in the account menu, given whether the user is
-                logged in, and whether a session is available to log in with */}
-                <div className={styles.accountInfoGroup}>
-                    <div className={styles.menuBarItem}>
-                        {this.props.canSave && (
-                            <SaveStatus className={classNames(styles.hoverable, styles.menuBarItem)} />
-                        )}
-                    </div>
-
-                    {menuOpts.canHaveSession ? (
-                        this.props.username ? (
-                            // ************ user is logged in ************
-                            <React.Fragment>
-                                {menuOpts.myStuffUrl ? (
-                                    <a
-                                        href={menuOpts.myStuffUrl}
-                                        aria-label={this.props.intl.formatMessage(ariaMessages.myStuff)}
-                                    >
-                                        <div
-                                            className={classNames(
-                                                styles.menuBarItem,
-                                                styles.hoverable,
-                                                styles.mystuffButton
-                                            )}
-                                        >
-                                            <img
-                                                className={styles.mystuffIcon}
-                                                src={mystuffIcon}
-                                            />
-                                        </div>
-                                    </a>
-                                ) : null}
-
-                                <AccountMenu
-                                    menuOpts={menuOpts}
-                                    username={this.props.username}
-                                    isRtl={this.props.isRtl}
-                                    onLogOut={this.props.onLogOut}
-                                    avatarBadge={this.props.avatarBadge}
-                                    depth={1}
-                                />
-                            </React.Fragment>
-                        ) : (
-                            // ********* user not logged in, but a session exists
-                            // ********* so they can choose to log in
-                            <React.Fragment>
-                                {menuOpts.canRegister ? (
-                                    <button
-                                        className={classNames(
-                                            styles.menuBarItem,
-                                            styles.hoverable
-                                        )}
-                                        key="join"
-                                        onClick={this.props.onOpenRegistration}
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Join Scratch"
-                                            description="Link for creating a Scratch account"
-                                            id="gui.menuBar.joinScratch"
-                                        />
-                                    </button>
-                                ) : null}
-
-                                {menuOpts.canLogin ? (
-                                    <button
-                                        className={classNames(
-                                            styles.menuBarItem,
-                                            styles.hoverable
-                                        )}
-                                        key="login"
-                                        onMouseUp={this.props.onClickLogin}
-                                        onClick={this.props.onClickLogin}
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Sign in"
-                                            description="Link for signing in to your Scratch account"
-                                            id="gui.menuBar.signIn"
-                                        />
-                                        <LoginDropdown
-                                            className={classNames(styles.menuBarMenu)}
-                                            isOpen={this.props.loginMenuOpen}
-                                            isRtl={this.props.isRtl}
-                                            renderLogin={this.props.renderLogin}
-                                            onClose={this.props.onRequestCloseLogin}
-                                        />
-                                    </button>
-                                ) : null}
-                            </React.Fragment>
-                        )
-                    ) : (
-                        // ******** no login session is available, so don't show login stuff
+                    ) : null))}
+                    {isPythonMenuMode ? null : (
                         <React.Fragment>
-                            {this.props.showComingSoon ? (
-                                <React.Fragment>
-                                    <MenuBarItemTooltip id="mystuff">
-                                        <div
-                                            className={classNames(
-                                                styles.menuBarItem,
-                                                styles.hoverable,
-                                                styles.mystuffButton
-                                            )}
+                            <div className={classNames(styles.menuBarItem)}>
+                                {this.props.canShare ? (
+                                    (this.props.isShowingProject || this.props.isUpdating) && (
+                                        <ProjectWatcher
+                                            onDoneUpdating={this.props.onSeeCommunity}
+                                            isShared={this.props.isShared}
                                         >
-                                            <img
-                                                className={styles.mystuffIcon}
-                                                src={mystuffIcon}
-                                            />
-                                        </div>
+                                            {
+                                                waitForUpdate => (
+                                                    <ShareButton
+                                                        className={styles.menuBarButton}
+                                                        isShared={this.props.isShared}
+                                                        /* eslint-disable react/jsx-no-bind */
+                                                        onClick={() => {
+                                                            this.handleClickShare(waitForUpdate);
+                                                        }}
+                                                        /* eslint-enable react/jsx-no-bind */
+                                                    />
+                                                )
+                                            }
+                                        </ProjectWatcher>
+                                    )
+                                ) : (
+                                    this.props.showComingSoon ? (
+                                        <MenuBarItemTooltip id="share-button">
+                                            <ShareButton className={styles.menuBarButton} />
+                                        </MenuBarItemTooltip>
+                                    ) : []
+                                )}
+                                {this.props.canRemix ? remixButton : []}
+                            </div>
+                            <div className={classNames(styles.menuBarItem, styles.communityButtonWrapper)}>
+                                {this.props.enableCommunity ? (
+                                    (this.props.isShowingProject || this.props.isUpdating) && (
+                                        <ProjectWatcher onDoneUpdating={this.props.onSeeCommunity}>
+                                            {
+                                                waitForUpdate => (
+                                                    <CommunityButton
+                                                        className={styles.menuBarButton}
+                                                        /* eslint-disable react/jsx-no-bind */
+                                                        onClick={() => {
+                                                            this.handleClickSeeCommunity(waitForUpdate);
+                                                        }}
+                                                        /* eslint-enable react/jsx-no-bind */
+                                                    />
+                                                )
+                                            }
+                                        </ProjectWatcher>
+                                    )
+                                ) : (this.props.showComingSoon ? (
+                                    <MenuBarItemTooltip id="community-button">
+                                        <CommunityButton className={styles.menuBarButton} />
                                     </MenuBarItemTooltip>
-                                    <MenuBarItemTooltip
-                                        id="account-nav"
-                                        place={this.props.isRtl ? 'right' : 'left'}
+                                ) : [])}
+                            </div>
+                            <Divider className={classNames(styles.divider)} />
+                            <div className={styles.fileGroup}>
+                                <button
+                                    aria-label={this.props.intl.formatMessage(ariaMessages.tutorials)}
+                                    className={
+                                        classNames(
+                                            styles.menuBarItem,
+                                            styles.noOffset,
+                                            styles.hoverable,
+                                            'tutorials-button'
+                                        )
+                                    }
+                                    onClick={this.props.onOpenTipLibrary}
+                                >
+                                    <img
+                                        className={styles.helpIcon}
+                                        src={helpIcon}
+                                    />
+                                    <span className={styles.tutorialsLabel}>
+                                        <FormattedMessage {...ariaMessages.tutorials} />
+                                    </span>
+                                </button>
+                                <button
+                                    aria-label={this.props.intl.formatMessage(ariaMessages.helloScratch)}
+                                    className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
+                                    onClick={this.props.onOpenHelloScratchModal}
+                                >
+                                    <span className={styles.helloScratchLabel}>
+                                        <FormattedMessage {...ariaMessages.helloScratch} />
+                                    </span>
+                                </button>
+                                {isDesktopModeLocked() ? null : (
+                                    <button
+                                        aria-label={this.props.intl.formatMessage(
+                                            this.props.editorMode === PYTHON_EDITOR_MODE ?
+                                                ariaMessages.stageMode :
+                                                ariaMessages.codingMode
+                                        )}
+                                        className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
+                                        onClick={this.handleToggleEditorMode}
                                     >
-                                        <div
-                                            className={classNames(
-                                                styles.menuBarItem,
-                                                styles.hoverable,
-                                                styles.accountNavMenu
-                                            )}
-                                        >
-                                            <img
-                                                className={styles.profileIcon}
-                                                src={profileIcon}
+                                        <span className={styles.helloScratchLabel}>
+                                            <FormattedMessage
+                                                {...(this.props.editorMode === PYTHON_EDITOR_MODE ?
+                                                    ariaMessages.stageMode :
+                                                    ariaMessages.codingMode)}
                                             />
-                                            <span>
-                                                {'scratch-cat'}
-                                            </span>
-                                            <img
-                                                className={styles.dropdownCaretIcon}
-                                                src={dropdownCaret}
-                                            />
-                                        </div>
-                                    </MenuBarItemTooltip>
-                                </React.Fragment>
-                            ) : []}
+                                        </span>
+                                    </button>
+                                )}
+                                <button
+                                    aria-label={this.props.intl.formatMessage(ariaMessages.debug)}
+                                    className={classNames(styles.menuBarItem, styles.noOffset, styles.hoverable)}
+                                    onClick={this.props.onOpenDebugModal}
+                                >
+                                    <img
+                                        className={styles.helpIcon}
+                                        src={debugIcon}
+                                    />
+                                    <span className={styles.debugLabel}>
+                                        <FormattedMessage {...ariaMessages.debug} />
+                                    </span>
+                                </button>
+                            </div>
                         </React.Fragment>
                     )}
                 </div>
 
-                {this.props.onClickAbout && (
-                    <AboutMenu
-                        onClick={this.props.onClickAbout}
-                        isRtl={this.props.isRtl}
-                        depth={1}
-                    />
+                {isPythonMenuMode ? null : (
+                    <React.Fragment>
+                        {/* show the proper UI in the account menu, given whether the user is
+                        logged in, and whether a session is available to log in with */}
+                        <div className={styles.accountInfoGroup}>
+                            <div className={styles.menuBarItem}>
+                                {this.props.canSave && (
+                                    <SaveStatus className={classNames(styles.hoverable, styles.menuBarItem)} />
+                                )}
+                            </div>
+
+                            {menuOpts.canHaveSession ? (
+                                this.props.username ? (
+                                    // ************ user is logged in ************
+                                    <React.Fragment>
+                                        {menuOpts.myStuffUrl ? (
+                                            <a
+                                                href={menuOpts.myStuffUrl}
+                                                aria-label={this.props.intl.formatMessage(ariaMessages.myStuff)}
+                                            >
+                                                <div
+                                                    className={classNames(
+                                                        styles.menuBarItem,
+                                                        styles.hoverable,
+                                                        styles.mystuffButton
+                                                    )}
+                                                >
+                                                    <img
+                                                        className={styles.mystuffIcon}
+                                                        src={mystuffIcon}
+                                                    />
+                                                </div>
+                                            </a>
+                                        ) : null}
+
+                                        <AccountMenu
+                                            menuOpts={menuOpts}
+                                            username={this.props.username}
+                                            isRtl={this.props.isRtl}
+                                            onLogOut={this.props.onLogOut}
+                                            avatarBadge={this.props.avatarBadge}
+                                            depth={1}
+                                        />
+                                    </React.Fragment>
+                                ) : (
+                                    // ********* user not logged in, but a session exists
+                                    // ********* so they can choose to log in
+                                    <React.Fragment>
+                                        {menuOpts.canRegister ? (
+                                            <button
+                                                className={classNames(
+                                                    styles.menuBarItem,
+                                                    styles.hoverable
+                                                )}
+                                                key="join"
+                                                onClick={this.props.onOpenRegistration}
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Join Scratch"
+                                                    description="Link for creating a Scratch account"
+                                                    id="gui.menuBar.joinScratch"
+                                                />
+                                            </button>
+                                        ) : null}
+
+                                        {menuOpts.canLogin ? (
+                                            <button
+                                                className={classNames(
+                                                    styles.menuBarItem,
+                                                    styles.hoverable
+                                                )}
+                                                key="login"
+                                                onMouseUp={this.props.onClickLogin}
+                                                onClick={this.props.onClickLogin}
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Sign in"
+                                                    description="Link for signing in to your Scratch account"
+                                                    id="gui.menuBar.signIn"
+                                                />
+                                                <LoginDropdown
+                                                    className={classNames(styles.menuBarMenu)}
+                                                    isOpen={this.props.loginMenuOpen}
+                                                    isRtl={this.props.isRtl}
+                                                    renderLogin={this.props.renderLogin}
+                                                    onClose={this.props.onRequestCloseLogin}
+                                                />
+                                            </button>
+                                        ) : null}
+                                    </React.Fragment>
+                                )
+                            ) : (
+                                // ******** no login session is available, so don't show login stuff
+                                <React.Fragment>
+                                    {this.props.showComingSoon ? (
+                                        <React.Fragment>
+                                            <MenuBarItemTooltip id="mystuff">
+                                                <div
+                                                    className={classNames(
+                                                        styles.menuBarItem,
+                                                        styles.hoverable,
+                                                        styles.mystuffButton
+                                                    )}
+                                                >
+                                                    <img
+                                                        className={styles.mystuffIcon}
+                                                        src={mystuffIcon}
+                                                    />
+                                                </div>
+                                            </MenuBarItemTooltip>
+                                            <MenuBarItemTooltip
+                                                id="account-nav"
+                                                place={this.props.isRtl ? 'right' : 'left'}
+                                            >
+                                                <div
+                                                    className={classNames(
+                                                        styles.menuBarItem,
+                                                        styles.hoverable,
+                                                        styles.accountNavMenu
+                                                    )}
+                                                >
+                                                    <img
+                                                        className={styles.profileIcon}
+                                                        src={profileIcon}
+                                                    />
+                                                    <span>
+                                                        {'scratch-cat'}
+                                                    </span>
+                                                    <img
+                                                        className={styles.dropdownCaretIcon}
+                                                        src={dropdownCaret}
+                                                    />
+                                                </div>
+                                            </MenuBarItemTooltip>
+                                        </React.Fragment>
+                                    ) : []}
+                                </React.Fragment>
+                            )}
+                        </div>
+
+                        {this.props.onClickAbout && (
+                            <AboutMenu
+                                onClick={this.props.onClickAbout}
+                                isRtl={this.props.isRtl}
+                                depth={1}
+                            />
+                        )}
+                    </React.Fragment>
                 )}
             </Box>
         );
     }
 }
-
 MenuBar.propTypes = {
     accountMenuOpen: PropTypes.bool,
     ariaLabel: PropTypes.string,

@@ -57,12 +57,19 @@ const DroppableBlocks = DropAreaHOC([
     DragConstants.BACKPACK_CODE
 ])(BlocksComponent);
 
-const pythonNativeExtensionId = 'pythonNative';
+const pythonExtensionIds = [
+    'pythonControl',
+    'pythonOperators',
+    'pythonText',
+    'pythonVariables',
+    'pythonList',
+    'pythonNative'
+];
 
 const makePythonToolboxXML = categoriesXML => [
     '<xml style="display: none">',
     ...categoriesXML
-        .filter(categoryInfo => categoryInfo.id === pythonNativeExtensionId)
+        .filter(categoryInfo => pythonExtensionIds.includes(categoryInfo.id))
         .map(categoryInfo => categoryInfo.xml),
     '</xml>'
 ].join('\n');
@@ -91,7 +98,7 @@ class Blocks extends React.Component {
             'handleMonitorsUpdate',
             'handleExtensionAdded',
             'handleBlocksInfoUpdate',
-            'ensurePythonNativeExtension',
+            'ensurePythonExtensions',
             'refreshToolboxXML',
             'onTargetsUpdate',
             'onPythonConsole',
@@ -196,7 +203,7 @@ class Blocks extends React.Component {
         this.workspace.getToolbox().selectItemByPosition(0);
 
         this.attachVM();
-        this.ensurePythonNativeExtension();
+        this.ensurePythonExtensions();
         // Only update blocks/vm locale when visible to avoid sizing issues
         // If locale changes while not visible it will get handled in didUpdate
         if (this.props.isVisible) {
@@ -229,7 +236,7 @@ class Blocks extends React.Component {
         }
 
         if (this.props.editorMode !== prevProps.editorMode) {
-            this.ensurePythonNativeExtension();
+            this.ensurePythonExtensions();
             this.requestToolboxUpdate();
             this.onPythonWorkspaceChange();
         }
@@ -657,16 +664,21 @@ class Blocks extends React.Component {
             this.props.updateToolboxState(toolboxXML);
         }
     }
-    ensurePythonNativeExtension () {
+    ensurePythonExtensions () {
         if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
         if (this.loadingPythonNativeExtension) return;
-        if (this.props.vm.extensionManager.isExtensionLoaded(pythonNativeExtensionId)) {
+        const pendingExtensionIds = pythonExtensionIds.filter(
+            extensionId => !this.props.vm.extensionManager.isExtensionLoaded(extensionId)
+        );
+        if (!pendingExtensionIds.length) {
             this.refreshToolboxXML();
             return;
         }
 
         this.loadingPythonNativeExtension = true;
-        this.props.vm.extensionManager.loadExtensionURL(pythonNativeExtensionId)
+        Promise.all(pendingExtensionIds.map(extensionId => (
+            this.props.vm.extensionManager.loadExtensionURL(extensionId)
+        )))
             .catch(error => {
                 log.error(error);
             })
