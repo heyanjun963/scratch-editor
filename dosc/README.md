@@ -13,8 +13,9 @@
 5. [新手学习路线图](./05-learning-roadmap.md)
 6. [scratch-blocks 模块导读](./08-scratch-blocks-module-guide.md)
 7. [scratch-vm 模块导读](./09-scratch-vm-module-guide.md)
-8. [桌面项目保存和恢复计划](./18-phase-d-project-save-restore-plan.md)
-9. [Python 积木分类和语法完善方案](./19-python-block-category-and-syntax-plan.md)
+8. [项目进度总览与商用差距](./14-project-progress-and-commercial-gap.md)
+9. [桌面项目保存和恢复计划](./18-phase-d-project-save-restore-plan.md)
+10. [Python 积木分类和语法完善方案](./19-python-block-category-and-syntax-plan.md)
 
 ## 先抓住一句话
 

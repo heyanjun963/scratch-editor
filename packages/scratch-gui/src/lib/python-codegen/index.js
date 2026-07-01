@@ -4,6 +4,7 @@ const prefixByCategory = {
     text: 'pythonText_',
     variables: 'pythonVariables_',
     list: 'pythonList_',
+    function: 'pythonFunction_',
     native: 'pythonNative_'
 };
 
@@ -29,6 +30,17 @@ const normalizePythonName = value => {
         .replace(/^[^A-Za-z_]+/, '');
     return cleaned || 'value';
 };
+
+const normalizePythonNameList = value => String(value || '')
+    .split(',')
+    .map(item => normalizePythonName(item))
+    .filter(Boolean);
+
+const pythonExpressionList = value => String(value || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
+    .join(', ');
 
 const getInputBlock = (block, name) => {
     if (block && typeof block.getInputTargetBlock === 'function') {
@@ -117,6 +129,12 @@ const expressionFromSelf = (block, imports, fallback = '') => {
         }]`;
     case `${prefixByCategory.list}length`:
         return `len(${normalizePythonName(getFieldValue(block, ['NAME'], 'items'))})`;
+    case `${prefixByCategory.function}parameter`:
+        return normalizePythonName(getFieldValue(block, ['NAME'], 'name'));
+    case `${prefixByCategory.function}callReporter`:
+        return `${normalizePythonName(getFieldValue(block, ['NAME'], 'my_function'))}(${
+            pythonExpressionList(getFieldValue(block, ['ARGS'], '"Scratch"'))
+        })`;
     case `${prefixByCategory.native}randomInteger`:
         imports.add('random');
         return `random.randint(${
@@ -172,6 +190,8 @@ const generateExpressionLine = (block, imports) => {
         ['list', 'makeList'],
         ['list', 'getItem'],
         ['list', 'length'],
+        ['function', 'parameter'],
+        ['function', 'callReporter'],
         ['native', 'getVariable'],
         ['native', 'arithmetic'],
         ['native', 'compare'],
@@ -211,6 +231,20 @@ const generateStatementLines = (block, imports, level = 0) => {
         return [`${indent(level)}${normalizePythonName(getFieldValue(block, ['NAME'], 'items'))}.append(${
             valueToPython(block, 'VALUE', 'apple', imports)
         })`];
+    case `${prefixByCategory.function}define`: {
+        const params = normalizePythonNameList(getFieldValue(block, ['PARAMS'], 'name')).join(', ');
+        const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
+        return [
+            `${indent(level)}def ${normalizePythonName(getFieldValue(block, ['NAME'], 'my_function'))}(${params}):`,
+            ...(body.length ? body : [`${indent(level + 1)}pass`])
+        ];
+    }
+    case `${prefixByCategory.function}call`:
+        return [`${indent(level)}${normalizePythonName(getFieldValue(block, ['NAME'], 'my_function'))}(${
+            pythonExpressionList(getFieldValue(block, ['ARGS'], '"Scratch"'))
+        })`];
+    case `${prefixByCategory.function}return`:
+        return [`${indent(level)}return ${valueToPython(block, 'VALUE', 'result', imports)}`];
     case `${prefixByCategory.control}ifThen`:
     case `${prefixByCategory.native}ifThen`: {
         const body = generateSubstack(block, 'SUBSTACK', imports, level + 1);
@@ -293,6 +327,13 @@ const generateStack = (topBlock, imports) => {
     return stack.flatMap(block => generateStatementLines(block, imports));
 };
 
+const isEntryBlock = block => block && (
+    block.type === 'event_whenflagclicked' ||
+    isType(block, 'control', 'main')
+);
+
+const isFunctionDefinitionBlock = block => isType(block, 'function', 'define');
+
 const generatePythonCode = workspace => {
     if (!workspace || typeof workspace.getTopBlocks !== 'function') {
         return '# Python coding mode is waiting for the blocks workspace.';
@@ -300,7 +341,18 @@ const generatePythonCode = workspace => {
 
     const imports = new Set();
     const topBlocks = workspace.getTopBlocks(true);
-    const sections = topBlocks.map(block => generateStack(block, imports)).filter(section => section.length);
+    const functionBlocks = topBlocks.filter(isFunctionDefinitionBlock);
+    const entryBlocks = topBlocks.filter(isEntryBlock);
+    const otherBlocks = topBlocks.filter(block => (
+        !isFunctionDefinitionBlock(block) &&
+        !isEntryBlock(block)
+    ));
+    const orderedBlocks = [
+        ...functionBlocks,
+        ...otherBlocks,
+        ...entryBlocks
+    ];
+    const sections = orderedBlocks.map(block => generateStack(block, imports)).filter(section => section.length);
 
     if (sections.length === 0) {
         return '# Drag Python blocks here to generate code.';

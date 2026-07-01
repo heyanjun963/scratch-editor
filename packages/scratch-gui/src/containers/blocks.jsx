@@ -63,6 +63,7 @@ const pythonExtensionIds = [
     'pythonText',
     'pythonVariables',
     'pythonList',
+    'pythonFunction',
     'pythonNative'
 ];
 

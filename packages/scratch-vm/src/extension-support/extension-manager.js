@@ -25,6 +25,7 @@ const builtinExtensions = {
     pythonVariables: () => require('../extensions/scratch3_python_variables'),
     pythonText: () => require('../extensions/scratch3_python_text'),
     pythonList: () => require('../extensions/scratch3_python_list'),
+    pythonFunction: () => require('../extensions/scratch3_python_function'),
     pythonNative: () => require('../extensions/scratch3_python_native'),
     videoSensing: () => require('../extensions/scratch3_video_sensing'),
     ev3: () => require('../extensions/scratch3_ev3'),

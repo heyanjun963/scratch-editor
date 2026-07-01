@@ -252,7 +252,7 @@ packages/scratch-gui/src/lib/python-codegen/
 
 ## 本轮已实施范围
 
-本轮按“先补基础语法分类”的思路落地，暂不做函数、字典、文件、异常、类和硬件 API。
+本轮按“先补基础语法分类”的思路落地，并追加函数积木 MVP。暂不做字典、文件、异常、类和硬件 API。
 
 新增 VM 内置扩展分类：
 
@@ -262,6 +262,7 @@ packages/scratch-vm/src/extensions/scratch3_python_operators
 packages/scratch-vm/src/extensions/scratch3_python_variables
 packages/scratch-vm/src/extensions/scratch3_python_text
 packages/scratch-vm/src/extensions/scratch3_python_list
+packages/scratch-vm/src/extensions/scratch3_python_function
 ```
 
 代码模式下会自动加载这些分类：
@@ -272,6 +273,7 @@ pythonOperators
 pythonText
 pythonVariables
 pythonList
+pythonFunction
 pythonNative
 ```
 
@@ -286,7 +288,10 @@ pythonNative
 | 文本 | `pythonText` | 文本字面量、join、length、转字符串 |
 | 变量 | `pythonVariables` | set、change by、get |
 | 列表 | `pythonList` | list、append、get item、length |
+| 函数 | `pythonFunction` | define function、call function、function reporter、return、parameter |
 | Python | `pythonNative` | print、sleep、input、number、random integer、current time |
+
+函数分类当前仍是 MVP，不是完整函数系统。它可以演示函数定义、调用、参数读取、返回值和折叠入口，但还缺少可视化参数编辑、参数类型校验、重名检查、调用块自动同步参数、函数重命名联动、保存恢复完整验证等能力。
 
 ### 代码生成覆盖
 
@@ -304,6 +309,7 @@ pythonOperators_
 pythonVariables_
 pythonText_
 pythonList_
+pythonFunction_
 pythonNative_
 ```
 
@@ -432,15 +438,54 @@ start_main()
 2. 确认停止按钮可中断运行。
 3. 再测试 `forever`。
 
+### 用例 6：函数定义、调用和折叠
+
+拖拽结构：
+
+```text
+define function my_function params name
+  print parameter name
+
+Python main
+  call function my_function args "Scratch"
+```
+
+期望生成：
+
+```python
+def my_function(name):
+    print(name)
+
+def start_main():
+    my_function("Scratch")
+
+start_main()
+```
+
+运行期望：
+
+```text
+Scratch
+```
+
+折叠验证：
+
+1. 右键 `define function my_function params name`。
+2. 点击“折叠函数”。
+3. 函数定义块应缩小，只显示摘要。
+4. 再次右键点击“展开函数”。
+5. 函数体内的 `print parameter name` 仍然存在。
+6. 折叠前后右侧 Python 代码不应变化。
+
 ## 当前结论
 
-下一阶段应该优先做“Python 分类体系 + 常用语法块补齐”。
+下一阶段应该继续补齐“Python 分类体系 + 常用语法块”，并把函数参数编辑体验从文本输入升级为更接近 Scratch 自制积木的可视化参数编辑。
 
 保存恢复先复用原版 `.sb3`，不要再做自定义 JSON 项目格式。
 
 后续再补：
 
-- 函数定义和函数调用。
+- 函数参数可视化编辑。
 - 字典、集合、元组等高级类型。
 - 文件读写。
 - try/except。

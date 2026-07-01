@@ -6,6 +6,41 @@
 export default function (vm) {
     const ScratchBlocks = require('scratch-blocks');
 
+    const registerPythonFunctionCollapse = function () {
+        const registry = ScratchBlocks.ContextMenuRegistry && ScratchBlocks.ContextMenuRegistry.registry;
+        if (!registry || registry.getItem('pythonFunctionCollapse')) return;
+
+        registry.register({
+            displayText: scope => {
+                const messages = ScratchBlocks.Msg || {};
+                if (scope.block && scope.block.isCollapsed()) {
+                    return messages.EXPAND_FUNCTION || '展开函数';
+                }
+                return messages.COLLAPSE_FUNCTION || '折叠函数';
+            },
+            preconditionFn: scope => {
+                if (
+                    scope.block &&
+                    !scope.block.isInFlyout &&
+                    scope.block.type === 'pythonFunction_define' &&
+                    scope.block.isEditable()
+                ) {
+                    return 'enabled';
+                }
+                return 'hidden';
+            },
+            callback: scope => {
+                if (!scope.block) return;
+                scope.block.setCollapsed(!scope.block.isCollapsed());
+            },
+            scopeType: ScratchBlocks.ContextMenuRegistry.ScopeType.BLOCK,
+            id: 'pythonFunctionCollapse',
+            weight: 4
+        });
+    };
+
+    registerPythonFunctionCollapse();
+
     const jsonForMenuBlock = function (name, menuOptionsFn, category, start) {
         return {
             message0: '%1',
