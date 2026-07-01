@@ -121,6 +121,16 @@ const getDesktopEditorMode = () => {
     return desktopMode === 'code' ? PYTHON_EDITOR_MODE : SCRATCH_EDITOR_MODE;
 };
 
+const notifyDesktopEditorReady = editorMode => {
+    if (typeof window === 'undefined') return;
+    if (!window.scratchDesktopEditor?.ready) return;
+    const desktopTabId = new URLSearchParams(window.location.search).get('desktopTabId');
+    window.scratchDesktopEditor.ready({
+        tabId: desktopTabId,
+        editorMode
+    });
+};
+
 const GUIComponent = props => {
     const intl = useIntl();
     const {
@@ -248,6 +258,12 @@ const GUIComponent = props => {
             props.setEditorMode(desktopEditorMode);
         }
     }, [editorMode, props.setEditorMode]);
+
+    useEffect(() => {
+        const desktopEditorMode = getDesktopEditorMode();
+        if (desktopEditorMode && desktopEditorMode !== editorMode) return;
+        notifyDesktopEditorReady(editorMode);
+    }, [editorMode]);
 
     const tabClassNames = {
         tabs: styles.tabs,

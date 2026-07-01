@@ -67,6 +67,13 @@ const pythonExtensionIds = [
     'pythonNative'
 ];
 
+const disabledFlyoutBlocks = {
+    pythonNative_currentTime: '当前时间积木暂未开放'
+};
+
+const disabledFlyoutBlockClass = 'company-disabled-flyout-block';
+const disabledFlyoutBlockListenerKey = '__companyDisabledFlyoutListener';
+
 const makePythonToolboxXML = categoriesXML => [
     '<xml style="display: none">',
     ...categoriesXML
@@ -345,12 +352,71 @@ class Blocks extends React.Component {
                     );
             }
         });
+        this.workspace.getToolbox().runAfterRerender(() => {
+            this.applyFlyoutBlockAvailability();
+        });
         this.workspace.getToolbox().forceRerender();
         this._renderedToolboxXML = this.props.toolboxXML;
+        this.applyFlyoutBlockAvailability();
 
         const queue = this.toolboxUpdateQueue;
         this.toolboxUpdateQueue = [];
         queue.forEach(fn => fn());
+    }
+
+    applyFlyoutBlockAvailability () {
+        const flyoutWorkspace = this.workspace &&
+            this.workspace.getFlyout() &&
+            this.workspace.getFlyout().getWorkspace();
+        if (!flyoutWorkspace || typeof flyoutWorkspace.getAllBlocks !== 'function') return;
+
+        const blocks = flyoutWorkspace.getAllBlocks(false);
+        blocks.forEach(block => {
+            const reason = this.props.editorMode === PYTHON_EDITOR_MODE ?
+                disabledFlyoutBlocks[block.type] : null;
+            const disabled = Boolean(reason);
+            if (typeof block.setDisabledReason === 'function') {
+                block.setDisabledReason(disabled, 'companyAvailability');
+            }
+            if (typeof block.setMovable === 'function') {
+                block.setMovable(!disabled);
+            }
+            if (typeof block.setEditable === 'function') {
+                block.setEditable(!disabled);
+            }
+            if (typeof block.setTooltip === 'function' && reason) {
+                block.setTooltip(reason);
+            }
+            if (typeof block.getSvgRoot === 'function') {
+                const svgRoot = block.getSvgRoot();
+                if (svgRoot) {
+                    svgRoot.classList.toggle(disabledFlyoutBlockClass, disabled);
+                    if (disabled) {
+                        svgRoot.setAttribute('data-disabled-reason', reason);
+                        svgRoot.setAttribute('title', reason);
+                        if (!svgRoot[disabledFlyoutBlockListenerKey]) {
+                            svgRoot[disabledFlyoutBlockListenerKey] = event => {
+                                const disabledReason = svgRoot.getAttribute('data-disabled-reason');
+                                if (!disabledReason) return;
+                                event.preventDefault();
+                                event.stopPropagation();
+                                this.ScratchBlocks.dialog.alert(disabledReason);
+                            };
+                            svgRoot.addEventListener('pointerdown', svgRoot[disabledFlyoutBlockListenerKey], true);
+                            svgRoot.addEventListener('click', svgRoot[disabledFlyoutBlockListenerKey], true);
+                        }
+                    } else {
+                        svgRoot.removeAttribute('data-disabled-reason');
+                        svgRoot.removeAttribute('title');
+                        if (svgRoot[disabledFlyoutBlockListenerKey]) {
+                            svgRoot.removeEventListener('pointerdown', svgRoot[disabledFlyoutBlockListenerKey], true);
+                            svgRoot.removeEventListener('click', svgRoot[disabledFlyoutBlockListenerKey], true);
+                            delete svgRoot[disabledFlyoutBlockListenerKey];
+                        }
+                    }
+                }
+            }
+        });
     }
 
     withToolboxUpdates (fn) {

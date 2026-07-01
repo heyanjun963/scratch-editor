@@ -86,6 +86,24 @@
     z-index: $z-index-drag-layer; /* make blocks match gui drag layer */
 }
 
+.blocks :global(.company-disabled-flyout-block) {
+    cursor: not-allowed;
+}
+
+.blocks :global(.company-disabled-flyout-block .blocklyPath) {
+    stroke: #e5484d;
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 2px rgba(229, 72, 77, 0.35));
+}
+
+.blocks :global(.company-disabled-flyout-block .blocklyText) {
+    fill: #8f1218;
+}
+
+.blocks :global(.company-disabled-flyout-block:hover .blocklyPath) {
+    stroke: #c40010;
+}
+
 /*
     Shrink category font to fit "My Blocks" for now.
     Probably will need different solutions for language support later, so

@@ -13,6 +13,10 @@ contextBridge.exposeInMainWorld('scratchDesktopTabs', {
     }
 });
 
+contextBridge.exposeInMainWorld('scratchDesktopEditor', {
+    ready: payload => ipcRenderer.send('editor:ready', payload)
+});
+
 contextBridge.exposeInMainWorld('scratchDesktopPython', {
     run: options => ipcRenderer.invoke('python:run', options),
     stop: tabId => ipcRenderer.invoke('python:stop', tabId),

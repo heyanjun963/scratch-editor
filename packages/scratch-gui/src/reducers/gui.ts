@@ -12,7 +12,7 @@ import hoveredTargetReducer, {hoveredTargetInitialState} from './hovered-target'
 import menuReducer, {menuInitialState} from './menus';
 import micIndicatorReducer, {micIndicatorInitialState} from './mic-indicator';
 import modalReducer, {modalsInitialState} from './modals';
-import modeReducer, {modeInitialState} from './mode';
+import modeReducer, {modeInitialState, PYTHON_EDITOR_MODE, SCRATCH_EDITOR_MODE} from './mode';
 import monitorReducer, {monitorsInitialState} from './monitors';
 import monitorLayoutReducer, {monitorLayoutInitialState} from './monitor-layout';
 import platformReducer, {platformInitialState} from './platform';
@@ -38,6 +38,13 @@ import {GUIConfig} from '../gui-config';
 
 const guiMiddleware = compose(applyMiddleware(throttle(300, {leading: true, trailing: true})));
 
+const getInitialEditorMode = () => {
+    if (typeof window === 'undefined') return modeInitialState.editorMode;
+    const desktopMode = new URLSearchParams(window.location.search).get('desktopMode');
+    if (!desktopMode) return modeInitialState.editorMode;
+    return desktopMode === 'code' ? PYTHON_EDITOR_MODE : SCRATCH_EDITOR_MODE;
+};
+
 const buildInitialState = (config: GUIConfig) => ({
     alerts: alertsInitialState,
     assetDrag: assetDragInitialState,
@@ -49,7 +56,10 @@ const buildInitialState = (config: GUIConfig) => ({
     customProcedures: customProceduresInitialState,
     dynamicAssets: dynamicAssetsInitialState,
     editorTab: editorTabInitialState,
-    mode: modeInitialState,
+    mode: {
+        ...modeInitialState,
+        editorMode: getInitialEditorMode()
+    },
     hoveredTarget: hoveredTargetInitialState,
     stageSize: stageSizeInitialState,
     menus: menuInitialState,

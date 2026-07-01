@@ -19,6 +19,7 @@ const devToolKey = process.platform === 'darwin' ?
 let mainWindow = null;
 let shellView = null;
 let homeView = null;
+let loadingView = null;
 let activeTabId = null;
 let nextTabIndex = 1;
 let pythonRunner = null;
@@ -61,6 +62,7 @@ const getDesktopAssetPath = (...segments) => (
 
 const getShellUrl = () => pathToFileURL(getDesktopAssetPath('shell', 'index.html')).toString();
 const getHomeUrl = () => pathToFileURL(getDesktopAssetPath('home', 'index.html')).toString();
+const getLoadingUrl = () => pathToFileURL(getDesktopAssetPath('loading', 'index.html')).toString();
 
 const editorModes = {
     stage: {
@@ -103,6 +105,15 @@ const broadcastTabsChanged = () => {
     });
 };
 
+const markEditorReady = webContents => {
+    const tabId = editorWebContentsTabIds.get(webContents.id);
+    const tab = tabs.get(tabId);
+    if (!tab) return;
+    tab.loading = false;
+    layoutViews();
+    broadcastTabsChanged();
+};
+
 const getContentSize = () => {
     if (!mainWindow) return {width: defaultSize.width, height: defaultSize.height};
     const bounds = mainWindow.getContentBounds();
@@ -129,6 +140,9 @@ const hiddenEditorBounds = () => ({
 const layoutViews = () => {
     if (!mainWindow || !shellView) return;
     const {width} = getContentSize();
+    const activeTab = tabs.get(activeTabId);
+    const showLoading = Boolean(activeTab && activeTab.loading);
+
     shellView.setBounds({
         x: 0,
         y: 0,
@@ -140,8 +154,14 @@ const layoutViews = () => {
         homeView.setBounds(activeTabId === null ? getEditorBounds() : hiddenEditorBounds());
     }
 
+    if (loadingView) {
+        loadingView.setBounds(showLoading ? getEditorBounds() : hiddenEditorBounds());
+    }
+
     for (const [tabId, editorView] of editorViews) {
-        editorView.setBounds(tabId === activeTabId ? getEditorBounds() : hiddenEditorBounds());
+        const tab = tabs.get(tabId);
+        const isVisible = tabId === activeTabId && tab && !tab.loading;
+        editorView.setBounds(isVisible ? getEditorBounds() : hiddenEditorBounds());
     }
 };
 
@@ -295,6 +315,20 @@ const createHomeView = () => {
     return view;
 };
 
+const createLoadingView = () => {
+    const view = new WebContentsView({
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false
+        }
+    });
+
+    registerDevToolsShortcut(view.webContents);
+    registerExternalLinkPolicy(view.webContents);
+    view.webContents.loadURL(getLoadingUrl());
+    return view;
+};
+
 const createEditorView = tab => {
     const view = new WebContentsView({
         webPreferences: {
@@ -311,8 +345,9 @@ const createEditorView = tab => {
     registerExternalLinkPolicy(view.webContents);
 
     view.webContents.once('did-finish-load', () => {
-        tab.loading = false;
-        broadcastTabsChanged();
+        if (tab.mode !== editorModes.code.mode) {
+            markEditorReady(view.webContents);
+        }
     });
 
     view.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
@@ -320,6 +355,7 @@ const createEditorView = tab => {
         tab.crashed = true;
         tab.crashReason = `${errorCode}: ${errorDescription}`;
         console.error('[desktop-main] Editor failed to load', validatedURL, tab.crashReason);
+        layoutViews();
         broadcastTabsChanged();
     });
 
@@ -327,6 +363,7 @@ const createEditorView = tab => {
         tab.loading = false;
         tab.crashed = true;
         tab.crashReason = details.reason;
+        layoutViews();
         broadcastTabsChanged();
     });
 
@@ -427,6 +464,11 @@ const registerTabIpc = () => {
     ipcMain.handle('tabs:activate', (_event, tabId) => activateTab(tabId));
     ipcMain.handle('tabs:close', (_event, tabId) => closeTab(tabId));
     ipcMain.handle('home:show', () => showHome());
+    ipcMain.on('editor:ready', event => {
+        if (editorWebContentsIds.has(event.sender.id)) {
+            markEditorReady(event.sender);
+        }
+    });
 };
 
 const registerPythonIpc = () => {
@@ -509,6 +551,9 @@ const createMainWindow = () => {
     homeView = createHomeView();
     browserWindow.contentView.addChildView(homeView);
 
+    loadingView = createLoadingView();
+    browserWindow.contentView.addChildView(loadingView);
+
     browserWindow.on('resize', layoutViews);
     browserWindow.on('maximize', layoutViews);
     browserWindow.on('unmaximize', layoutViews);
@@ -553,6 +598,7 @@ app.whenReady().then(() => {
         mainWindow = null;
         shellView = null;
         homeView = null;
+        loadingView = null;
         activeTabId = null;
         tabs.clear();
         editorViews.clear();
