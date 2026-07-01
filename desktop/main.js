@@ -63,6 +63,32 @@ const getDesktopAssetPath = (...segments) => (
 const getShellUrl = () => pathToFileURL(getDesktopAssetPath('shell', 'index.html')).toString();
 const getHomeUrl = () => pathToFileURL(getDesktopAssetPath('home', 'index.html')).toString();
 const getLoadingUrl = () => pathToFileURL(getDesktopAssetPath('loading', 'index.html')).toString();
+const getAllowedSerialOrigins = () => {
+    const origins = new Set(['file://']);
+    try {
+        origins.add(new URL(getAppUrl()).origin);
+    } catch {
+        // Ignore malformed override URLs. Serial permission will fall back to denied.
+    }
+    return origins;
+};
+
+const getSerialPortLabel = port => [
+    port.portName,
+    port.displayName,
+    port.portId
+].filter(Boolean).join(' ');
+
+const isBluetoothSerialPort = port => (
+    /bluetooth|\u84dd\u7259|spp|edifier|\u8033\u673a/i.test(getSerialPortLabel(port))
+);
+
+const isPreferredSerialPort = port => /COM7|CH340|CH341|USB-SERIAL|USB2\.0-Serial/i.test(getSerialPortLabel(port));
+
+const isHardwareSerialPort = port => (
+    !isBluetoothSerialPort(port) &&
+    /USB|COM\d+|CH340|CH341|CP210|FTDI|Arduino|CDC|Serial/i.test(getSerialPortLabel(port))
+);
 
 const editorModes = {
     stage: {
@@ -183,6 +209,7 @@ const showPermissionWarning = (browserWindow, permissionType) => {
 
 const handlePermissionRequest = async (webContents, permission, callback, details) => {
     if (!mainWindow || !editorWebContentsIds.has(webContents.id)) return callback(false);
+    if (permission === 'serial') return callback(true);
     if (!details.isMainFrame || permission !== 'media') return callback(false);
 
     let askForMicrophone = false;
@@ -509,6 +536,46 @@ const registerTerminalIpc = () => {
     ipcMain.handle('terminal:status', event => terminalRunner.getStatus(getSenderTabId(event)));
 };
 
+const registerSerialIpc = () => {
+    const {ipcMain} = require('electron');
+    ipcMain.handle('serial:available', event => {
+        getSenderTabId(event);
+        return true;
+    });
+};
+
+const registerSerialDeviceHandlers = () => {
+    const allowedOrigins = getAllowedSerialOrigins();
+    session.defaultSession.on('select-serial-port', (event, portList, webContents, callback) => {
+        if (!editorWebContentsIds.has(webContents.id)) {
+            callback('');
+            return;
+        }
+        event.preventDefault();
+        const ports = portList
+            .map(port => ({
+                portId: port.portId,
+                portName: port.portName,
+                displayName: port.displayName,
+                vendorId: port.vendorId,
+                productId: port.productId
+            }))
+            .filter(isHardwareSerialPort);
+        const selectedPort = ports.find(isPreferredSerialPort) || ports[0];
+        webContents.send('serial:ports', {
+            ports,
+            selectedPortId: selectedPort ? selectedPort.portId : ''
+        });
+        callback(selectedPort ? selectedPort.portId : '');
+    });
+    session.defaultSession.setPermissionCheckHandler((webContents, permission, _requestingOrigin, details = {}) => {
+        if (permission !== 'serial') return false;
+        if (webContents && editorWebContentsIds.has(webContents.id)) return true;
+        return allowedOrigins.has(details.securityOrigin);
+    });
+    session.defaultSession.setDevicePermissionHandler(details => details.deviceType === 'serial');
+};
+
 const createMainWindow = () => {
     const windowOptions = process.platform === 'darwin' ? {
         titleBarStyle: 'hiddenInset',
@@ -581,12 +648,14 @@ app.whenReady().then(() => {
     pythonRunner = new PythonRunner({app});
     terminalRunner = new TerminalRunner({pythonRunner});
     session.defaultSession.setPermissionRequestHandler(handlePermissionRequest);
+    registerSerialDeviceHandlers();
     session.defaultSession.on('will-download', (_event, downloadItem) => {
         if (mainWindow) handleProjectDownload(mainWindow, downloadItem);
     });
     registerTabIpc();
     registerPythonIpc();
     registerTerminalIpc();
+    registerSerialIpc();
     mainWindow = createMainWindow();
     mainWindow.on('closed', () => {
         if (pythonRunner) {

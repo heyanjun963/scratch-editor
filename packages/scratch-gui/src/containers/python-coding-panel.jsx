@@ -77,6 +77,7 @@ const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 const PythonCodingPanel = props => {
     const {
         code,
+        consoleText,
         error,
         intl,
         isRunning,
@@ -89,6 +90,7 @@ const PythonCodingPanel = props => {
         scriptPath
     } = props;
     const terminalRef = useRef(null);
+    const consoleTextRef = useRef('');
     const [hasConsoleOutput, setHasConsoleOutput] = useState(false);
     const desktopPythonApi = getDesktopPythonApi();
     const desktopTerminalApi = getDesktopTerminalApi();
@@ -120,6 +122,26 @@ const PythonCodingPanel = props => {
         setHasConsoleOutput(false);
         onClearConsole();
     }, [onClearConsole]);
+
+    useEffect(() => {
+        if (!consoleText) {
+            consoleTextRef.current = '';
+            return;
+        }
+        if (!consoleText.startsWith(consoleTextRef.current)) {
+            consoleTextRef.current = consoleText;
+            writeTerminalLine(consoleText);
+            return;
+        }
+        const nextText = consoleText.slice(consoleTextRef.current.length).replace(/^\n/, '');
+        consoleTextRef.current = consoleText;
+        if (nextText) {
+            writeTerminalLine(nextText);
+        }
+    }, [
+        consoleText,
+        writeTerminalLine
+    ]);
 
     useEffect(() => {
         if (!desktopTerminalApi) return undefined;
@@ -305,6 +327,7 @@ const PythonCodingPanel = props => {
 
 PythonCodingPanel.propTypes = {
     code: PropTypes.string,
+    consoleText: PropTypes.string,
     error: PropTypes.string,
     intl: intlShape.isRequired,
     isRunning: PropTypes.bool,
@@ -319,6 +342,7 @@ PythonCodingPanel.propTypes = {
 
 const mapStateToProps = state => ({
     code: state.scratchGui.pythonCoding.code,
+    consoleText: state.scratchGui.pythonCoding.consoleText,
     error: state.scratchGui.pythonCoding.error,
     isRunning: state.scratchGui.pythonCoding.isRunning,
     lastExitCode: state.scratchGui.pythonCoding.lastExitCode,

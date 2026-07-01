@@ -469,7 +469,7 @@ desktop/security.md
 | 项目保存恢复 | 待验证原版能力 | 复用 `.sb3` 保存/加载，必要时扩展 metadata | P0 |
 | 函数折叠 | MVP 实现中 | 已补 Python 函数积木和函数定义块右键折叠入口，待人工验证 | P0 |
 | 工具栏积木禁拖 | MVP 实现中 | 已用 Python `current time` 做禁用样例，后续需接产品配置/设备状态 | P0 |
-| 串口和上传代码 | 未开始 | 获取串口、选择连接、上传生成代码到设备 | P1 |
+| 串口和上传代码 | Web Serial MVP 实现中 | 已接 Electron Web Serial 选择、连接和代码写入入口，后续需补真实设备上传协议 | P1 |
 | 自定义扩展库/自定义积木 | 未开始 | 用户可配置扩展积木，并导出配置文件 | P1 |
 | 自定义扩展 | Demo | 公司规范扩展包 | P1 |
 | 硬件连接 | 未开始 | 串口/USB/烧录能力 | P1 |
@@ -716,7 +716,7 @@ current time 积木出现红色禁止样式
 
 ### 阶段 G：串口和上传代码
 
-当前状态：未开始。
+当前状态：Web Serial MVP 实现中。
 
 目标：桌面端可以获取本机串口列表，选择串口连接，并将生成代码上传到设备。
 
@@ -742,21 +742,73 @@ current time 积木出现红色禁止样式
 
 需要研究：
 
-- Windows/macOS/Linux 串口枚举方式。
-- `serialport` 在当前 Electron/Node 版本下的兼容性。
-- 打包后 native module 重建策略。
-- 设备上传协议，是普通串口写入、文件复制、还是厂商烧录工具。
+- Electron 官方 Web Serial 方案需要处理 `select-serial-port`、权限检查和设备授权，适合浏览器权限模型。
+- `serialport` 是 Node 侧传统方案，可直接枚举、打开、读写串口；但它涉及 native module、Electron ABI 和打包重建。
+- 本轮不再使用 PowerShell 脚本，改用 Electron/Chromium 内置 Web Serial API。
+- 当前“上传”含义是把生成的 Python 代码文本写入串口，不等于真实硬件烧录协议。
+- 后续需要根据公司硬件确认上传协议：普通串口 REPL、文件系统复制、厂商烧录工具，还是自定义 bootloader 协议。
+
+本轮实现范围：
+
+1. Electron 主进程处理 `select-serial-port`，同步优先选择 CH340/COM7 候选端口，并把候选项发给渲染进程展示。
+2. preload 只暴露串口可用性和候选项监听的白名单 IPC，不暴露脚本执行或系统命令能力。
+3. Python 模式头部菜单栏新增串口工具条：选择串口、选择波特率、连接/断开、上传。
+4. 渲染进程使用 `navigator.serial.requestPort()`、`port.open()` 和 `port.writable` 完成连接和写入。
+5. 串口操作结果写入现有 Python Terminal，方便人工观察。
+
+当前限制：
+
+- 需要 Electron/Chromium 支持 Web Serial。
+- Web Serial 权限模型下，未授权前无法像系统脚本一样直接列出全量串口；首次进入时下拉框只提示点击 Refresh 检测，点击 Refresh 或 Connect 后才会触发 Electron 的 `select-serial-port` 候选列表。
+- 当前连接会保持在渲染进程内存中，刷新页面或关闭标签页后需要重新连接。
+- 暂无上传进度、取消、超时配置 UI。
+- 暂无设备握手、板卡识别、协议适配和上传后运行控制。
 
 验收：
 
 ```text
-点击获取串口
-显示 COM/tty 列表
-选择一个串口
+点击 Connect
+触发 Web Serial 串口选择
+显示候选串口并选择一个串口
 连接成功后状态变为已连接
 点击上传代码
 显示上传中、成功或失败
 断开串口后状态正确恢复
+```
+
+人工测试用例：
+
+```text
+用例 1：无串口设备
+进入 Python 编码模式
+查看串口下拉框显示 Click Refresh to detect
+点击 Refresh 不报前端白屏
+点击 Connect 给出无可用串口或取消提示
+
+用例 2：有串口设备
+插入 USB 串口设备
+点击 Connect
+下拉框显示过滤后的硬件串口候选项，不应出现蓝牙耳机、SPP 等蓝牙设备
+选择波特率 115200
+终端输出 selected，且优先匹配 COM7/CH340/USB-SERIAL，显示名称优先使用 COM 端口名
+终端输出 connected
+
+用例 3：上传当前代码
+拖出 print 或基础 Python 积木生成代码
+连接串口
+点击 Upload
+终端输出 uploaded bytes
+
+用例 4：串口被占用
+用其他串口工具占用同一个 COM 口
+点击 Connect 或 Upload
+终端输出失败原因
+页面不白屏，按钮状态能恢复
+
+用例 5：标签页清理
+连接串口后关闭当前标签页
+重新新建 Python 标签页
+串口状态不应继承上一个标签页的连接状态
 ```
 
 ### 阶段 H：自定义扩展库和配置导出

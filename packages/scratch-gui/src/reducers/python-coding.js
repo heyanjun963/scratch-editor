@@ -5,6 +5,11 @@ const SET_PYTHON_RUNNING = 'scratch-gui/python-coding/SET_PYTHON_RUNNING';
 const SET_PYTHON_SCRIPT_PATH = 'scratch-gui/python-coding/SET_PYTHON_SCRIPT_PATH';
 const SET_PYTHON_EXIT_CODE = 'scratch-gui/python-coding/SET_PYTHON_EXIT_CODE';
 const SET_PYTHON_ERROR = 'scratch-gui/python-coding/SET_PYTHON_ERROR';
+const SET_SERIAL_PORTS = 'scratch-gui/python-coding/SET_SERIAL_PORTS';
+const SET_SERIAL_PORT_PATH = 'scratch-gui/python-coding/SET_SERIAL_PORT_PATH';
+const SET_SERIAL_BAUD_RATE = 'scratch-gui/python-coding/SET_SERIAL_BAUD_RATE';
+const SET_SERIAL_CONNECTED = 'scratch-gui/python-coding/SET_SERIAL_CONNECTED';
+const SET_SERIAL_BUSY = 'scratch-gui/python-coding/SET_SERIAL_BUSY';
 
 const maxConsoleLines = 200;
 
@@ -14,7 +19,12 @@ const initialState = {
     isRunning: false,
     scriptPath: null,
     lastExitCode: null,
-    error: null
+    error: null,
+    serialPorts: [],
+    serialPortPath: '',
+    serialBaudRate: 115200,
+    serialConnected: false,
+    serialBusy: false
 };
 
 const reducer = function (state, action) {
@@ -55,6 +65,26 @@ const reducer = function (state, action) {
     case SET_PYTHON_ERROR:
         return Object.assign({}, state, {
             error: action.error
+        });
+    case SET_SERIAL_PORTS:
+        return Object.assign({}, state, {
+            serialPorts: action.ports
+        });
+    case SET_SERIAL_PORT_PATH:
+        return Object.assign({}, state, {
+            serialPortPath: action.path
+        });
+    case SET_SERIAL_BAUD_RATE:
+        return Object.assign({}, state, {
+            serialBaudRate: action.baudRate
+        });
+    case SET_SERIAL_CONNECTED:
+        return Object.assign({}, state, {
+            serialConnected: action.connected
+        });
+    case SET_SERIAL_BUSY:
+        return Object.assign({}, state, {
+            serialBusy: action.busy
         });
     default:
         return state;
@@ -109,6 +139,41 @@ const setPythonError = function (error) {
     };
 };
 
+const setSerialPorts = function (ports) {
+    return {
+        type: SET_SERIAL_PORTS,
+        ports
+    };
+};
+
+const setSerialPortPath = function (path) {
+    return {
+        type: SET_SERIAL_PORT_PATH,
+        path
+    };
+};
+
+const setSerialBaudRate = function (baudRate) {
+    return {
+        type: SET_SERIAL_BAUD_RATE,
+        baudRate
+    };
+};
+
+const setSerialConnected = function (connected) {
+    return {
+        type: SET_SERIAL_CONNECTED,
+        connected
+    };
+};
+
+const setSerialBusy = function (busy) {
+    return {
+        type: SET_SERIAL_BUSY,
+        busy
+    };
+};
+
 export {
     reducer as default,
     initialState as pythonCodingInitialState,
@@ -118,5 +183,10 @@ export {
     setPythonRunning,
     setPythonScriptPath,
     setPythonExitCode,
-    setPythonError
+    setPythonError,
+    setSerialPorts,
+    setSerialPortPath,
+    setSerialBaudRate,
+    setSerialConnected,
+    setSerialBusy
 };

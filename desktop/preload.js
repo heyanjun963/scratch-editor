@@ -50,3 +50,12 @@ contextBridge.exposeInMainWorld('scratchDesktopTerminal', {
         return () => ipcRenderer.removeListener('terminal:exit', listener);
     }
 });
+
+contextBridge.exposeInMainWorld('scratchDesktopSerial', {
+    isAvailable: () => ipcRenderer.invoke('serial:available'),
+    onPorts: handler => {
+        const listener = (_event, payload) => handler(payload);
+        ipcRenderer.on('serial:ports', listener);
+        return () => ipcRenderer.removeListener('serial:ports', listener);
+    }
+});
