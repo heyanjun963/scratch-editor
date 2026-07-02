@@ -89,7 +89,7 @@ sequenceDiagram
 - `@scratch/scratch-render/dist/web`
 - `@scratch/scratch-svg-renderer/dist/web`
 
-所以第一次运行 GUI 前，通常要先构建内部依赖包。具体命令见 [本地开发运行手册](./04-local-dev-runbook.md)。
+所以第一次运行 GUI 前，通常要先构建内部依赖包。具体命令见 [本地开发运行手册](../guides/01-local-dev-runbook.md)。
 
 ## 类比 GitDiagram / DeepWiki / Gitingest
 
