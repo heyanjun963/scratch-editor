@@ -173,6 +173,39 @@ class ExtensionManager {
     }
 
     /**
+     * Register an in-memory extension object. This is used by tools which build
+     * a Scratch extension from declarative data instead of loading JS by URL.
+     * @param {string} extensionId - the extension ID used for duplicate checks.
+     * @param {object} extensionObject - an object with getInfo() and block functions.
+     * @returns {Promise} resolved once the extension object is registered.
+     */
+    registerExtensionObject (extensionId, extensionObject) {
+        if (this.isExtensionLoaded(extensionId)) {
+            const message = `Rejecting attempt to load a second extension with ID ${extensionId}`;
+            log.warn(message);
+            return Promise.resolve();
+        }
+
+        const serviceName = this._registerInternalExtension(extensionObject);
+        this._loadedExtensions.set(extensionId, serviceName);
+        return Promise.resolve();
+    }
+
+    /**
+     * Unregister an in-memory extension object.
+     * @param {string} extensionId - the extension ID to unregister.
+     * @returns {Promise} resolved once the extension primitives are removed.
+     */
+    unregisterExtensionObject (extensionId) {
+        if (!this.isExtensionLoaded(extensionId)) {
+            return Promise.resolve();
+        }
+
+        this._loadedExtensions.delete(extensionId);
+        return dispatch.call('runtime', '_unregisterExtensionPrimitives', extensionId);
+    }
+
+    /**
      * Regenerate blockinfo for any loaded extensions
      * @returns {Promise} resolved once all the extensions have been reinitialized
      */

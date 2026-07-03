@@ -170,8 +170,11 @@ class LibraryComponent extends React.Component {
 
     handleSelect (id) {
         const selectedItem = this.getFilteredData().find(item => this.constructKey(item) === id);
+        if (!selectedItem) return;
 
-        this.handleClose();
+        if (!selectedItem.keepLibraryOpenOnSelect) {
+            this.handleClose();
+        }
         this.props.onItemSelected(selectedItem);
     }
     handleClose () {

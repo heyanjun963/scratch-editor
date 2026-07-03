@@ -22,6 +22,8 @@ import defineDynamicBlock from '../lib/define-dynamic-block';
 import {DEFAULT_MODE, getColorsForMode, colorModeMap} from '../lib/settings/color-mode';
 import {CAT_BLOCKS_THEME} from '../lib/settings/theme';
 import generatePythonCode from '../lib/python-codegen';
+import {manifestToExtensionObject} from '../lib/custom-extension/manifest-to-extension';
+import {registerPythonCodegenManifest} from '../lib/custom-extension/codegen-registry';
 import {
     injectExtensionBlockIcons,
     injectExtensionCategoryMode,
@@ -74,13 +76,18 @@ const disabledFlyoutBlocks = {
 const disabledFlyoutBlockClass = 'company-disabled-flyout-block';
 const disabledFlyoutBlockListenerKey = '__companyDisabledFlyoutListener';
 
-const makePythonToolboxXML = categoriesXML => [
-    '<xml style="display: none">',
-    ...categoriesXML
-        .filter(categoryInfo => pythonExtensionIds.includes(categoryInfo.id))
-        .map(categoryInfo => categoryInfo.xml),
-    '</xml>'
-].join('\n');
+const makePythonToolboxXML = (categoriesXML, customExtensionIds) => {
+    const allowedExtensionIds = pythonExtensionIds.concat(
+        String(customExtensionIds || '').split(',').filter(Boolean)
+    );
+    return [
+        '<xml style="display: none">',
+        ...categoriesXML
+            .filter(categoryInfo => allowedExtensionIds.includes(categoryInfo.id))
+            .map(categoryInfo => categoryInfo.xml),
+        '</xml>'
+    ].join('\n');
+};
 
 class Blocks extends React.Component {
     constructor (props) {
@@ -232,6 +239,7 @@ class Blocks extends React.Component {
             this.props.extensionLibraryVisible !== nextProps.extensionLibraryVisible ||
             this.props.customProceduresVisible !== nextProps.customProceduresVisible ||
             this.props.editorMode !== nextProps.editorMode ||
+            this.props.customExtensionIds !== nextProps.customExtensionIds ||
             this.props.locale !== nextProps.locale ||
             this.props.anyModalVisible !== nextProps.anyModalVisible ||
             this.props.stageSize !== nextProps.stageSize
@@ -247,6 +255,10 @@ class Blocks extends React.Component {
             this.ensurePythonExtensions();
             this.requestToolboxUpdate();
             this.onPythonWorkspaceChange();
+        }
+
+        if (this.props.customExtensionIds !== prevProps.customExtensionIds) {
+            this.ensurePythonExtensions();
         }
 
         // Only rerender the toolbox when the blocks are visible and the xml is
@@ -541,7 +553,7 @@ class Blocks extends React.Component {
                 this.props.colorMode
             );
             if (this.props.editorMode === PYTHON_EDITOR_MODE) {
-                return makePythonToolboxXML(dynamicBlocksXML);
+                return makePythonToolboxXML(dynamicBlocksXML, this.props.customExtensionIds);
             }
             return makeToolboxXML(false, target.isStage, target.id, dynamicBlocksXML,
                 targetCostumes[targetCostumes.length - 1].name,
@@ -737,8 +749,26 @@ class Blocks extends React.Component {
         const pendingExtensionIds = pythonExtensionIds.filter(
             extensionId => !this.props.vm.extensionManager.isExtensionLoaded(extensionId)
         );
+        const registerCustomExtensions = () => Promise.all(this.props.customExtensionLibraries.map(library => {
+            const manifest = library.manifest;
+            registerPythonCodegenManifest(manifest);
+            if (this.props.vm.extensionManager.isExtensionLoaded(manifest.id)) {
+                return Promise.resolve();
+            }
+            return this.props.vm.extensionManager.registerExtensionObject(
+                manifest.id,
+                manifestToExtensionObject(manifest)
+            );
+        }));
         if (!pendingExtensionIds.length) {
-            this.refreshToolboxXML();
+            registerCustomExtensions()
+                .then(() => {
+                    this.refreshToolboxXML();
+                })
+                .catch(error => {
+                    log.error(error);
+                    this.refreshToolboxXML();
+                });
             return;
         }
 
@@ -746,6 +776,7 @@ class Blocks extends React.Component {
         Promise.all(pendingExtensionIds.map(extensionId => (
             this.props.vm.extensionManager.loadExtensionURL(extensionId)
         )))
+            .then(registerCustomExtensions)
             .catch(error => {
                 log.error(error);
             })
@@ -895,6 +926,12 @@ class Blocks extends React.Component {
 Blocks.propTypes = {
     anyModalVisible: PropTypes.bool,
     canUseCloud: PropTypes.bool,
+    customExtensionIds: PropTypes.string,
+    customExtensionLibraries: PropTypes.arrayOf(PropTypes.shape({
+        manifest: PropTypes.shape({
+            id: PropTypes.string
+        })
+    })),
     customProceduresVisible: PropTypes.bool,
     extensionLibraryVisible: PropTypes.bool,
     isRtl: PropTypes.bool,
@@ -957,7 +994,8 @@ Blocks.defaultOptions = {
 Blocks.defaultProps = {
     isVisible: true,
     options: Blocks.defaultOptions,
-    colorMode: DEFAULT_MODE
+    colorMode: DEFAULT_MODE,
+    customExtensionLibraries: []
 };
 
 const mapStateToProps = state => ({
@@ -971,6 +1009,10 @@ const mapStateToProps = state => ({
     messages: state.locales.messages,
     toolboxXML: state.scratchGui.toolbox.toolboxXML,
     editorMode: state.scratchGui.mode.editorMode,
+    customExtensionIds: state.scratchGui.customExtensions.installedLibraries
+        .map(library => library.manifest.id)
+        .join(','),
+    customExtensionLibraries: state.scratchGui.customExtensions.installedLibraries,
     customProceduresVisible: state.scratchGui.customProcedures.active,
     workspaceMetrics: state.scratchGui.workspaceMetrics,
     useCatBlocks: isTimeTravel2020(state) || state.scratchGui.settings.theme === CAT_BLOCKS_THEME

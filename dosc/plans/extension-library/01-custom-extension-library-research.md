@@ -9,9 +9,10 @@
 ## 0. 结论速览（先看这段）
 
 1. **本仓库已经具备扩展系统的大半基础**：`scratch-vm` 有完整的扩展注册与 URL 动态加载通道，`scratch-gui` 有扩展库卡片列表、按模式过滤、甚至「输入扩展 URL」入口。已存在公司自定义扩展 `companyHttp` 作为范例。
-2. **最大的技术缺口是「代码生成」**：当前 Python 代码是**在 GUI 里按 opcode 硬编码**生成的（`python-codegen/index.js`）。因此，仅靠扩展元数据（`getInfo()`）新增的自定义积木，能显示和拖拽，但**不会自动生成 Python**。要做真正「用户自定义积木」，必须把代码生成从「硬编码」改造成「数据驱动 / 模板驱动」。
+2. **最大的技术缺口是「代码生成」**：调研时 Python 代码是**在 GUI 里按 opcode 硬编码**生成的（`python-codegen/index.js`）。因此，仅靠扩展元数据（`getInfo()`）新增的自定义积木，能显示和拖拽，但**不会自动生成 Python**。当前 MVP 已把生成核心迁到 `scratch-vm/src/codegen/python.js`，并通过模板注册表支持自定义积木产码。
 3. **推荐路线**：定义一个自包含的**拓展库文件格式**（一个 `.zip` 包，内含 `manifest.json` + 积木定义 + 代码生成模板 + 图标 + 可选运行库），在 GUI 里做一个「管理库」面板负责导入/导出/启用，用 `scratch-vm` 的动态扩展机制在运行时注册积木，用改造后的数据驱动 codegen 生成代码。文件的**上传/下载复用仓库已有的 `download-blob.js` 和 `file-uploader.js`**。
 4. **不建议**直接照搬 Mixly 的 `Blockly.Blocks` + `Blockly.Python.forBlock` 源码格式，因为 Scratch 的积木/扩展体系与原生 Blockly 不同；但**可以借鉴 Mixly「一个文件夹/压缩包就是一个库、可上传下载」的组织与管理理念**。
+5. **重要修正**：现有 VM 支持「内置扩展」和「URL Worker 扩展」，但**没有现成的 manifest 动态注册 API**。本方案需要新增一层「manifest → extension object/getInfo → VM 注册 → codegen 注册」的桥接模块。
 
 ---
 
@@ -52,7 +53,7 @@ WonderCam/
 - `loadExtensionURL(extensionURL)`：
   - 若 `extensionURL` 命中 `builtinExtensions` → 同步 `new extension(runtime)`，注册。
   - 否则 → `new Worker('./extension-worker.js')` 在**沙箱 Worker** 里加载。这就是「从 URL 动态加载第三方扩展」的既有通道。
-- `_prepareExtensionInfo` / `_prepareBlockInfo`：清洗扩展元数据，补默认值。**限制：扩展 id 必须匹配 `^[a-z0-9]+$`**（做自定义库 id 时要遵守）。
+- `_prepareExtensionInfo` / `_prepareBlockInfo`：清洗扩展元数据，补默认值。**技术限制：扩展 id 需匹配 `/^[a-z0-9]+$/i`**，即大小写字母和数字可通过；公司规范建议统一小写字母和数字，避免文件名、URL、包名和跨平台大小写问题。
 - `refreshBlocks()`：重新拉取所有已加载扩展的 `getInfo()` 并刷新积木——支持动态积木（`isDynamic`）。
 
 `packages/scratch-vm/src/extension-support/extension-worker.js`
@@ -66,7 +67,7 @@ WonderCam/
 ```js
 getInfo () {
   return {
-    id: 'companyHttp',                 // 必须 ^[a-z0-9]+$
+    id: 'companyHttp',                 // VM 允许大小写字母和数字，公司规范建议小写
     name: '...',                       // 分类显示名
     blockIconURI: iconURI,             // 积木上的图标（data:svg）
     menuIconURI: iconURI,
@@ -116,7 +117,12 @@ getInfo () {
 
 ### 2.4 关键差距：代码生成是硬编码的
 
-`packages/scratch-gui/src/lib/python-codegen/index.js`
+调研时入口是 `packages/scratch-gui/src/lib/python-codegen/index.js`。当前实现已迁移为：
+
+```text
+packages/scratch-vm/src/codegen/python.js        # VM 侧核心生成器
+packages/scratch-gui/src/lib/python-codegen/index.js # GUI 侧薄桥接
+```
 
 - `generatePythonCode(workspace)` 遍历 workspace 顶层块，按类别前缀分发：
 
@@ -153,6 +159,20 @@ getInfo () {
 | D. 导出/下载到本地 | 把当前库打包成文件保存到本地 | download-blob + zip 打包 |
 
 对照 [进度总览](../../progress/project-progress-and-commercial-gap.md) 的**阶段 H：自定义扩展库和配置导出**（当前「未开始」，优先级第四），本方案即该阶段的落地设计。
+
+### 3.1 当前已有能力 vs 需要新增能力
+
+| 能力 | 当前仓库状态 | 是否可复用 | 还缺什么 |
+| - | - | - | - |
+| 内置扩展注册 | `scratch-vm` 已支持 `builtinExtensions` | 可复用 | 自定义库不能每次都改源码注册 |
+| URL 动态扩展 | `loadExtensionURL()` + Worker 已支持远程 JS | 谨慎复用 | 不适合作为学生自定义 MVP，安全面太大 |
+| 扩展库 UI | `extension-library.jsx` 已能展示静态卡片 | 可复用 | 需要动态合并已导入库 |
+| 积木绘制 | VM 生成 block JSON/XML，GUI 调 `defineBlocksWithJsonArray` | 可复用 | manifest 需转换为 `getInfo()` |
+| Python 代码生成 | `python-codegen/index.js` 按 opcode 硬编码 | 只能部分复用 | 需要自定义模板注册表和兜底分发 |
+| 本地导入 | `file-uploader.js` 可读文件 | 可复用 | 需要 manifest/zip 解析与校验 |
+| 本地导出 | `download-blob.js` 可下载 Blob | 可复用 | 需要序列化 manifest/打包 `.sbext` |
+| 应用级持久化 | 桌面端已有 Electron IPC 基础 | 可复用思路 | 需要用户目录读写白名单 |
+| 随 `.sb3` 保存 | 原版只保存 extension IDs | 需新增 | 需要保存 manifest/资源并在加载 blocks 前恢复 |
 
 ---
 
@@ -250,6 +270,7 @@ my-library.sbext            # zip 压缩包，扩展名自定（如 .sbext / .s3
 - 积木显示：把 manifest 的 `blocks[]` 转成 `getInfo().blocks`，走现有 `extension-manager` 注册链路。
 - 运行时行为：对纯代码生成型积木，VM 侧行为可为空实现（因为最终产物是 Python 文本，不需要在 VM 里"执行"）；若要在舞台模式实时执行，另配 `func`。
 - 代码生成：见 §6 改造。
+- 需要新增桥接层：当前 `loadExtensionURL()` 不能直接接收 manifest，需要新增 `custom-extension-registry` 一类模块，负责校验 manifest、生成 extension object、调用 VM 注册能力，并同步登记 codegen 模板。
 
 **优点**：安全（无第三方 JS 执行）、跨浏览器/桌面一致、导入导出就是一个 JSON/zip、最贴合"学生自定义"。
 **缺点**：表达能力受模板限制（复杂控制流/自定义绘制积木做不了）。
@@ -289,6 +310,18 @@ manifest 默认声明式；对高级用户允许在包内附带受控的生成�
 
 > 这样内置 Python 积木照旧，自定义积木通过模板产码，二者共用一套遍历与缩进逻辑。
 
+建议新增模块边界：
+
+```text
+packages/scratch-gui/src/lib/custom-extension/
+  manifest-schema.js       # manifest 字段校验、默认值、错误信息
+  manifest-to-extension.js # manifest -> getInfo() 结构
+  codegen-registry.js      # block.type -> python template 注册表
+  library-store.js         # 已导入库的内存/持久化状态
+```
+
+当前 MVP 已把 Python codegen 核心迁入 `scratch-vm`。`scratch-gui` 仍负责 manifest 导入、管理和模板注册；后续若要让 VM 独立理解 manifest，再考虑把 schema 和转换逻辑继续下沉到 `scratch-vm`。
+
 ---
 
 ## 7. GUI「管理库」面板设计（对齐 Mixly）
@@ -296,11 +329,21 @@ manifest 默认声明式；对高级用户允许在包内附带受控的生成�
 新增一个「扩展/库管理」入口（可放在扩展库弹窗顶部或菜单栏），提供：
 
 - **已安装库列表**：名称、版本、积木数、启用/停用、删除。
-- **导入库（上传到本地/工程）**：`<input type="file" accept=".sbext,.json,.zip">` → 复用 `file-uploader.js` 读取 → 解析 manifest（zip 则先解压，仓库已有 JSZip(3.10.1) 依赖用于 sb3）→ 校验（id 合法、formatVersion、模板占位符）→ 注册进 vm + codegen 注册表 → 刷新扩展库清单。
+- **导入库（上传到本地/工程）**：`<input type="file" accept=".sbext,.json,.zip">` → 复用 `file-uploader.js` 读取 → 解析 manifest（zip 则先解压；当前 JSZip 是 `scratch-vm` 的依赖，若 GUI 直接解包，应给 `scratch-gui` 显式加依赖或把解包放到桌面/VM 工具层）→ 校验（id 合法、formatVersion、模板占位符）→ 注册进 vm + codegen 注册表 → 刷新扩展库清单。
 - **导出库（下载到本地）**：把某个库（或"当前自定义积木集合"）序列化为 manifest（+ 运行库 + 图标）→ 打成 zip → `download-blob(filename, blob)` 下载。
 - **可选：可视化积木编辑器**：表单化地新建积木（opcode、文本模板 `打印 [VALUE]`、参数类型、代码模板），直接生成 manifest 条目。这是"学生自定义积木"体验最好的形态，可作为方案一之上的 UI 增强，建议 MVP 之后做。
 
 导入后如何进入扩展库清单：现有 `libraries/extensions/index.jsx` 是**静态数组**，需改为「静态内置 + 动态已导入库」合并（把已导入库的卡片 push 进 `extensionLibraryContent` 的运行时副本，或让 `extension-library.jsx` 额外读取一个"已安装自定义库"来源）。
+
+推荐不要直接修改静态数组本身，而是在 `extension-library.jsx` 渲染时合并：
+
+```text
+extensionLibraryContent
+  + state.scratchGui.customExtensions.installedLibraries
+  -> LibraryComponent.data
+```
+
+这样能保持内置扩展清单稳定，也方便后续做启用/停用、删除、搜索和按模式过滤。
 
 ---
 
@@ -314,11 +357,46 @@ manifest 默认声明式；对高级用户允许在包内附带受控的生成�
 
 > 建议：MVP 用「本次会话 + 手动导入」，随后补「桌面端库目录持久化」，最后研究「随 `.sb3` 保存」。
 
+当前仓库的 `.sb3` 序列化只会保存项目用到的 `extensions` ID，反序列化时再按 ID 调 `extensionManager.loadExtensionURL()`。它不会自动保存完整自定义库 manifest。
+
+所以“随项目保存”需要单独设计，不能只依赖原版 `extensions` 字段：
+
+```text
+方案 A：project.json meta.companyExtensions
+  优点：实现简单，读写 project.json 即可
+  缺点：大型库/运行库/图标不适合塞进 meta
+
+方案 B：.sb3 zip 附加文件 extensions/<extensionId>/manifest.json
+  优点：结构清晰，可连同 icon/libraries 一起保存
+  缺点：需要改保存和加载流程，加载项目 blocks 前先恢复自定义库
+
+方案 C：项目只记录 extensionId，库由应用级目录提供
+  优点：项目文件小
+  缺点：换电脑打开会缺库，不适合教学资料分发
+```
+
+推荐路径：H1-H5 先不改 `.sb3`；H6 做应用级目录；H7 再做 `.sb3` 附加文件。这样不会让第一版被项目格式拖慢。
+
+---
+
+## 8.1 MVP 边界建议
+
+第一版建议明确只做 **Python 编码模式的自定义积木**：
+
+- 自定义积木能在扩展库/工具栏出现。
+- 自定义积木能拖到画布。
+- 自定义积木能按模板生成 Python 代码。
+- 不承诺在 Scratch 舞台模式里实时运行。
+- 不执行用户提供的 JS。
+- 不处理复杂自定义字段、复杂渲染器和硬件上传协议。
+
+这样可以把核心问题收敛到“积木定义 + Python codegen + 导入导出”。如果一开始同时支持舞台运行，就必须为每个自定义 opcode 提供 VM 运行函数，复杂度会明显上升。
+
 ---
 
 ## 9. 安全与校验（务必）
 
-- **id/命名**：强制 `extensionId` 匹配 `^[a-z0-9]+$`（VM 用 /i 大小写不敏感，故 `companyCustom` 合法）；库内 opcode 唯一，避免与内置扩展冲突。
+- **id/命名**：技术上 `extensionId` 匹配 `/^[a-z0-9]+$/i` 即可；公司规范建议统一小写字母和数字。库内 opcode 唯一，避免与内置扩展冲突。
 - **无可执行代码（方案一）**：manifest 不含 JS；codegen 只做模板字符串替换，禁止 `eval`。
 - **模板占位符白名单**：`{ARG}` 只能引用该积木声明过的参数名。
 - **运行库落盘边界**：`runtimeLibrary` 只允许写入受控工作目录，路径需规范化，禁止 `..` 穿越。
@@ -332,14 +410,15 @@ manifest 默认声明式；对高级用户允许在包内附带受控的生成�
 
 | 阶段 | 目标 | 关键改动点 | 验收 |
 | - | - | - | - |
-| H1 | 定义格式 + 导入单个 manifest（内存） | 定 `manifest.json` schema；`extension-library` 增加「导入」入口；把 manifest 转 `getInfo()` 注册 | 导入一个含 1~2 个积木的 JSON，扩展库出现新分类，能拖入画布 |
+| H1 | 定义格式 + 导入单个 manifest（内存） | 定 `manifest.json` schema；新增 manifest 校验和转换模块；`extension-library` 增加「导入」入口；把 manifest 转成 extension object 并注册到 VM | 导入一个含 1~2 个积木的 JSON，扩展库出现新分类，能拖入画布 |
 | H2 | 自定义积木产码 | 改造 `python-codegen`：自定义 opcode 走模板驱动；建注册表 | 拖入自定义积木 → 右侧生成正确 Python |
 | H3 | 导出库到本地 | 复用 `download-blob`；序列化 manifest（+图标）为文件/zip | 导出后能再次导入并恢复积木 |
 | H4 | zip 包 + 运行库 | 支持 `.sbext` zip（含 `libraries/*.py`）；生成 `.py` 时落盘运行库 | 生成的 Python 能 `import` 库并本机运行（接阶段 B） |
 | H5 | 可视化积木编辑器 | 表单化新建/编辑积木，生成 manifest 条目 | 不写 JSON 也能造积木 |
-| H6 | 持久化 | 桌面端库目录持久化；研究随 `.sb3` 保存 | 重启后库仍在；带自定义积木的项目可迁移 |
+| H6 | 应用级持久化 | 桌面端库目录持久化；Web 端可选 IndexedDB | 重启后库仍在 |
+| H7 | 随项目保存 | 研究 `.sb3` 附加 manifest/资源文件；加载项目时先恢复库再恢复 blocks | 带自定义积木的项目可迁移 |
 
-优先级：H1→H2 是「能不能用」的核心；H3 满足「上传/下载到本地」的显式诉求；H4 之后接硬件/真实运行。
+优先级：H1→H2 是「能不能用」的核心；H3 满足「上传/下载到本地」的显式诉求；H4 之后接硬件/真实运行；H6/H7 负责产品化保存和迁移。
 
 ---
 

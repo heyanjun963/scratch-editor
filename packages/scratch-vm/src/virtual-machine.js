@@ -9,6 +9,7 @@ const JSZip = require('jszip');
 
 const Buffer = require('buffer').Buffer;
 const centralDispatch = require('./dispatch/central-dispatch');
+const generatePythonCode = require('./codegen/python');
 const ExtensionManager = require('./extension-support/extension-manager');
 const log = require('./util/log');
 const MathUtil = require('./util/math-util');
@@ -213,6 +214,16 @@ class VirtualMachine extends EventEmitter {
      */
     setCompatibilityMode (compatibilityModeOn) {
         this.runtime.setCompatibilityMode(!!compatibilityModeOn);
+    }
+
+    /**
+     * Generate Python code from a Blockly workspace.
+     * @param {object} workspace - Blockly workspace-like object.
+     * @param {object} options - code generation options.
+     * @returns {string} Generated Python code.
+     */
+    generatePythonCode (workspace, options) {
+        return generatePythonCode(workspace, options);
     }
 
     /**

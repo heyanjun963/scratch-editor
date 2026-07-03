@@ -889,6 +889,18 @@ class Runtime extends EventEmitter {
     }
 
     /**
+     * Remove the primitives for an extension.
+     * @param {string} extensionId - the extension ID to remove.
+     * @private
+     */
+    _unregisterExtensionPrimitives (extensionId) {
+        const index = this._blockInfo.findIndex(info => info.id === extensionId);
+        if (index >= 0) {
+            this._blockInfo.splice(index, 1);
+        }
+    }
+
+    /**
      * Read extension information, convert menus, blocks and custom field types
      * and store the results in the provided category object.
      * @param {CategoryInfo} categoryInfo - the category to be filled

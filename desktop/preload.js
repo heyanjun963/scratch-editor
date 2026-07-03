@@ -59,3 +59,8 @@ contextBridge.exposeInMainWorld('scratchDesktopSerial', {
         return () => ipcRenderer.removeListener('serial:ports', listener);
     }
 });
+
+contextBridge.exposeInMainWorld('scratchDesktopCustomExtensions', {
+    load: () => ipcRenderer.invoke('customExtensions:load'),
+    save: manifests => ipcRenderer.invoke('customExtensions:save', manifests)
+});

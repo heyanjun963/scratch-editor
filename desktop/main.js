@@ -79,6 +79,37 @@ const getSerialPortLabel = port => [
     port.portId
 ].filter(Boolean).join(' ');
 
+const getCustomExtensionLibrariesFilePath = () => path.join(
+    app.getPath('userData'),
+    'custom-extension-libraries',
+    'libraries.json'
+);
+
+const readCustomExtensionLibraries = async () => {
+    try {
+        const raw = await fs.promises.readFile(getCustomExtensionLibrariesFilePath(), 'utf8');
+        const manifests = JSON.parse(raw);
+        return {
+            manifests: Array.isArray(manifests) ? manifests : []
+        };
+    } catch (error) {
+        if (error && error.code === 'ENOENT') {
+            return {manifests: []};
+        }
+        throw error;
+    }
+};
+
+const writeCustomExtensionLibraries = async manifests => {
+    if (!Array.isArray(manifests)) {
+        throw new Error('Custom extension libraries must be an array.');
+    }
+    const filePath = getCustomExtensionLibrariesFilePath();
+    await fs.promises.mkdir(path.dirname(filePath), {recursive: true});
+    await fs.promises.writeFile(filePath, JSON.stringify(manifests, null, 2), 'utf8');
+    return {ok: true};
+};
+
 const isBluetoothSerialPort = port => (
     /bluetooth|\u84dd\u7259|spp|edifier|\u8033\u673a/i.test(getSerialPortLabel(port))
 );
@@ -544,6 +575,18 @@ const registerSerialIpc = () => {
     });
 };
 
+const registerCustomExtensionIpc = () => {
+    const {ipcMain} = require('electron');
+    ipcMain.handle('customExtensions:load', event => {
+        getSenderTabId(event);
+        return readCustomExtensionLibraries();
+    });
+    ipcMain.handle('customExtensions:save', (event, manifests = []) => {
+        getSenderTabId(event);
+        return writeCustomExtensionLibraries(manifests);
+    });
+};
+
 const registerSerialDeviceHandlers = () => {
     const allowedOrigins = getAllowedSerialOrigins();
     session.defaultSession.on('select-serial-port', (event, portList, webContents, callback) => {
@@ -656,6 +699,7 @@ app.whenReady().then(() => {
     registerPythonIpc();
     registerTerminalIpc();
     registerSerialIpc();
+    registerCustomExtensionIpc();
     mainWindow = createMainWindow();
     mainWindow.on('closed', () => {
         if (pythonRunner) {

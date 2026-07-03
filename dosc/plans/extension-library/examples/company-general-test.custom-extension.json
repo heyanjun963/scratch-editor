@@ -1,0 +1,225 @@
+{
+  "formatVersion": 1,
+  "id": "companykit",
+  "name": "公司通用测试库",
+  "version": "1.0.0",
+  "color1": "#8E44AD",
+  "color2": "#71368A",
+  "color3": "#5B2C6F",
+  "blocks": [
+    {
+      "opcode": "init_csv_runtime",
+      "blockType": "command",
+      "text": "初始化CSV运行环境",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "company_csv_files = {}\ncompany_csv_writers = {}\ncompany_csv_last_rows = []\nprint(\"CSV runtime ready\")",
+          "imports": []
+        }
+      }
+    },
+    {
+      "opcode": "csv_open_file",
+      "blockType": "command",
+      "text": "以 [MODE] 模式打开CSV文件 [PATH] 并命名为 [NAME]",
+      "arguments": {
+        "MODE": {
+          "type": "string",
+          "defaultValue": "a"
+        },
+        "PATH": {
+          "type": "string",
+          "defaultValue": "data.csv"
+        },
+        "NAME": {
+          "type": "string",
+          "defaultValue": "csvfile"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "company_csv_files[{NAME}] = open({PATH}, {MODE}, newline=\"\", encoding=\"utf-8\")\ncompany_csv_writers[{NAME}] = csv.writer(company_csv_files[{NAME}])",
+          "imports": [
+            "csv"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "csv_file_exists",
+      "blockType": "boolean",
+      "text": "判断CSV文件 [PATH] 是否存在",
+      "arguments": {
+        "PATH": {
+          "type": "string",
+          "defaultValue": "data.csv"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "pathlib.Path({PATH}).exists()",
+          "imports": [
+            "pathlib"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "csv_write_header",
+      "blockType": "command",
+      "text": "向CSV对象 [NAME] 写入表头 [HEADERS]",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "csvfile"
+        },
+        "HEADERS": {
+          "type": "string",
+          "defaultValue": "[\"index\", \"name\", \"score\"]"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "company_csv_writers[{NAME}].writerow(json.loads({HEADERS}))",
+          "imports": [
+            "json"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "csv_write_list_row",
+      "blockType": "command",
+      "text": "向CSV对象 [NAME] 追加列表数据 [ROW]",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "csvfile"
+        },
+        "ROW": {
+          "type": "string",
+          "defaultValue": "[1, \"Alice\", 98]"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "company_csv_writers[{NAME}].writerow(json.loads({ROW}))\ncompany_csv_last_rows.append(json.loads({ROW}))",
+          "imports": [
+            "json"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "csv_write_dict_row",
+      "blockType": "command",
+      "text": "向CSV对象 [NAME] 按字段 [FIELDS] 写入字典数据 [DATA]",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "csvfile"
+        },
+        "FIELDS": {
+          "type": "string",
+          "defaultValue": "[\"index\", \"name\", \"score\"]"
+        },
+        "DATA": {
+          "type": "string",
+          "defaultValue": "{\"index\": 2, \"name\": \"Bob\", \"score\": 87}"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "csv.DictWriter(company_csv_files[{NAME}], fieldnames=json.loads({FIELDS})).writerow(json.loads({DATA}))",
+          "imports": [
+            "csv",
+            "json"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "csv_close_file",
+      "blockType": "command",
+      "text": "关闭CSV对象 [NAME]",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "csvfile"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "company_csv_files[{NAME}].close()\nprint(\"CSV closed:\", {NAME})",
+          "imports": []
+        }
+      }
+    },
+    {
+      "opcode": "json_pick_value",
+      "blockType": "reporter",
+      "text": "从JSON文本 [JSON_TEXT] 读取字段 [KEY]",
+      "arguments": {
+        "JSON_TEXT": {
+          "type": "string",
+          "defaultValue": "{\"temperature\": 26, \"humidity\": 61, \"ok\": true}"
+        },
+        "KEY": {
+          "type": "string",
+          "defaultValue": "temperature"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "json.loads({JSON_TEXT})[{KEY}]",
+          "imports": [
+            "json"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "http_get_text",
+      "blockType": "reporter",
+      "text": "请求URL [URL] 超时 [TIMEOUT] 秒并返回文本",
+      "arguments": {
+        "URL": {
+          "type": "string",
+          "defaultValue": "https://httpbin.org/get"
+        },
+        "TIMEOUT": {
+          "type": "number",
+          "defaultValue": 5
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "urllib.request.urlopen({URL}, timeout={TIMEOUT}).read().decode(\"utf-8\")",
+          "imports": [
+            "urllib.request"
+          ]
+        }
+      }
+    },
+    {
+      "opcode": "debug_log_with_time",
+      "blockType": "command",
+      "text": "带时间打印 [TEXT]",
+      "arguments": {
+        "TEXT": {
+          "type": "string",
+          "defaultValue": "hello company kit"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print(time.strftime(\"[%H:%M:%S]\"), {TEXT})",
+          "imports": [
+            "time"
+          ]
+        }
+      }
+    }
+  ]
+}
