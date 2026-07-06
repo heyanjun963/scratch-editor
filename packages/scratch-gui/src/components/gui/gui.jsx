@@ -31,7 +31,6 @@ import Alerts from '../../containers/alerts.jsx';
 import DragLayer from '../../containers/drag-layer.jsx';
 import ConnectionModal from '../../containers/connection-modal.jsx';
 import HelloScratchModal from '../../containers/hello-scratch-modal.jsx';
-import LibraryManager from '../../containers/library-manager.jsx';
 import PythonCodingPanel from '../../containers/python-coding-panel.jsx';
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
 
@@ -180,7 +179,6 @@ const GUIComponent = props => {
         isShared,
         isTelemetryEnabled,
         isTotallyNormal,
-        libraryManagerVisible,
         loading,
         logo,
         manuallySaveThumbnails,
@@ -353,9 +351,6 @@ const GUIComponent = props => {
                     ) : null}
                     {helloScratchModalVisible ? (
                         <HelloScratchModal />
-                    ) : null}
-                    {libraryManagerVisible ? (
-                        <LibraryManager />
                     ) : null}
                     {costumeLibraryVisible ? (
                         <CostumeLibrary
@@ -681,7 +676,6 @@ GUIComponent.propTypes = {
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
     isShared: PropTypes.bool,
-    libraryManagerVisible: PropTypes.bool,
     isTotallyNormal: PropTypes.bool,
     loading: PropTypes.bool,
     logo: PropTypes.string,

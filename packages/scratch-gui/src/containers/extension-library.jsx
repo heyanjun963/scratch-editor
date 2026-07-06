@@ -6,8 +6,10 @@ import {defineMessages, injectIntl} from 'react-intl';
 import intlShape from '../lib/intlShape.js';
 
 import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
+import {PYTHON_EDITOR_MODE} from '../reducers/mode';
 
 import LibraryComponent from '../components/library/library.jsx';
+import ProductExtensionLibrary from '../components/product-extension-library/product-extension-library.jsx';
 import extensionIcon from '../components/action-menu/icon--sprite.svg';
 
 const messages = defineMessages({
@@ -48,6 +50,15 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
+        if (this.props.editorMode === PYTHON_EDITOR_MODE) {
+            return (
+                <ProductExtensionLibrary
+                    onBuiltinExtensionSelect={this.handleItemSelect}
+                    onRequestClose={this.props.onRequestClose}
+                />
+            );
+        }
+
         const extensionLibraryThumbnailData = extensionLibraryContent
             .filter(extension => !extension.modes || extension.modes.includes(this.props.editorMode))
             .map(extension => ({
