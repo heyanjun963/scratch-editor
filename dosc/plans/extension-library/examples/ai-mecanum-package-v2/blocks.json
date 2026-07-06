@@ -1,0 +1,244 @@
+{
+  "categories": [
+    {
+      "id": "motion",
+      "name": "运动底盘",
+      "blocks": [
+        "when_start",
+        "main",
+        "move_dir",
+        "move_distance",
+        "turn_speed",
+        "stop",
+        "set_motor_speeds",
+        "reset_motor"
+      ]
+    },
+    {
+      "id": "sensors",
+      "name": "传感器",
+      "blocks": [
+        "sonar_distance",
+        "sonar_set_rgb",
+        "line_status",
+        "line_offset",
+        "battery"
+      ]
+    },
+    {
+      "id": "actuators",
+      "name": "执行器",
+      "blocks": [
+        "buzzer_tone",
+        "buzzer_close",
+        "disable_lowpower_alarm"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "opcode": "when_start",
+      "blockType": "hat",
+      "text": "当启动时",
+      "category": "motion",
+      "arguments": {}
+    },
+    {
+      "opcode": "main",
+      "blockType": "hat",
+      "text": "主程序",
+      "category": "motion",
+      "arguments": {}
+    },
+    {
+      "opcode": "move_dir",
+      "blockType": "command",
+      "text": "麦轮车按方向 [DIRECTION] 速度 [SPEED] 运动",
+      "category": "motion",
+      "arguments": {
+        "DIRECTION": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 50
+        }
+      }
+    },
+    {
+      "opcode": "move_distance",
+      "blockType": "command",
+      "text": "麦轮车按方向 [DIRECTION] 速度 [SPEED] 移动距离 [DISTANCE]",
+      "category": "motion",
+      "arguments": {
+        "DIRECTION": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 50
+        },
+        "DISTANCE": {
+          "type": "number",
+          "defaultValue": 20
+        }
+      }
+    },
+    {
+      "opcode": "turn_speed",
+      "blockType": "command",
+      "text": "麦轮车转向 [DIRECTION] 速度 [SPEED]",
+      "category": "motion",
+      "arguments": {
+        "DIRECTION": {
+          "type": "number",
+          "defaultValue": 1
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 30
+        }
+      }
+    },
+    {
+      "opcode": "stop",
+      "blockType": "command",
+      "text": "停止麦轮车",
+      "category": "motion",
+      "arguments": {}
+    },
+    {
+      "opcode": "set_motor_speeds",
+      "blockType": "command",
+      "text": "设置四个电机速度 左前 [SPEED1] 右前 [SPEED2] 左后 [SPEED3] 右后 [SPEED4]",
+      "category": "motion",
+      "arguments": {
+        "SPEED1": {
+          "type": "number",
+          "defaultValue": 30
+        },
+        "SPEED2": {
+          "type": "number",
+          "defaultValue": 30
+        },
+        "SPEED3": {
+          "type": "number",
+          "defaultValue": 30
+        },
+        "SPEED4": {
+          "type": "number",
+          "defaultValue": 30
+        }
+      }
+    },
+    {
+      "opcode": "reset_motor",
+      "blockType": "command",
+      "text": "复位麦轮车电机",
+      "category": "motion",
+      "arguments": {}
+    },
+    {
+      "opcode": "sonar_distance",
+      "blockType": "reporter",
+      "text": "超声波距离",
+      "category": "sensors",
+      "arguments": {}
+    },
+    {
+      "opcode": "sonar_set_rgb",
+      "blockType": "command",
+      "text": "超声波灯 [NUM] 设置 RGB 红 [RED] 绿 [GREEN] 蓝 [BLUE]",
+      "category": "sensors",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "RED": {
+          "type": "number",
+          "defaultValue": 255
+        },
+        "GREEN": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "BLUE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      }
+    },
+    {
+      "opcode": "line_status",
+      "blockType": "boolean",
+      "text": "巡线传感器 [SENSOR] 第 [NUM] 路检测到黑线",
+      "category": "sensors",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "linefollow6"
+        },
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      }
+    },
+    {
+      "opcode": "line_offset",
+      "blockType": "reporter",
+      "text": "巡线传感器 [SENSOR] 偏移量",
+      "category": "sensors",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "linefollow6"
+        }
+      }
+    },
+    {
+      "opcode": "battery",
+      "blockType": "reporter",
+      "text": "电池电量",
+      "category": "sensors",
+      "arguments": {}
+    },
+    {
+      "opcode": "buzzer_tone",
+      "blockType": "command",
+      "text": "蜂鸣器频率 [TONE] 节拍 [RHYTHM] 模式 [MODE]",
+      "category": "actuators",
+      "arguments": {
+        "TONE": {
+          "type": "number",
+          "defaultValue": 262
+        },
+        "RHYTHM": {
+          "type": "number",
+          "defaultValue": 0.5
+        },
+        "MODE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_close",
+      "blockType": "command",
+      "text": "关闭蜂鸣器",
+      "category": "actuators",
+      "arguments": {}
+    },
+    {
+      "opcode": "disable_lowpower_alarm",
+      "blockType": "command",
+      "text": "关闭低电压报警",
+      "category": "actuators",
+      "arguments": {}
+    }
+  ]
+}

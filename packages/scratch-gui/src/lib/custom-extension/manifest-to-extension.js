@@ -1,5 +1,7 @@
 const createNoopBlockFunction = block => {
     switch (block.blockType) {
+    case 'hat':
+        return () => true;
     case 'boolean':
         return () => false;
     case 'reporter':

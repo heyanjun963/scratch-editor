@@ -1,0 +1,20 @@
+{
+  "formatVersion": 2,
+  "id": "aimecanum",
+  "name": "AI 机甲麦轮车",
+  "version": "1.0.0",
+  "description": "从旧版 python-generator.js 中迁移的 AI 机甲麦轮车 Python 积木示例库",
+  "target": "python",
+  "color1": "#ff8c1a",
+  "color2": "#db6e00",
+  "color3": "#b85c00",
+  "entry": {
+    "blocks": "blocks.json",
+    "python": "generator/python.json"
+  },
+  "runtime": {
+    "pythonLibraries": [
+      "libraries/aimecanum_notes.py"
+    ]
+  }
+}

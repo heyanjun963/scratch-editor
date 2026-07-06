@@ -4,6 +4,7 @@ const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 const blockTypeMap = {
     command: 'command',
+    hat: 'hat',
     reporter: 'reporter',
     boolean: 'Boolean'
 };
@@ -76,6 +77,30 @@ const normalizeArguments = (block, rawArguments) => {
     }, {});
 };
 
+const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
+    assertObject(rawPythonCodegen, `积木 ${opcode} 缺少 codegen.python 配置`);
+    if (typeof rawPythonCodegen.template === 'undefined') {
+        throw new Error(`积木 ${opcode} 缺少 codegen.python.template`);
+    }
+    return {
+        template: String(rawPythonCodegen.template),
+        imports: Array.isArray(rawPythonCodegen.imports) ?
+            rawPythonCodegen.imports.map(String) :
+            [],
+        runtimeFiles: Array.isArray(rawPythonCodegen.runtimeFiles) ?
+            rawPythonCodegen.runtimeFiles.map(String) :
+            [],
+        variables: Array.isArray(rawPythonCodegen.variables) ?
+            rawPythonCodegen.variables.map(String) :
+            [],
+        setups: Array.isArray(rawPythonCodegen.setups) ?
+            rawPythonCodegen.setups.map(String) :
+            [],
+        launcher: rawPythonCodegen.launcher ? String(rawPythonCodegen.launcher) : '',
+        section: rawPythonCodegen.section ? String(rawPythonCodegen.section) : ''
+    };
+};
+
 const normalizeBlock = (rawBlock, seenOpcodes) => {
     assertObject(rawBlock, 'blocks 中的每一项都必须是对象');
 
@@ -92,57 +117,105 @@ const normalizeBlock = (rawBlock, seenOpcodes) => {
     if (!blockTypeMap[blockType]) {
         throw new Error(`积木 ${opcode} 的 blockType ${blockType} 暂不支持`);
     }
-    if (!rawBlock.codegen || !rawBlock.codegen.python || !rawBlock.codegen.python.template) {
-        throw new Error(`积木 ${opcode} 缺少 codegen.python.template`);
-    }
 
+    const rawPythonCodegen = rawBlock.codegen && rawBlock.codegen.python;
     const block = {
         opcode,
         blockType,
         scratchBlockType: blockTypeMap[blockType],
         text: String(rawBlock.text || opcode),
         arguments: normalizeArguments({opcode}, rawBlock.arguments),
+        category: rawBlock.category ? String(rawBlock.category) : null,
         codegen: {
-            python: {
-                template: String(rawBlock.codegen.python.template),
-                imports: Array.isArray(rawBlock.codegen.python.imports) ?
-                    rawBlock.codegen.python.imports.map(String) :
-                    []
-            }
+            python: normalizePythonCodegen(opcode, rawPythonCodegen)
         }
     };
     validateArgumentReferences(block, Object.keys(block.arguments));
     return block;
 };
 
-const normalizeCustomExtensionManifest = rawManifest => {
-    assertObject(rawManifest, '拓展库配置必须是 JSON 对象');
-
-    if (Number(rawManifest.formatVersion) !== 1) {
-        throw new Error('当前只支持 formatVersion = 1 的自定义拓展库');
+const normalizeBlocks = rawBlocks => {
+    if (!Array.isArray(rawBlocks) || rawBlocks.length === 0) {
+        throw new Error('拓展库至少需要包含一个积木');
     }
+    const seenOpcodes = new Set();
+    return rawBlocks.map(block => normalizeBlock(block, seenOpcodes));
+};
 
+const normalizeCategories = rawCategories => {
+    if (!Array.isArray(rawCategories)) return [];
+    return rawCategories.map(category => {
+        assertObject(category, 'categories 中的每一项都必须是对象');
+        return {
+            id: String(category.id || category.name || ''),
+            name: String(category.name || category.id || ''),
+            blocks: Array.isArray(category.blocks) ? category.blocks.map(String) : []
+        };
+    }).filter(category => category.id || category.name);
+};
+
+const normalizeCommonManifestFields = rawManifest => {
     const id = String(rawManifest.id || '').trim();
     if (!ID_PATTERN.test(id)) {
         throw new Error('拓展库 id 必须只包含小写字母和数字');
     }
 
-    if (!Array.isArray(rawManifest.blocks) || rawManifest.blocks.length === 0) {
-        throw new Error('拓展库至少需要包含一个积木');
-    }
-
-    const seenOpcodes = new Set();
     return {
-        formatVersion: 1,
         id,
         name: String(rawManifest.name || id),
         version: String(rawManifest.version || '1.0.0'),
+        description: rawManifest.description ? String(rawManifest.description) : '',
         icon: rawManifest.icon ? String(rawManifest.icon) : null,
         color1: normalizeColor(rawManifest.color1, '#4C97FF'),
         color2: normalizeColor(rawManifest.color2, '#3373CC'),
         color3: normalizeColor(rawManifest.color3, '#285CA3'),
-        blocks: rawManifest.blocks.map(block => normalizeBlock(block, seenOpcodes))
+        target: String(rawManifest.target || rawManifest.source || 'python'),
+        source: String(rawManifest.source || rawManifest.target || 'python')
     };
+};
+
+const normalizeCustomExtensionManifestV1 = rawManifest => ({
+    formatVersion: 1,
+    ...normalizeCommonManifestFields(rawManifest),
+    categories: [],
+    runtime: {
+        pythonLibraries: [],
+        files: []
+    },
+    package: null,
+    blocks: normalizeBlocks(rawManifest.blocks)
+});
+
+const normalizeCustomExtensionManifestV2 = rawManifest => ({
+    formatVersion: 2,
+    ...normalizeCommonManifestFields(rawManifest),
+    categories: normalizeCategories(rawManifest.categories),
+    runtime: {
+        pythonLibraries: rawManifest.runtime && Array.isArray(rawManifest.runtime.pythonLibraries) ?
+            rawManifest.runtime.pythonLibraries.map(String) :
+            [],
+        files: rawManifest.runtime && Array.isArray(rawManifest.runtime.files) ?
+            rawManifest.runtime.files.map(file => ({
+                path: String(file.path || ''),
+                content: String(file.content || '')
+            })).filter(file => file.path) :
+            []
+    },
+    package: rawManifest.package || null,
+    blocks: normalizeBlocks(rawManifest.blocks)
+});
+
+const normalizeCustomExtensionManifest = rawManifest => {
+    assertObject(rawManifest, '拓展库配置必须是 JSON 对象');
+
+    const formatVersion = Number(rawManifest.formatVersion || 1);
+    if (formatVersion === 1) {
+        return normalizeCustomExtensionManifestV1(rawManifest);
+    }
+    if (formatVersion === 2) {
+        return normalizeCustomExtensionManifestV2(rawManifest);
+    }
+    throw new Error(`当前不支持 formatVersion = ${rawManifest.formatVersion} 的自定义拓展库`);
 };
 
 const serializeCustomExtensionManifest = manifest => {
@@ -151,13 +224,19 @@ const serializeCustomExtensionManifest = manifest => {
         id: manifest.id,
         name: manifest.name,
         version: manifest.version,
+        description: manifest.description || '',
         color1: manifest.color1,
         color2: manifest.color2,
         color3: manifest.color3,
+        target: manifest.target || 'python',
+        source: manifest.source || manifest.target || 'python',
+        categories: manifest.categories || [],
+        runtime: manifest.runtime || {pythonLibraries: [], files: []},
         blocks: manifest.blocks.map(block => ({
             opcode: block.opcode,
             blockType: block.blockType,
             text: block.text,
+            category: block.category || undefined,
             arguments: Object.keys(block.arguments).reduce((argumentsByName, name) => {
                 const argument = block.arguments[name];
                 argumentsByName[name] = {
@@ -169,13 +248,19 @@ const serializeCustomExtensionManifest = manifest => {
             codegen: {
                 python: {
                     template: block.codegen.python.template,
-                    imports: block.codegen.python.imports || []
+                    imports: block.codegen.python.imports || [],
+                    runtimeFiles: block.codegen.python.runtimeFiles || [],
+                    variables: block.codegen.python.variables || [],
+                    setups: block.codegen.python.setups || [],
+                    launcher: block.codegen.python.launcher || '',
+                    section: block.codegen.python.section || ''
                 }
             }
         }))
     };
 
     if (manifest.icon) serialized.icon = manifest.icon;
+    if (manifest.package) serialized.package = manifest.package;
     return serialized;
 };
 

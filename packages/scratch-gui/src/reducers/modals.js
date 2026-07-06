@@ -5,6 +5,7 @@ const MODAL_BACKDROP_LIBRARY = 'backdropLibrary';
 const MODAL_COSTUME_LIBRARY = 'costumeLibrary';
 const MODAL_DEBUG = 'debugModal';
 const MODAL_EXTENSION_LIBRARY = 'extensionLibrary';
+const MODAL_LIBRARY_MANAGER = 'libraryManager';
 const MODAL_LOADING_PROJECT = 'loadingProject';
 const MODAL_TELEMETRY = 'telemetryModal';
 const MODAL_SOUND_LIBRARY = 'soundLibrary';
@@ -19,6 +20,7 @@ const initialState = {
     [MODAL_COSTUME_LIBRARY]: false,
     [MODAL_DEBUG]: false,
     [MODAL_EXTENSION_LIBRARY]: false,
+    [MODAL_LIBRARY_MANAGER]: false,
     [MODAL_LOADING_PROJECT]: false,
     [MODAL_TELEMETRY]: false,
     [MODAL_SOUND_LIBRARY]: false,
@@ -68,6 +70,9 @@ const openDebugModal = function () {
 const openExtensionLibrary = function () {
     return openModal(MODAL_EXTENSION_LIBRARY);
 };
+const openLibraryManager = function () {
+    return openModal(MODAL_LIBRARY_MANAGER);
+};
 const openLoadingProject = function () {
     return openModal(MODAL_LOADING_PROJECT);
 };
@@ -104,6 +109,9 @@ const closeDebugModal = function () {
 const closeExtensionLibrary = function () {
     return closeModal(MODAL_EXTENSION_LIBRARY);
 };
+const closeLibraryManager = function () {
+    return closeModal(MODAL_LIBRARY_MANAGER);
+};
 const closeLoadingProject = function () {
     return closeModal(MODAL_LOADING_PROJECT);
 };
@@ -135,6 +143,7 @@ export {
     openCostumeLibrary,
     openDebugModal,
     openExtensionLibrary,
+    openLibraryManager,
     openLoadingProject,
     openSoundLibrary,
     openSpriteLibrary,
@@ -147,6 +156,7 @@ export {
     closeCostumeLibrary,
     closeDebugModal,
     closeExtensionLibrary,
+    closeLibraryManager,
     closeLoadingProject,
     closeSpriteLibrary,
     closeSoundLibrary,

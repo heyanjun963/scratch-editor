@@ -1,5 +1,8 @@
 const codegenContext = {
-    getPythonCodegenTemplate: () => null
+    getPythonCodegenTemplate: () => null,
+    launcher: '',
+    setups: new Set(),
+    variables: new Set()
 };
 
 const prefixByCategory = {
@@ -26,6 +29,18 @@ const literalToPython = value => {
 };
 
 const indent = level => '    '.repeat(level);
+
+const getPythonAssignmentName = line => {
+    const match = String(line || '').match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=/);
+    return match ? match[1] : null;
+};
+
+const renderLauncher = (launcher, entryName) => {
+    if (!launcher) return `${entryName}()`;
+    return String(launcher)
+        .replace(/\{MAIN\}/g, entryName)
+        .replace(/\bstart_main\b/g, entryName);
+};
 
 const normalizePythonName = value => {
     const cleaned = String(value || 'value')
@@ -195,12 +210,31 @@ const addCustomImports = (templateInfo, imports) => {
     });
 };
 
-const applyCustomTemplate = (templateInfo, block, imports) => {
-    addCustomImports(templateInfo, imports);
-    return templateInfo.template.replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, inputName) => {
+const applyTemplateText = (template, templateInfo, block, imports) => (
+    String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, inputName) => {
         const fallback = getDefaultArgumentValue(templateInfo, inputName, '');
         return valueToPython(block, inputName, fallback, imports);
+    })
+);
+
+const addCustomGenerationMetadata = (templateInfo, block, imports) => {
+    addCustomImports(templateInfo, imports);
+    (templateInfo.variables || []).forEach(line => {
+        const renderedLine = applyTemplateText(line, templateInfo, block, imports);
+        if (renderedLine) codegenContext.variables.add(renderedLine);
     });
+    (templateInfo.setups || []).forEach(line => {
+        const renderedLine = applyTemplateText(line, templateInfo, block, imports);
+        if (renderedLine) codegenContext.setups.add(renderedLine);
+    });
+    if (templateInfo.launcher) {
+        codegenContext.launcher = templateInfo.launcher;
+    }
+};
+
+const applyCustomTemplate = (templateInfo, block, imports) => {
+    addCustomGenerationMetadata(templateInfo, block, imports);
+    return applyTemplateText(templateInfo.template, templateInfo, block, imports);
 };
 
 const getPythonCodegenTemplate = blockType => codegenContext.getPythonCodegenTemplate(blockType);
@@ -215,6 +249,7 @@ const customBlockToPythonStatementLines = (block, imports, level) => {
     const templateInfo = getPythonCodegenTemplate(block.type);
     if (!templateInfo) return null;
     const code = applyCustomTemplate(templateInfo, block, imports);
+    if (!code) return [];
     return code.split('\n').map(line => `${indent(level)}${line}`);
 };
 
@@ -357,17 +392,34 @@ const generateSubstack = (block, inputName, imports, level) => {
     return getStackBlocks(substack).flatMap(child => generateStatementLines(child, imports, level));
 };
 
-const generateStack = (topBlock, imports) => {
+const generateStack = (topBlock, imports, options = {}) => {
     const stack = getStackBlocks(topBlock);
     if (stack.length === 0) return [];
 
-    if (topBlock.type === 'event_whenflagclicked' || isType(topBlock, 'control', 'main')) {
+    if (isCustomSetupHatBlock(topBlock)) {
+        const templateInfo = getPythonCodegenTemplate(topBlock.type);
+        addCustomGenerationMetadata(templateInfo, topBlock, imports);
+        return stack.slice(1).flatMap(block => generateStatementLines(block, imports, 0));
+    }
+
+    if (topBlock.type === 'event_whenflagclicked' || isType(topBlock, 'control', 'main') || isCustomMainHatBlock(topBlock)) {
+        const templateInfo = getPythonCodegenTemplate(topBlock.type);
+        if (templateInfo) {
+            addCustomGenerationMetadata(templateInfo, topBlock, imports);
+        }
         const body = stack.slice(1).flatMap(block => generateStatementLines(block, imports, 1));
+        const globalNames = Array.from(codegenContext.variables)
+            .map(getPythonAssignmentName)
+            .filter(Boolean)
+            .sort();
+        const globalLines = globalNames.map(name => `${indent(1)}global ${name}`);
+        const entryName = options.entryName || 'start_main';
         return [
-            'def start_main():',
+            `def ${entryName}():`,
+            ...globalLines,
             ...(body.length ? body : ['    pass']),
             '',
-            'start_main()'
+            renderLauncher(codegenContext.launcher, entryName)
         ];
     }
 
@@ -376,13 +428,29 @@ const generateStack = (topBlock, imports) => {
 
 const isEntryBlock = block => block && (
     block.type === 'event_whenflagclicked' ||
-    isType(block, 'control', 'main')
+    isType(block, 'control', 'main') ||
+    isCustomMainHatBlock(block)
 );
+
+const isCustomSetupHatBlock = block => {
+    if (!block) return false;
+    const templateInfo = getPythonCodegenTemplate(block.type);
+    return Boolean(templateInfo && templateInfo.blockType === 'hat' && templateInfo.section === 'setup');
+};
+
+const isCustomMainHatBlock = block => {
+    if (!block) return false;
+    const templateInfo = getPythonCodegenTemplate(block.type);
+    return Boolean(templateInfo && templateInfo.blockType === 'hat' && templateInfo.section === 'main');
+};
 
 const isFunctionDefinitionBlock = block => isType(block, 'function', 'define');
 
 const generatePythonCode = (workspace, options = {}) => {
     codegenContext.getPythonCodegenTemplate = options.getPythonCodegenTemplate || (() => null);
+    codegenContext.launcher = '';
+    codegenContext.setups = new Set();
+    codegenContext.variables = new Set();
     if (!workspace || typeof workspace.getTopBlocks !== 'function') {
         return '# Python coding mode is waiting for the blocks workspace.';
     }
@@ -390,17 +458,27 @@ const generatePythonCode = (workspace, options = {}) => {
     const imports = new Set();
     const topBlocks = workspace.getTopBlocks(true);
     const functionBlocks = topBlocks.filter(isFunctionDefinitionBlock);
+    const setupHatBlocks = topBlocks.filter(isCustomSetupHatBlock);
     const entryBlocks = topBlocks.filter(isEntryBlock);
     const otherBlocks = topBlocks.filter(block => (
         !isFunctionDefinitionBlock(block) &&
+        !isCustomSetupHatBlock(block) &&
         !isEntryBlock(block)
     ));
     const orderedBlocks = [
         ...functionBlocks,
+        ...setupHatBlocks,
         ...otherBlocks,
         ...entryBlocks
     ];
-    const sections = orderedBlocks.map(block => generateStack(block, imports)).filter(section => section.length);
+    const entryIndexByBlock = new Map(entryBlocks.map((block, index) => [block, index]));
+    const sections = orderedBlocks.map(block => {
+        const entryIndex = entryIndexByBlock.get(block);
+        const entryName = typeof entryIndex === 'number' ?
+            (entryIndex === 0 ? 'start_main' : `start_main${entryIndex}`) :
+            undefined;
+        return generateStack(block, imports, {entryName});
+    }).filter(section => section.length);
 
     if (sections.length === 0) {
         return '# Drag Python blocks here to generate code.';
@@ -409,9 +487,13 @@ const generatePythonCode = (workspace, options = {}) => {
     const importLines = Array.from(imports).sort().map(name => (
         /^(?:from|import)\s/.test(name) ? name : `import ${name}`
     ));
+    const variableLines = Array.from(codegenContext.variables);
+    const setupLines = Array.from(codegenContext.setups);
     return [
         ...importLines,
         ...(importLines.length ? [''] : []),
+        ...(variableLines.length ? ['# initialize variables', ...variableLines, ''] : []),
+        ...(setupLines.length ? [...setupLines, ''] : []),
         ...sections.flatMap((section, index) => (index === 0 ? section : ['', ...section]))
     ].join('\n');
 };

@@ -1,0 +1,144 @@
+{
+  "imports": [
+    "import Hiwonder",
+    "import Hiwonder_DEV",
+    "import time"
+  ],
+  "launcher": "Hiwonder.startMain({MAIN})",
+  "blocks": {
+    "when_start": {
+      "template": "",
+      "section": "setup",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "main": {
+      "template": "",
+      "section": "main",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "move_dir": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.move_dir({DIRECTION}, {SPEED})",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "move_distance": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.move_distance({DISTANCE}, {DIRECTION}, {SPEED})",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "turn_speed": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.rotate_speed({DIRECTION} * {SPEED})",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "stop": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.stop()",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "set_motor_speeds": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.set_motors_speed({SPEED4}, {SPEED3}, {SPEED2}, {SPEED1})",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "reset_motor": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.reset()",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "sonar_distance": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.sonar.getDistance()",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "sonar_set_rgb": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "mecanumCar.sonar.setRGB({NUM}, {RED}, {GREEN}, {BLUE})",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "line_status": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "(getattr(mecanumCar, {SENSOR}).get_result_data() & (1 << ({NUM} - 1))) > 0",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "line_offset": {
+      "variables": [
+        "mecanumCar = Hiwonder_DEV.DEV_MecanumCar( )"
+      ],
+      "template": "getattr(mecanumCar, {SENSOR}).read_offset()",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "battery": {
+      "template": "Hiwonder.Battery_power()",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "buzzer_tone": {
+      "variables": [
+        "beep = Hiwonder.Buzzer()"
+      ],
+      "template": "beep.playTone({TONE}, {RHYTHM}, {MODE})",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "buzzer_close": {
+      "variables": [
+        "beep = Hiwonder.Buzzer()"
+      ],
+      "template": "beep.onoff(False)",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    },
+    "disable_lowpower_alarm": {
+      "template": "Hiwonder.disableLowPowerAlarm()",
+      "runtimeFiles": [
+        "libraries/aimecanum_notes.py"
+      ]
+    }
+  }
+}

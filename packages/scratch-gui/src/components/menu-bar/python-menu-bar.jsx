@@ -16,6 +16,7 @@ import {
     setSerialPortPath,
     setSerialPorts
 } from '../../reducers/python-coding';
+import {openLibraryManager} from '../../reducers/modals';
 
 import styles from './menu-bar.css';
 
@@ -64,6 +65,11 @@ const messages = defineMessages({
         id: 'gui.pythonCoding.serialDetectPrompt',
         defaultMessage: 'Click Refresh to detect',
         description: 'Serial port select placeholder before Web Serial has been requested'
+    },
+    libraryManager: {
+        id: 'gui.pythonCoding.libraryManager',
+        defaultMessage: 'Manage Libraries',
+        description: 'Button label for opening the custom library manager'
     }
 });
 
@@ -113,6 +119,7 @@ const PythonMenuBar = ({
     onSetSerialConnected,
     onSetSerialPortPath,
     onSetSerialPorts,
+    onOpenLibraryManager,
     onWriteConsoleLine,
     onStartSelectingFileUpload,
     remixMessage,
@@ -339,6 +346,13 @@ const PythonMenuBar = ({
                             depth={depth}
                         />
                     )}
+                    <button
+                        className={classNames(styles.menuBarItem, styles.hoverable)}
+                        type="button"
+                        onClick={onOpenLibraryManager}
+                    >
+                        <FormattedMessage {...messages.libraryManager} />
+                    </button>
                 </div>
                 <div className={styles.pythonSerialGroup}>
                     <span className={styles.pythonSerialLabel}>Serial</span>
@@ -445,6 +459,7 @@ PythonMenuBar.propTypes = {
     onSetSerialConnected: PropTypes.func.isRequired,
     onSetSerialPortPath: PropTypes.func.isRequired,
     onSetSerialPorts: PropTypes.func.isRequired,
+    onOpenLibraryManager: PropTypes.func.isRequired,
     onWriteConsoleLine: PropTypes.func.isRequired,
     onStartSelectingFileUpload: PropTypes.func,
     remixMessage: PropTypes.node,
@@ -484,6 +499,7 @@ const mapDispatchToProps = dispatch => ({
     onSetSerialConnected: connected => dispatch(setSerialConnected(connected)),
     onSetSerialPortPath: path => dispatch(setSerialPortPath(path)),
     onSetSerialPorts: ports => dispatch(setSerialPorts(ports)),
+    onOpenLibraryManager: () => dispatch(openLibraryManager()),
     onWriteConsoleLine: consoleText => dispatch(appendPythonConsole(consoleText))
 });
 
