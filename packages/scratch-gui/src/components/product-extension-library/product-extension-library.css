@@ -123,7 +123,6 @@
 }
 
 .chipGroup,
-.checkboxGroup,
 .toolbarActions {
     display: flex;
     gap: .65rem;
@@ -150,15 +149,6 @@
     color: #ff9f1a;
 }
 
-.checkboxLabel {
-    display: inline-flex;
-    gap: .35rem;
-    align-items: center;
-    color: #5d6878;
-    font-size: .82rem;
-    white-space: nowrap;
-}
-
 .toolbarButton,
 .sortButton {
     min-height: 2rem;
@@ -167,7 +157,8 @@
     border-radius: 1rem;
     background: #fff;
     color: #ff9f1a;
-    font-weight: 800;
+    font-weight: 600;
+    font-size: .85rem;
 }
 
 .toolbarButtonSecondary {

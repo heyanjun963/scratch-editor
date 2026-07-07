@@ -100,25 +100,10 @@ const messages = defineMessages({
         description: 'Function module category filter in the product extension library',
         id: 'gui.productExtensionLibrary.functionModule'
     },
-    official: {
-        defaultMessage: '官方库',
-        description: 'Official filter in the product extension library',
-        id: 'gui.productExtensionLibrary.official'
-    },
-    favorite: {
-        defaultMessage: '已收藏',
-        description: 'Favorite filter in the product extension library',
-        id: 'gui.productExtensionLibrary.favorite'
-    },
     loaded: {
         defaultMessage: '已加载',
-        description: 'Loaded filter in the product extension library',
+        description: 'Loaded extension status in the product extension library',
         id: 'gui.productExtensionLibrary.loaded'
-    },
-    downloaded: {
-        defaultMessage: '已下载',
-        description: 'Downloaded filter in the product extension library',
-        id: 'gui.productExtensionLibrary.downloaded'
     },
     checkVersion: {
         defaultMessage: '检查版本',
@@ -253,10 +238,6 @@ const ProductExtensionLibraryComponent = ({
     const [chip, setChip] = useState('all');
     const [query, setQuery] = useState('');
     const [checking, setChecking] = useState(false);
-    const [loadedOnly, setLoadedOnly] = useState(false);
-    const [downloadedOnly, setDownloadedOnly] = useState(false);
-    const [officialOnly, setOfficialOnly] = useState(false);
-    const [favoriteOnly, setFavoriteOnly] = useState(false);
 
     useEffect(() => {
         setChecking(true);
@@ -290,12 +271,7 @@ const ProductExtensionLibraryComponent = ({
             manifest: library.manifest
         })) : [];
         return getFlatItems(activeTab).concat(localItems).filter(item => {
-            const isLoaded = loadedExtensionIds.includes(item.id) || item.source === 'local';
             if (chip !== 'all' && item.categoryId !== chip) return false;
-            if (loadedOnly && !isLoaded) return false;
-            if (downloadedOnly && item.status !== 'available') return false;
-            if (officialOnly && item.status !== 'available' && item.status !== 'planned') return false;
-            if (favoriteOnly) return false;
             if (!normalizedQuery) return true;
             return [
                 item.name,
@@ -308,11 +284,7 @@ const ProductExtensionLibraryComponent = ({
     }, [
         activeTab,
         chip,
-        downloadedOnly,
-        favoriteOnly,
         installedLibraries,
-        loadedOnly,
-        officialOnly,
         query
     ]);
 
@@ -501,40 +473,6 @@ const ProductExtensionLibraryComponent = ({
                             {intl.formatMessage(category.message)}
                         </button>
                     ))}
-                </div>
-                <div className={styles.checkboxGroup}>
-                    <label className={styles.checkboxLabel}>
-                        <input
-                            checked={officialOnly}
-                            type="checkbox"
-                            onChange={event => setOfficialOnly(event.target.checked)}
-                        />
-                        {intl.formatMessage(messages.official)}
-                    </label>
-                    <label className={styles.checkboxLabel}>
-                        <input
-                            checked={favoriteOnly}
-                            type="checkbox"
-                            onChange={event => setFavoriteOnly(event.target.checked)}
-                        />
-                        {intl.formatMessage(messages.favorite)}
-                    </label>
-                    <label className={styles.checkboxLabel}>
-                        <input
-                            checked={loadedOnly}
-                            type="checkbox"
-                            onChange={event => setLoadedOnly(event.target.checked)}
-                        />
-                        {intl.formatMessage(messages.loaded)}
-                    </label>
-                    <label className={styles.checkboxLabel}>
-                        <input
-                            checked={downloadedOnly}
-                            type="checkbox"
-                            onChange={event => setDownloadedOnly(event.target.checked)}
-                        />
-                        {intl.formatMessage(messages.downloaded)}
-                    </label>
                 </div>
                 <div className={styles.toolbarActions}>
                     <input

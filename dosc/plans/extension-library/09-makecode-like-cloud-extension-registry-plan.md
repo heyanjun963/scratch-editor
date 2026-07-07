@@ -13,7 +13,7 @@ MakeCode 的扩展机制有几个关键点值得借鉴：
 | - | - |
 | 扩展是动态/静态库机制，可以扩展某个 target | 我们的拓展库要绑定 Python 模式、主控产品和模块能力 |
 | 用户在 Extensions 面板选择扩展后，会新增一个积木分类 | 我们也要从拓展面板选择后刷新左侧工具箱 |
-| 动态扩展可以从 GitHub 加载、编译并纳入 Web App | 我们可以从公司后台下载 `.sbext`，解析后注册到 VM 和 Python codegen |
+| 动态扩展可以从 GitHub 加载、编译并纳入 Web App | 我们可以支持“代码仓库源 + 公司后台源”两条路线，最终都下载 `.sbext` 或 manifest 后注册到 VM 和 Python codegen |
 | 可搜索扩展需要审批，禁用扩展不能加载 | 我们需要后台审核、上下架、禁用和灰度机制 |
 | 扩展由 `pxt.json` 描述，包含文件、依赖、版本等信息 | 我们的 `.sbext` 需要稳定 manifest，描述 blocks、generator、runtime、依赖和兼容关系 |
 | 项目引用扩展时会锁定具体版本，更新需要用户显式操作 | 我们保存项目时也应记录拓展库 id、version、source 和 checksum |
@@ -30,17 +30,17 @@ MakeCode 的扩展机制有几个关键点值得借鉴：
 
 ## 2. 一句话目标
 
-建立一个“本地导入 + 云端目录 + 版本锁定 + 审核发布”的统一拓展库框架：
+建立一个“本地导入 + 代码仓库源 + 云端目录 + 版本锁定 + 审核发布”的统一拓展库框架：
 
 ```text
 本地 .sbext 文件
     \
      -> 统一 package reader -> manifest -> VM 注册 -> 工具箱积木 -> Python codegen
     /
-公司后台拓展库目录
+代码仓库源 / 公司后台拓展库目录
 ```
 
-编辑器不关心拓展库来自本地还是后台。只要最后变成统一 manifest，就走同一条注册和生成链路。
+编辑器不关心拓展库来自本地、代码仓库还是后台。只要最后变成统一 manifest，就走同一条注册和生成链路。
 
 ---
 
@@ -65,6 +65,7 @@ MakeCode 的扩展机制有几个关键点值得借鉴：
 | 来源 | 说明 |
 | - | - |
 | 内置 | 随编辑器打包，离线可用 |
+| 代码仓库 | 类似 MakeCode，从 GitHub、Gitee、GitLab 或公司 Git 服务读取拓展包清单和源码 |
 | 云端 | 公司后台审核通过的拓展库 |
 | 本地 | 用户从磁盘导入的 `.json/.zip/.sbext` |
 | 草稿 | 用户上传后但未审核通过的个人/组织可见拓展 |
@@ -90,7 +91,8 @@ MakeCode 的扩展机制有几个关键点值得借鉴：
 flowchart TD
     A["本地 .sbext/.zip/.json"] --> C["package-reader"]
     B["公司后台 catalog/package API"] --> D["remote-library-client"]
-    D --> E["下载 .sbext 包"]
+    R["代码仓库 raw/release 源"] --> D
+    D --> E["下载 .sbext 包或 manifest"]
     E --> C
     C --> F["manifest-schema 规范化"]
     F --> G["customExtensions Redux"]
@@ -103,7 +105,7 @@ flowchart TD
 
 设计原则：
 
-1. **来源解耦**：本地文件和云端文件都先变成同一种 `.sbext` 包。
+1. **来源解耦**：本地文件、代码仓库文件和云端文件都先变成同一种 `.sbext` 包或 manifest。
 2. **注册复用**：不为云端拓展另写一套 VM 注册逻辑。
 3. **生成复用**：不为云端拓展另写一套 Python codegen。
 4. **审核优先**：普通用户不能加载被禁用或未通过审核的公开拓展。
@@ -111,9 +113,116 @@ flowchart TD
 
 ---
 
-## 5. 后台数据模型
+## 5. 拓展来源和节点策略
 
-### 5.1 拓展库记录
+### 5.1 两条发布路线
+
+后续可以同时支持两条路线：
+
+| 路线 | 适合阶段 | 优点 | 风险 |
+| - | - | - | - |
+| 代码仓库源 | 早期、内部团队、开源生态 | 成本低，直接复用 GitHub/Gitee/GitLab 的 release、raw 文件和版本标签 | 国内访问 GitHub 不稳定，权限、审核和撤回能力弱 |
+| 公司后台源 | 商用、教学场景、正式产品 | 可审核、可下架、可灰度、可统计、可做权限和版本锁定 | 需要服务器、对象存储、CDN 和后台管理成本 |
+
+推荐策略：
+
+1. **早期先支持代码仓库源**，用仓库地址或 release 地址加载拓展包，快速验证生态。
+2. **正式商用走公司后台源**，后台只保存 catalog、审核状态、版本元数据和包地址。
+3. **两条路线都转成统一 manifest**，前端和 Python codegen 不关心来源。
+
+### 5.2 代码仓库源格式
+
+参考 MakeCode 的思路，拓展可以来自一个代码仓库：
+
+```text
+https://github.com/company/aimecanum-extension
+https://gitee.com/company/aimecanum-extension
+https://gitlab.company.com/extensions/aimecanum
+```
+
+仓库内推荐结构：
+
+```text
+aimecanum-extension/
+├── manifest.json
+├── generator.js
+├── blocks.json
+├── assets/
+└── releases/
+    └── aimecanum-1.0.0.sbext
+```
+
+编辑器加载时只关心两个入口：
+
+| 入口 | 用途 |
+| - | - |
+| `manifest.json` | 预览卡片、版本、兼容关系、积木元数据 |
+| `.sbext` release 包 | 安装时下载，保证包内容和版本固定 |
+
+### 5.3 国内/国外节点
+
+为了兼顾国内和国外访问速度，建议把“拓展源”抽象成多节点：
+
+```json
+{
+  "id": "company-ai-mecanum",
+  "version": "1.0.0",
+  "sources": [
+    {
+      "region": "cn",
+      "type": "gitee-release",
+      "url": "https://gitee.com/company/aimecanum-extension/releases/download/v1.0.0/aimecanum.sbext"
+    },
+    {
+      "region": "global",
+      "type": "github-release",
+      "url": "https://github.com/company/aimecanum-extension/releases/download/v1.0.0/aimecanum.sbext"
+    },
+    {
+      "region": "cn",
+      "type": "company-cdn",
+      "url": "https://cdn-cn.example.com/extensions/aimecanum/1.0.0/package.sbext"
+    }
+  ],
+  "sha256": "PACKAGE_SHA256"
+}
+```
+
+客户端选择规则：
+
+1. 用户地区是中国大陆时，优先 `cn` 节点。
+2. 国外用户优先 `global` 节点。
+3. 当前节点失败时，自动尝试下一个节点。
+4. 下载后校验 `sha256`，防止镜像内容不一致。
+5. 成功的节点可缓存为下次默认节点。
+
+### 5.4 推荐落地架构
+
+最省服务器成本的方案不是完全不要后台，而是让后台只做“轻目录”：
+
+```text
+公司后台
+  -> 保存 catalog、版本、审核状态、sha256、节点列表
+  -> 不一定直接托管所有大文件
+
+代码仓库 / CDN / 对象存储
+  -> 托管 .sbext 包、图标和示例资源
+
+编辑器
+  -> 拉 catalog
+  -> 根据 region 选择节点
+  -> 下载包
+  -> 校验 sha256
+  -> 注册拓展
+```
+
+这样既保留后台审核和下架能力，又可以把大文件流量交给 GitHub、Gitee、CDN 或对象存储。
+
+---
+
+## 6. 后台数据模型
+
+### 6.1 拓展库记录
 
 ```json
 {
@@ -132,7 +241,7 @@ flowchart TD
 }
 ```
 
-### 5.2 版本记录
+### 6.2 版本记录
 
 ```json
 {
@@ -141,6 +250,18 @@ flowchart TD
   "status": "approved",
   "packageUrl": "https://cdn.example.com/extensions/company-ai-mecanum/1.0.3/package.sbext",
   "manifestUrl": "https://cdn.example.com/extensions/company-ai-mecanum/1.0.3/manifest.json",
+  "sources": [
+    {
+      "region": "cn",
+      "type": "company-cdn",
+      "url": "https://cdn-cn.example.com/extensions/company-ai-mecanum/1.0.3/package.sbext"
+    },
+    {
+      "region": "global",
+      "type": "github-release",
+      "url": "https://github.com/company/company-ai-mecanum/releases/download/v1.0.3/package.sbext"
+    }
+  ],
   "sha256": "PACKAGE_SHA256",
   "size": 48213,
   "compatibility": {
@@ -154,7 +275,7 @@ flowchart TD
 }
 ```
 
-### 5.3 状态枚举
+### 6.3 状态枚举
 
 | status | 含义 | 是否可被普通用户加载 |
 | - | - | - |
@@ -167,9 +288,9 @@ flowchart TD
 
 ---
 
-## 6. 后台 API 草案
+## 7. 后台 API 草案
 
-### 6.1 查询目录
+### 7.1 查询目录
 
 ```http
 GET /api/extensions/catalog?target=python&kind=module&productId=company-ai-mecanum&q=ultra&page=1
@@ -197,15 +318,35 @@ GET /api/extensions/catalog?target=python&kind=module&productId=company-ai-mecan
 }
 ```
 
-### 6.2 下载指定版本
+### 7.2 下载指定版本
 
 ```http
 GET /api/extensions/company-ultrasonic/versions/1.0.0/package
 ```
 
-返回 `.sbext` 文件。
+返回 `.sbext` 文件，或者返回带多节点地址的下载描述。
 
-### 6.3 上传拓展包
+```json
+{
+  "extensionId": "company-ultrasonic",
+  "version": "1.0.0",
+  "sha256": "PACKAGE_SHA256",
+  "sources": [
+    {
+      "region": "cn",
+      "type": "company-cdn",
+      "url": "https://cdn-cn.example.com/extensions/company-ultrasonic/1.0.0/package.sbext"
+    },
+    {
+      "region": "global",
+      "type": "github-release",
+      "url": "https://github.com/company/company-ultrasonic/releases/download/v1.0.0/package.sbext"
+    }
+  ]
+}
+```
+
+### 7.3 上传拓展包
 
 ```http
 POST /api/extensions/upload
@@ -228,13 +369,13 @@ Content-Type: multipart/form-data
 4. 存储包文件和图标。
 5. 进入 `draft` 或 `reviewing` 状态。
 
-### 6.4 提交审核
+### 7.4 提交审核
 
 ```http
 POST /api/extensions/{id}/versions/{version}/submit-review
 ```
 
-### 6.5 禁用版本
+### 7.5 禁用版本
 
 ```http
 PATCH /api/extensions/{id}/versions/{version}
@@ -249,9 +390,9 @@ PATCH /api/extensions/{id}/versions/{version}
 
 ---
 
-## 7. 前端框架改造
+## 8. 前端框架改造
 
-### 7.1 新增远程源抽象
+### 8.1 新增远程源抽象
 
 建议新增：
 
@@ -272,7 +413,7 @@ packages/scratch-gui/src/lib/custom-extension/
 | `remote-library-cache.js` | 缓存已下载包，支持离线再次加载 |
 | `upload-library-package.js` | 上传本地包到后台 |
 
-### 7.2 Redux 状态扩展
+### 8.2 Redux 状态扩展
 
 建议扩展 `custom-extensions.js`：
 
@@ -297,7 +438,7 @@ packages/scratch-gui/src/lib/custom-extension/
 | `packageCache` | 已下载版本的本地缓存索引 |
 | `uploadTasks` | 上传进度、错误和结果 |
 
-### 7.3 面板加载流程
+### 8.3 面板加载流程
 
 ```text
 打开拓展面板
@@ -318,7 +459,7 @@ packages/scratch-gui/src/lib/custom-extension/
 
 ---
 
-## 8. 拓展包格式补充
+## 9. 拓展包格式补充
 
 为了支撑云端维护，`.sbext` 推荐固定结构：
 
@@ -361,7 +502,7 @@ package.sbext
 
 ---
 
-## 9. 安全和审核策略
+## 10. 安全和审核策略
 
 第一阶段建议只允许声明式拓展包，不允许普通用户上传任意 JS 执行代码。
 
@@ -378,7 +519,7 @@ MakeCode 对可搜索扩展采用审批机制，并明确禁用扩展不能加�
 
 ---
 
-## 10. 项目保存和版本锁定
+## 11. 项目保存和版本锁定
 
 项目中需要记录已用拓展库：
 
@@ -412,7 +553,7 @@ MakeCode 对可搜索扩展采用审批机制，并明确禁用扩展不能加�
 
 ---
 
-## 11. 分阶段实施
+## 12. 分阶段实施
 
 ### 阶段 1：源抽象和面板占位
 
@@ -502,7 +643,7 @@ MakeCode 对可搜索扩展采用审批机制，并明确禁用扩展不能加�
 
 ---
 
-## 12. 后续维护方式
+## 13. 后续维护方式
 
 框架搭好后，新增一个公司产品或模块的理想流程是：
 
@@ -528,7 +669,7 @@ MakeCode 对可搜索扩展采用审批机制，并明确禁用扩展不能加�
 
 ---
 
-## 13. 推荐结论
+## 14. 推荐结论
 
 建议把拓展库产品化拆成两条线并行：
 

@@ -15,6 +15,7 @@
 | [07 自定义拓展库完整逻辑流转](./07-extension-library-runtime-flow.md) | 汇报用端到端说明：导入、规范化、注册 VM、显示工具箱、拖拽积木、生成 Python 代码的完整链路 |
 | [08 产品/模块式拓展面板执行方案](./08-product-module-extension-panel-plan.md) | 参考 Mind+ 竞品形态，把自定义拓展库入口迁回拓展面板，设计主控扩展/模块扩展 Tab、产品兼容关系、灰色禁用状态、工具箱启用策略和分阶段落地计划 |
 | [09 MakeCode-like 云端拓展库框架方案](./09-makecode-like-cloud-extension-registry-plan.md) | 参考 Microsoft MakeCode 扩展机制，设计公司后台上传、云端目录、远程 `.sbext` 下载、审核、版本锁定、本地导入兜底和后续只维护拓展包的框架 |
+| [10 旧产品拓展迁移计划](./10-old-product-migration-plan.md) | 结合旧 `scratch-vm/src/extensions` 和旧 `python-generator`，规划旧产品、公共模块、启动帽子块、初始化变量、Python 生成器和测试基线的迁移路线 |
 
 ## 当前结论
 
