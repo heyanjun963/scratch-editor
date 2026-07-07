@@ -114,14 +114,17 @@ const writeCustomExtensionLibraries = async manifests => {
     return {ok: true};
 };
 
-const isBluetoothSerialPort = port => (
-    /bluetooth|\u84dd\u7259|spp|edifier|\u8033\u673a/i.test(getSerialPortLabel(port))
-);
-
-const isHardwareSerialPort = port => (
-    !isBluetoothSerialPort(port) &&
-    /USB|COM\d+|CH340|CH341|CP210|FTDI|Arduino|CDC|Serial/i.test(getSerialPortLabel(port))
-);
+// 串口信息在不同 Windows 驱动里不稳定，这里不做过滤，先完整交给前端展示。
+const getSelectableSerialPorts = portList => {
+    const ports = portList.map(port => ({
+        portId: port.portId,
+        portName: port.portName,
+        displayName: port.displayName,
+        vendorId: port.vendorId,
+        productId: port.productId
+    }));
+    return ports;
+};
 
 // 桌面端 tab 的 mode 会透传到 GUI，用来决定舞台模式或 Python 编码模式。
 const editorModes = {
@@ -615,15 +618,7 @@ const registerSerialDeviceHandlers = () => {
             return;
         }
         event.preventDefault();
-        const ports = portList
-            .map(port => ({
-                portId: port.portId,
-                portName: port.portName,
-                displayName: port.displayName,
-                vendorId: port.vendorId,
-                productId: port.productId
-            }))
-            .filter(isHardwareSerialPort);
+        const ports = getSelectableSerialPorts(portList);
         const selectedPort = ports[0];
         webContents.send('serial:ports', {
             ports,
