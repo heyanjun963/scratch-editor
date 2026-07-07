@@ -5,6 +5,7 @@ const {pathToFileURL} = require('url');
 const PythonRunner = require('./python-runner');
 const TerminalRunner = require('./terminal-runner');
 
+// Electron 主进程入口：负责桌面窗口、浏览器式标签页、本机 Python、串口和本地拓展库 IPC。
 const defaultSize = {width: 1280, height: 800};
 const titleBarHeight = 40;
 const port = process.env.PORT || 8601;
@@ -54,6 +55,7 @@ const getAppUrl = () => {
     return pathToFileURL(path.join(app.getAppPath(), 'packages', 'scratch-gui', 'build', 'index.html')).toString();
 };
 
+// 打包后桌面壳资源会跟随 app 路径；开发环境直接读 desktop 目录。
 const getDesktopAssetPath = (...segments) => (
     isDevelopment ?
         path.join(__dirname, ...segments) :
@@ -73,6 +75,7 @@ const getAllowedSerialOrigins = () => {
     return origins;
 };
 
+// Web Serial 给到的信息在不同驱动上差异很大，这里统一拼成可搜索标签。
 const getSerialPortLabel = port => [
     port.portName,
     port.displayName,
@@ -100,6 +103,7 @@ const readCustomExtensionLibraries = async () => {
     }
 };
 
+// 本地拓展库在桌面端落盘到 userData，避免只存在浏览器 localStorage。
 const writeCustomExtensionLibraries = async manifests => {
     if (!Array.isArray(manifests)) {
         throw new Error('Custom extension libraries must be an array.');
@@ -114,13 +118,12 @@ const isBluetoothSerialPort = port => (
     /bluetooth|\u84dd\u7259|spp|edifier|\u8033\u673a/i.test(getSerialPortLabel(port))
 );
 
-const isPreferredSerialPort = port => /COM7|CH340|CH341|USB-SERIAL|USB2\.0-Serial/i.test(getSerialPortLabel(port));
-
 const isHardwareSerialPort = port => (
     !isBluetoothSerialPort(port) &&
     /USB|COM\d+|CH340|CH341|CP210|FTDI|Arduino|CDC|Serial/i.test(getSerialPortLabel(port))
 );
 
+// 桌面端 tab 的 mode 会透传到 GUI，用来决定舞台模式或 Python 编码模式。
 const editorModes = {
     stage: {
         mode: 'stage',
@@ -144,6 +147,7 @@ const createEditorUrl = tab => {
     return url.toString();
 };
 
+// shell 顶栏只消费轻量 tab 状态，真正的编辑器 WebContentsView 独立保存。
 const getTabList = () => Array.from(tabs.values()).map(tab => ({
     id: tab.id,
     title: tab.title,
@@ -187,6 +191,7 @@ const getEditorBounds = () => {
     };
 };
 
+// WebContentsView 没有 display:none，隐藏非活动视图时移到屏幕外。
 const hiddenEditorBounds = () => ({
     x: -10000,
     y: titleBarHeight,
@@ -238,6 +243,7 @@ const showPermissionWarning = (browserWindow, permissionType) => {
     });
 };
 
+// 只允许编辑器主 frame 申请媒体和串口权限，避免外链或子 frame 越权。
 const handlePermissionRequest = async (webContents, permission, callback, details) => {
     if (!mainWindow || !editorWebContentsIds.has(webContents.id)) return callback(false);
     if (permission === 'serial') return callback(true);
@@ -264,6 +270,7 @@ const handlePermissionRequest = async (webContents, permission, callback, detail
     return callback(true);
 };
 
+// 复用 Scratch 原版 sb3 下载逻辑，但通过原生保存对话框决定最终位置。
 const handleProjectDownload = (browserWindow, downloadItem) => {
     const filename = downloadItem.getFilename();
     const userChosenPath = dialog.showSaveDialogSync(browserWindow, {
@@ -310,6 +317,7 @@ const handleProjectDownload = (browserWindow, downloadItem) => {
     });
 };
 
+// 自定义标题栏隐藏了系统菜单，保留快捷键方便调试桌面壳和编辑器页面。
 const registerDevToolsShortcut = webContents => {
     webContents.on('before-input-event', (event, input) => {
         if (input.code === devToolKey.code &&
@@ -326,6 +334,7 @@ const registerDevToolsShortcut = webContents => {
     });
 };
 
+// 编辑器内的新窗口请求统一转系统浏览器打开，主窗口不承载第三方页面。
 const registerExternalLinkPolicy = webContents => {
     webContents.setWindowOpenHandler(({url}) => {
         let protocol = '';
@@ -342,6 +351,7 @@ const registerExternalLinkPolicy = webContents => {
     });
 };
 
+// shellView 是顶部 tab 条；它和编辑器视图分离，避免切 tab 时重建整个壳。
 const createShellView = () => {
     const view = new WebContentsView({
         webPreferences: {
@@ -358,6 +368,7 @@ const createShellView = () => {
     return view;
 };
 
+// homeView 是没有活动 tab 时显示的首页，也用于新建 tab 前选择编辑器模式。
 const createHomeView = () => {
     const view = new WebContentsView({
         webPreferences: {
@@ -373,6 +384,7 @@ const createHomeView = () => {
     return view;
 };
 
+// code 模式初始化较慢，loadingView 用来覆盖 WebContentsView 首屏白屏。
 const createLoadingView = () => {
     const view = new WebContentsView({
         webPreferences: {
@@ -387,6 +399,7 @@ const createLoadingView = () => {
     return view;
 };
 
+// 每个编辑器 tab 对应一个独立 WebContentsView，从而隔离页面状态和 Redux 实例。
 const createEditorView = tab => {
     const view = new WebContentsView({
         webPreferences: {
@@ -442,6 +455,7 @@ const activateTab = tabId => {
     return {tabs: getTabList(), activeTabId};
 };
 
+// 回到首页不会销毁已有 tab，只是让活动 tab 置空并显示 homeView。
 const showHome = () => {
     activeTabId = null;
     layoutViews();
@@ -472,6 +486,7 @@ const createTab = ({mode = 'scratch', title} = {}) => {
     return {tabs: getTabList(), activeTabId};
 };
 
+// 关闭 tab 时必须同步停止 Python/PTY，避免后台进程继续占用资源。
 const closeTab = tabId => {
     if (!tabs.has(tabId)) return {tabs: getTabList(), activeTabId};
     if (pythonRunner) {
@@ -504,6 +519,7 @@ const closeTab = tabId => {
     return {tabs: getTabList(), activeTabId};
 };
 
+// 所有本机能力 IPC 都按发送方 WebContents 反查 tab，避免前端伪造 tabId 操作其他标签。
 const getSenderTabId = event => {
     const tabId = editorWebContentsTabIds.get(event.sender.id);
     if (!tabId || !tabs.has(tabId)) {
@@ -529,6 +545,7 @@ const registerTabIpc = () => {
     });
 };
 
+// 非交互 Python 运行通道，作为 PTY 不可用时的降级方案。
 const registerPythonIpc = () => {
     const {ipcMain} = require('electron');
     ipcMain.handle('python:run', async (event, options = {}) => {
@@ -546,6 +563,7 @@ const registerPythonIpc = () => {
     ipcMain.handle('python:status', event => pythonRunner.getStatus(getSenderTabId(event)));
 };
 
+// 交互式终端通道，前端 xterm 的输入、resize 和停止都会走这里。
 const registerTerminalIpc = () => {
     const {ipcMain} = require('electron');
     ipcMain.handle('terminal:startPython', async (event, options = {}) => {
@@ -575,6 +593,7 @@ const registerSerialIpc = () => {
     });
 };
 
+// 本地拓展库持久化只开放给编辑器 tab，数据格式仍交给 GUI 侧 schema 校验。
 const registerCustomExtensionIpc = () => {
     const {ipcMain} = require('electron');
     ipcMain.handle('customExtensions:load', event => {
@@ -587,6 +606,7 @@ const registerCustomExtensionIpc = () => {
     });
 };
 
+// Web Serial 会列出蓝牙等伪串口，这里在主进程先过滤出更像硬件串口的候选项。
 const registerSerialDeviceHandlers = () => {
     const allowedOrigins = getAllowedSerialOrigins();
     session.defaultSession.on('select-serial-port', (event, portList, webContents, callback) => {
@@ -604,7 +624,7 @@ const registerSerialDeviceHandlers = () => {
                 productId: port.productId
             }))
             .filter(isHardwareSerialPort);
-        const selectedPort = ports.find(isPreferredSerialPort) || ports[0];
+        const selectedPort = ports[0];
         webContents.send('serial:ports', {
             ports,
             selectedPortId: selectedPort ? selectedPort.portId : ''
@@ -619,6 +639,7 @@ const registerSerialDeviceHandlers = () => {
     session.defaultSession.setDevicePermissionHandler(details => details.deviceType === 'serial');
 };
 
+// 主窗口只创建一次，后续 tab/home/loading 都作为 WebContentsView 挂到 contentView。
 const createMainWindow = () => {
     const windowOptions = process.platform === 'darwin' ? {
         titleBarStyle: 'hiddenInset',

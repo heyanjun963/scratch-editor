@@ -6,6 +6,7 @@ const newTabButton = document.getElementById('newTabButton');
 let currentTabs = [];
 let activeTabId = null;
 
+// 顶部壳页面只渲染 tab 状态，不直接接触编辑器 WebContentsView。
 const renderTabs = () => {
     tabStrip.replaceChildren();
     homeButton.classList.toggle('active', activeTabId === null);
@@ -54,12 +55,14 @@ const renderTabs = () => {
     }
 };
 
+// 主进程广播 tabs:changed 后，壳页面用同一份 payload 重绘 tab 条。
 const applyTabsPayload = payload => {
     currentTabs = payload.tabs || [];
     activeTabId = payload.activeTabId || null;
     renderTabs();
 };
 
+// 首次加载时主动拉取一次，避免错过 shell 页面 ready 前的广播。
 const loadTabs = async () => {
     applyTabsPayload(await tabsApi.list());
 };

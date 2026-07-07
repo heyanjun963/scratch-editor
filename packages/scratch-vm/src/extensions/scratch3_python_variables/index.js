@@ -3,11 +3,13 @@ const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const formatMessage = require('format-message');
 
+// Python 变量类积木：VM 内用简单对象保存预览值，最终变量赋值仍由 Python codegen 输出。
 class Scratch3PythonVariablesBlocks {
     constructor () {
         this._variables = Object.create(null);
     }
 
+    // getInfo 定义变量赋值、增量和取值 reporter。
     getInfo () {
         return {
             id: 'pythonVariables',
@@ -77,15 +79,18 @@ class Scratch3PythonVariablesBlocks {
         };
     }
 
+    // 编辑器预览态保存变量值。
     setVariable (args) {
         this._variables[Cast.toString(args.NAME)] = args.VALUE;
     }
 
+    // 编辑器预览态按数字累加变量。
     changeVariable (args) {
         const name = Cast.toString(args.NAME);
         this._variables[name] = Cast.toNumber(this._variables[name]) + Cast.toNumber(args.VALUE);
     }
 
+    // reporter 返回当前预览值；生成 Python 时会输出变量名。
     getVariable (args) {
         return this._variables[Cast.toString(args.NAME)] || '';
     }

@@ -3,7 +3,9 @@ const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const formatMessage = require('format-message');
 
+// Python 文本类积木：提供字符串字面量、拼接、长度和类型转换的 reporter。
 class Scratch3PythonTextBlocks {
+    // getInfo 声明文本相关积木，供 Python 模式工具箱展示。
     getInfo () {
         return {
             id: 'pythonText',
@@ -84,18 +86,22 @@ class Scratch3PythonTextBlocks {
         };
     }
 
+    // 预览态返回普通字符串；Python 生成时会带引号输出。
     literal (args) {
         return Cast.toString(args.TEXT);
     }
 
+    // 预览态执行 JS 字符串拼接。
     join (args) {
         return `${Cast.toString(args.A)}${Cast.toString(args.B)}`;
     }
 
+    // 预览态返回字符串长度；Python 生成时会转成 len(...)。
     length (args) {
         return Cast.toString(args.VALUE).length;
     }
 
+    // 预览态转换为字符串；Python 生成时会转成 str(...)。
     toString (args) {
         return Cast.toString(args.VALUE);
     }

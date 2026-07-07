@@ -5,11 +5,13 @@ import {normalizeCustomExtensionManifest} from './manifest-schema';
 const JSON_EXTENSIONS = ['.json'];
 const ZIP_EXTENSIONS = ['.zip', '.sbext'];
 
+// package-reader 负责把用户选择的 .json/.zip/.sbext 统一读成规范化 manifest。
 const getFileExtension = fileName => {
     const dotIndex = String(fileName || '').lastIndexOf('.');
     return dotIndex >= 0 ? String(fileName).slice(dotIndex).toLowerCase() : '';
 };
 
+// 浏览器 File API 文本读取，用于单 JSON manifest。
 const readFileAsText = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -17,6 +19,7 @@ const readFileAsText = file => new Promise((resolve, reject) => {
     reader.readAsText(file);
 });
 
+// 压缩包需要 ArrayBuffer 交给 JSZip 解析。
 const readFileAsArrayBuffer = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -24,6 +27,7 @@ const readFileAsArrayBuffer = file => new Promise((resolve, reject) => {
     reader.readAsArrayBuffer(file);
 });
 
+// ZIP 内路径统一小写索引，兼容 Windows/Mixly 目录包常见的大小写差异。
 const createZipLookup = zip => Object.keys(zip.files).reduce((lookup, path) => {
     const file = zip.files[path];
     if (!file.dir) {
@@ -32,6 +36,7 @@ const createZipLookup = zip => Object.keys(zip.files).reduce((lookup, path) => {
     return lookup;
 }, new Map());
 
+// 按候选路径查找文件，支持 config.json/manifest.json 等多种包结构别名。
 const getZipFile = (lookup, candidates) => {
     for (const candidate of candidates.filter(Boolean)) {
         const file = lookup.get(String(candidate).replace(/\\/g, '/').toLowerCase());
@@ -40,6 +45,7 @@ const getZipFile = (lookup, candidates) => {
     return null;
 };
 
+// 读取 ZIP 内 JSON，并把错误信息定位到具体配置文件。
 const readZipJson = async (lookup, candidates, label) => {
     const file = getZipFile(lookup, candidates);
     if (!file) {
@@ -52,6 +58,7 @@ const readZipJson = async (lookup, candidates, label) => {
     }
 };
 
+// runtime 文件不是所有包都必须携带，存在则内联到 manifest 方便桌面端保存。
 const readOptionalRuntimeFiles = async (lookup, paths) => {
     const uniquePaths = Array.from(new Set(paths.filter(Boolean).map(path => String(path).replace(/\\/g, '/'))));
     const files = [];
@@ -69,6 +76,7 @@ const readOptionalRuntimeFiles = async (lookup, paths) => {
 
 const uniqueStrings = values => Array.from(new Set(values.filter(Boolean).map(String)));
 
+// blocks.json 兼容数组和 {categories, blocks} 两种写法。
 const normalizeBlockCollection = rawBlocks => {
     if (Array.isArray(rawBlocks)) {
         return {
@@ -88,6 +96,7 @@ const normalizeBlockCollection = rawBlocks => {
     throw new Error('blocks.json must be an array, or an object with a blocks array');
 };
 
+// generator/python.json 可以写公共配置，也可以按 opcode 覆盖每个积木的生成规则。
 const normalizeGeneratorCollection = rawGenerator => {
     if (!rawGenerator || typeof rawGenerator !== 'object' || Array.isArray(rawGenerator)) {
         throw new Error('generator/python.json must be an object');
@@ -105,6 +114,7 @@ const normalizeGeneratorCollection = rawGenerator => {
     };
 };
 
+// 合并 block 内联 codegen 和独立 generator 配置，独立 generator 优先补齐模板。
 const getBlockPythonCodegen = (rawBlock, generatorInfo, commonImports) => {
     const inlinePython = rawBlock.codegen && rawBlock.codegen.python ? rawBlock.codegen.python : {};
     const generatorPython = generatorInfo || {};
@@ -140,6 +150,7 @@ const getBlockPythonCodegen = (rawBlock, generatorInfo, commonImports) => {
     };
 };
 
+// 目录包合并入口：manifest/config + blocks + generator + runtime files -> v2 manifest。
 const mergePackageManifest = async (zipLookup, rawManifest, rawBlocks, rawGenerator, packageFileName) => {
     const blockCollection = normalizeBlockCollection(rawBlocks);
     const generatorCollection = normalizeGeneratorCollection(rawGenerator);
@@ -193,6 +204,7 @@ const mergePackageManifest = async (zipLookup, rawManifest, rawBlocks, rawGenera
     });
 };
 
+// 读取 WonderCam 类目录包压缩文件，保留新协议但兼容常见文件命名。
 const readZipPackage = async file => {
     const zip = await JSZip.loadAsync(await readFileAsArrayBuffer(file));
     const lookup = createZipLookup(zip);
@@ -214,6 +226,7 @@ const readZipPackage = async file => {
     return mergePackageManifest(lookup, rawManifest, rawBlocks, rawGenerator, file.name);
 };
 
+// 单 JSON 文件走最小格式，适合用户快速分享自定义积木。
 const readJsonManifest = async file => {
     try {
         return normalizeCustomExtensionManifest(JSON.parse(await readFileAsText(file)));
@@ -222,6 +235,7 @@ const readJsonManifest = async file => {
     }
 };
 
+// 文件后缀决定读取策略，调用方只关心最终得到的 manifest。
 const readCustomExtensionPackage = file => {
     const extension = getFileExtension(file.name);
     if (JSON_EXTENSIONS.includes(extension)) {

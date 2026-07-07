@@ -114,6 +114,7 @@ const ariaMessages = defineMessages({
 // Assume that it doesn't change for a session.
 let isRendererSupported = null;
 
+// 桌面端用 URL 参数锁定 tab 创建时的模式，避免新建 Python 编辑器先闪成舞台模式。
 const getDesktopEditorMode = () => {
     if (typeof window === 'undefined') return null;
     const desktopMode = new URLSearchParams(window.location.search).get('desktopMode');
@@ -121,6 +122,7 @@ const getDesktopEditorMode = () => {
     return desktopMode === 'code' ? PYTHON_EDITOR_MODE : SCRATCH_EDITOR_MODE;
 };
 
+// Python 模式等 GUI 自己确认完成后再通知主进程隐藏 loadingView。
 const notifyDesktopEditorReady = editorMode => {
     if (typeof window === 'undefined') return;
     if (!window.scratchDesktopEditor?.ready) return;
@@ -228,11 +230,13 @@ const GUIComponent = props => {
         vm,
         ...componentProps
     } = omit(props, 'dispatch', 'setPlatform');
+    // Python 模式复用代码页承载积木区，并用右侧 PythonCodingPanel 替换舞台区。
     const isPythonEditorMode = editorMode === PYTHON_EDITOR_MODE;
     if (children) {
         return <Box {...componentProps}>{children}</Box>;
     }
 
+    // 如果桌面 tab 指定了模式，GUI 内部 Redux 必须同步到这个模式。
     useEffect(() => {
         if (props.platform) {
             // TODO: This uses the imported `setPlatform` directly,
@@ -241,6 +245,7 @@ const GUIComponent = props => {
         }
     }, [props.platform]);
 
+    // 模式稳定后通知桌面主进程，否则会提前隐藏 loading 导致白屏闪烁。
     useEffect(() => {
         if (
             !isFetchingUserData &&

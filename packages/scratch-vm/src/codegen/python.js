@@ -12,8 +12,10 @@ const prefixByCategory = {
     native: 'pythonNative_'
 };
 
+// Python 代码生成器分三层：表达式生成、语句生成、入口栈拼装。
 const quotePythonString = value => JSON.stringify(String(value));
 
+// 字面量参数优先识别数字/布尔值，其余内容按 Python 字符串处理。
 const literalToPython = value => {
     const stringValue = String(value);
     if (/^-?(?:\d+|\d*\.\d+)$/.test(stringValue.trim())) {
@@ -27,6 +29,7 @@ const literalToPython = value => {
 
 const indent = level => '    '.repeat(level);
 
+// Scratch 输入允许中文和空格，落到 Python 变量/函数名时需要规整成合法标识符。
 const normalizePythonName = value => {
     const cleaned = String(value || 'value')
         .trim()
@@ -35,6 +38,7 @@ const normalizePythonName = value => {
     return cleaned || 'value';
 };
 
+// 函数参数文本用逗号分隔，逐个规整成 Python 参数名。
 const normalizePythonNameList = value => String(value || '')
     .split(',')
     .map(item => normalizePythonName(item))
@@ -46,6 +50,7 @@ const pythonExpressionList = value => String(value || '')
     .filter(Boolean)
     .join(', ');
 
+// Blockly 输入槽可能没有接 reporter，此时返回 null 让调用方使用默认值。
 const getInputBlock = (block, name) => {
     if (block && typeof block.getInputTargetBlock === 'function') {
         return block.getInputTargetBlock(name);
@@ -53,6 +58,7 @@ const getInputBlock = (block, name) => {
     return null;
 };
 
+// 同一个语义在不同积木里可能叫 TEXT/NUM/VALUE，用候选字段名提高复用性。
 const getFieldValue = (block, names, fallback = '') => {
     if (!block || typeof block.getFieldValue !== 'function') return fallback;
     for (const name of names) {
@@ -62,6 +68,7 @@ const getFieldValue = (block, names, fallback = '') => {
     return fallback;
 };
 
+// 从帽子积木或语句积木开始，沿 next 指针收集同一条竖向积木栈。
 const getStackBlocks = topBlock => {
     const blocks = [];
     let block = topBlock;
@@ -76,6 +83,7 @@ const isType = (block, category, opcode) => block && block.type === `${prefixByC
 
 const isAnyType = (block, pairs) => pairs.some(([category, opcode]) => isType(block, category, opcode));
 
+// 把单个 reporter/boolean 积木转换成 Python 表达式字符串。
 const expressionFromSelf = (block, imports, fallback = '') => {
     switch (block.type) {
     case `${prefixByCategory.variables}getVariable`:
@@ -163,17 +171,20 @@ const expressionFromSelf = (block, imports, fallback = '') => {
     }
 };
 
+// 读取输入槽：有 reporter 就递归生成表达式，没有 reporter 就取字段默认值。
 const valueToPython = (block, inputName, fallback = '', imports = new Set()) => {
     const inputBlock = getInputBlock(block, inputName);
     if (!inputBlock) return literalToPython(getFieldValue(block, [inputName], fallback));
     return expressionFromSelf(inputBlock, imports, fallback);
 };
 
+// 数字输入允许用户填普通字段，去掉字符串引号后交给 Python 表达式使用。
 const numberToPython = (block, inputName, fallback = '0', imports = new Set()) => {
     const value = valueToPython(block, inputName, fallback, imports);
     return value.replace(/^"|"$/g, '');
 };
 
+// boolean 输入没有 reporter 时按字段值折算成 True/False。
 const booleanToPython = (block, inputName, fallback = 'True', imports = new Set()) => {
     const inputBlock = getInputBlock(block, inputName);
     if (!inputBlock) {
@@ -183,6 +194,7 @@ const booleanToPython = (block, inputName, fallback = 'True', imports = new Set(
     return expressionFromSelf(inputBlock, imports, fallback);
 };
 
+// 自定义 manifest 参数有默认值，模板替换时优先使用 manifest 默认值。
 const getDefaultArgumentValue = (templateInfo, inputName, fallback) => {
     const argument = templateInfo.arguments && templateInfo.arguments[inputName];
     if (!argument || typeof argument.defaultValue === 'undefined') return fallback;
@@ -195,6 +207,7 @@ const addCustomImports = (templateInfo, imports) => {
     });
 };
 
+// 把 manifest 模板里的 {ARG} 替换为积木当前输入对应的 Python 代码。
 const applyTemplateText = (template, templateInfo, block, imports) => (
     String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, inputName) => {
         const argument = templateInfo.arguments && templateInfo.arguments[inputName];
@@ -206,6 +219,7 @@ const applyTemplateText = (template, templateInfo, block, imports) => (
     })
 );
 
+// 自定义积木可以在生成本行代码时顺带声明 import、全局变量、setup 和 launcher。
 const addCustomGenerationMetadata = (templateInfo, block, imports) => {
     addCustomImports(templateInfo, imports);
     (templateInfo.variables || []).forEach(line => {
@@ -221,6 +235,7 @@ const addCustomGenerationMetadata = (templateInfo, block, imports) => {
     }
 };
 
+// 普通自定义积木最终落到一段 template 文本。
 const applyCustomTemplate = (templateInfo, block, imports) => {
     addCustomGenerationMetadata(templateInfo, block, imports);
     return applyTemplateText(templateInfo.template, templateInfo, block, imports);
@@ -254,12 +269,14 @@ const renderEntryFooter = (templateInfo, block, imports, entryName) => {
 
 const getPythonCodegenTemplate = blockType => codegenContext.getTemplate(blockType);
 
+// reporter/boolean 自定义积木作为表达式参与上层模板替换。
 const customBlockToPythonExpression = (block, imports) => {
     const templateInfo = getPythonCodegenTemplate(block.type);
     if (!templateInfo || templateInfo.blockType === 'command') return null;
     return applyCustomTemplate(templateInfo, block, imports);
 };
 
+// command 自定义积木作为语句输出，按当前缩进级别补空格。
 const customBlockToPythonStatementLines = (block, imports, level) => {
     const templateInfo = getPythonCodegenTemplate(block.type);
     if (!templateInfo) return null;
@@ -268,6 +285,7 @@ const customBlockToPythonStatementLines = (block, imports, level) => {
     return code.split('\n').map(line => `${indent(level)}${line}`);
 };
 
+// 表达式积木如果独立作为语句出现，仍生成一行可读 Python 或 unsupported 注释。
 const generateExpressionLine = (block, imports) => {
     if (isAnyType(block, [
         ['variables', 'getVariable'],
@@ -303,6 +321,7 @@ const generateExpressionLine = (block, imports) => {
     return `# Unsupported block: ${block.type}`;
 };
 
+// 把 command/control/function 积木转换成一组带缩进的 Python 语句。
 const generateStatementLines = (block, imports, level = 0) => {
     switch (block.type) {
     case `${prefixByCategory.native}print`:
@@ -401,12 +420,14 @@ const generateStatementLines = (block, imports, level = 0) => {
     }
 };
 
+// control/function 的内部 C 口积木通过 SUBSTACK 输入继续递归生成。
 const generateSubstack = (block, inputName, imports, level) => {
     const substack = getInputBlock(block, inputName);
     if (!substack) return [];
     return getStackBlocks(substack).flatMap(child => generateStatementLines(child, imports, level));
 };
 
+// 顶层积木栈按入口类型处理：setup 生成顶层代码，main/事件生成函数或回调。
 const generateStack = (topBlock, imports, options = {}) => {
     const stack = getStackBlocks(topBlock);
     if (stack.length === 0) return [];
@@ -445,18 +466,21 @@ const generateStack = (topBlock, imports, options = {}) => {
     return stack.flatMap(block => generateStatementLines(block, imports));
 };
 
+// 只有 Scratch 绿旗、Python main、自定义 main 帽子才算可执行入口。
 const isEntryBlock = block => block && (
     block.type === 'event_whenflagclicked' ||
     isType(block, 'control', 'main') ||
     isCustomMainHatBlock(block)
 );
 
+// section=setup 的自定义帽子用于初始化顶层代码，例如“当启动时”。
 const isCustomSetupHatBlock = block => {
     if (!block) return false;
     const templateInfo = getPythonCodegenTemplate(block.type);
     return Boolean(templateInfo && templateInfo.blockType === 'hat' && templateInfo.section === 'setup');
 };
 
+// section=main 或默认主入口帽子会包进函数体。
 const isCustomMainHatBlock = block => {
     if (!block) return false;
     const templateInfo = getPythonCodegenTemplate(block.type);
@@ -465,12 +489,14 @@ const isCustomMainHatBlock = block => {
 
 const isFunctionDefinitionBlock = block => isType(block, 'function', 'define');
 
+// 自带 entryTemplate 的事件回调已有固定函数名，不参与 start_main/start_main1 自动编号。
 const usesGeneratedEntryName = block => {
     if (!block) return false;
     const templateInfo = getPythonCodegenTemplate(block.type);
     return !templateInfo || !templateInfo.entryTemplate;
 };
 
+// 对外入口：读取 Blockly workspace 顶层积木，生成完整 Python 文件文本。
 const generatePythonCode = (workspace, options = {}) => {
     codegenContext = new PythonCodegenContext({
         getPythonCodegenTemplate: options.getPythonCodegenTemplate

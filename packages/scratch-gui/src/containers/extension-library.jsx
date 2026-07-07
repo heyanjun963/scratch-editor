@@ -32,6 +32,7 @@ class ExtensionLibrary extends React.PureComponent {
             'handleItemSelect'
         ]);
     }
+    // 原版拓展页的点击逻辑；Python 模式下作为内置 Scratch 拓展的兜底加载函数传给新页面。
     handleItemSelect (item) {
         const id = item.extensionId;
         let url = item.extensionURL ? item.extensionURL : id;
@@ -49,6 +50,7 @@ class ExtensionLibrary extends React.PureComponent {
             }
         }
     }
+    // Python 模式使用公司产品拓展库整页，其它模式仍走 Scratch 原版拓展库。
     render () {
         if (this.props.editorMode === PYTHON_EDITOR_MODE) {
             return (

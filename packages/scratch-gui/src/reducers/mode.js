@@ -6,6 +6,7 @@ const SET_EDITOR_MODE = 'scratch-gui/mode/SET_EDITOR_MODE';
 const SCRATCH_EDITOR_MODE = 'scratch';
 const PYTHON_EDITOR_MODE = 'python';
 
+// editorMode 是公司新增的编辑器形态开关，桌面端创建 tab 时会锁定初始值。
 const initialState = {
     showBranding: false,
     isFullScreen: false,
@@ -14,6 +15,7 @@ const initialState = {
     editorMode: SCRATCH_EDITOR_MODE
 };
 
+// 原有 player/fullscreen 状态保持不变，Python/舞台模式只通过 editorMode 切换。
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {

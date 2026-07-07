@@ -3,7 +3,9 @@ const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const formatMessage = require('format-message');
 
+// Python 运算类积木：运行时给 reporter 一个预览值，真实表达式文本由 codegen 生成。
 class Scratch3PythonOperatorsBlocks {
+    // getInfo 定义算术、比较、逻辑、not 四类表达式积木及其菜单。
     getInfo () {
         return {
             id: 'pythonOperators',
@@ -121,6 +123,7 @@ class Scratch3PythonOperatorsBlocks {
         };
     }
 
+    // 编辑器预览态执行 JS 算术；Python 生成时保留用户选择的运算符。
     arithmetic (args) {
         const a = Cast.toNumber(args.A);
         const b = Cast.toNumber(args.B);
@@ -143,6 +146,7 @@ class Scratch3PythonOperatorsBlocks {
         }
     }
 
+    // 比较积木在预览态尽量贴近 Python 的数值比较。
     compare (args) {
         const a = args.A;
         const b = args.B;
@@ -163,12 +167,14 @@ class Scratch3PythonOperatorsBlocks {
         }
     }
 
+    // 逻辑积木按菜单选择 and/or。
     logic (args) {
         return Cast.toString(args.OP) === 'or' ?
             Cast.toBoolean(args.A) || Cast.toBoolean(args.B) :
             Cast.toBoolean(args.A) && Cast.toBoolean(args.B);
     }
 
+    // not reporter 返回布尔取反结果。
     not (args) {
         return !Cast.toBoolean(args.VALUE);
     }

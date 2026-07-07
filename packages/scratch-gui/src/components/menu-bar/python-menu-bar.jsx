@@ -72,6 +72,7 @@ const getDesktopSerialApi = () => {
     return window.scratchDesktopSerial || null;
 };
 
+// Web Serial 由 Chromium 提供，必须由用户手势触发 requestPort。
 const getWebSerialApi = () => {
     if (typeof navigator === 'undefined') return null;
     return navigator.serial || null;
@@ -84,11 +85,12 @@ const pickPreferredPort = (ports, selectedPath) => {
         const selected = ports.find(port => port.path === selectedPath);
         if (selected) return selected;
     }
-    return ports.find(port => /COM7|CH340|USB-SERIAL/i.test(portLabel(port))) || ports[0] || null;
+    return ports[0] || null;
 };
 
 const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 
+// Python 模式专用头部菜单：只保留设置、文件和串口相关操作。
 const PythonMenuBar = ({
     ariaLabel,
     ariaRole,
@@ -130,6 +132,7 @@ const PythonMenuBar = ({
     const serialPortPathRef = useRef(serialPortPath);
     const selectedPortLabelRef = useRef('');
 
+    // 串口错误统一写入 Python 控制台，并用 ANSI 红色显示。
     const writeSerialError = useCallback((message, values) => {
         onWriteConsoleLine(colorStderr(intl.formatMessage(message, values)));
     }, [
@@ -141,6 +144,7 @@ const PythonMenuBar = ({
         serialPortPathRef.current = serialPortPath;
     }, [serialPortPath]);
 
+    // Refresh 触发 Web Serial 选择器；主进程会在 select-serial-port 事件中过滤候选端口。
     const handleRefreshSerialPorts = useCallback(async () => {
         if (!serialApiAvailable) {
             onWriteConsoleLine(intl.formatMessage(messages.serialUnavailable));
@@ -164,6 +168,7 @@ const PythonMenuBar = ({
         writeSerialError
     ]);
 
+    // Electron 主进程推送过滤后的串口列表，前端只保存 portId/path 和显示名。
     useEffect(() => {
         if (!desktopSerialApi) return undefined;
         return desktopSerialApi.onPorts(payload => {
@@ -195,6 +200,7 @@ const PythonMenuBar = ({
         onWriteConsoleLine
     ]);
 
+    // 下拉框选择只更新显示状态；真正授权仍需要 Web Serial requestPort。
     const handleSerialPortChange = useCallback(event => {
         const selectedPath = event.target.value;
         const selectedPort = serialPorts.find(port => port.path === selectedPath);
@@ -205,6 +211,7 @@ const PythonMenuBar = ({
         serialPorts
     ]);
 
+    // 连接阶段再次调用 requestPort 是 Web Serial 的授权要求，当前实现还不是自动直连指定 COM。
     const handleSerialConnect = useCallback(async () => {
         if (!serialApiAvailable) {
             onWriteConsoleLine(intl.formatMessage(messages.serialUnavailable));
@@ -242,6 +249,7 @@ const PythonMenuBar = ({
         writeSerialError
     ]);
 
+    // 断开时关闭 Web Serial Port，并清掉当前连接引用。
     const handleSerialDisconnect = useCallback(async () => {
         onSetSerialBusy(true);
         try {
@@ -266,6 +274,7 @@ const PythonMenuBar = ({
         writeSerialError
     ]);
 
+    // MVP 上传只是把生成的 Python 文本写入串口；后续硬件烧录协议需要在这里替换。
     const handleSerialUpload = useCallback(async () => {
         if (!serialPortRef.current) {
             onWriteConsoleLine(intl.formatMessage(messages.serialUnavailable));

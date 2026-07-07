@@ -179,6 +179,7 @@ class ExtensionManager {
      * @param {object} extensionObject - an object with getInfo() and block functions.
      * @returns {Promise} resolved once the extension object is registered.
      */
+    // 声明式拓展库不加载远程 JS，而是把 manifest 转成内存对象后直接注册。
     registerExtensionObject (extensionId, extensionObject) {
         if (this.isExtensionLoaded(extensionId)) {
             const message = `Rejecting attempt to load a second extension with ID ${extensionId}`;
@@ -196,6 +197,7 @@ class ExtensionManager {
      * @param {string} extensionId - the extension ID to unregister.
      * @returns {Promise} resolved once the extension primitives are removed.
      */
+    // 卸载产品/本地拓展时同步清 runtime primitives，让工具箱刷新后不再显示旧分类。
     unregisterExtensionObject (extensionId) {
         if (!this.isExtensionLoaded(extensionId)) {
             return Promise.resolve();
@@ -325,6 +327,7 @@ class ExtensionManager {
                     result = '---';
                     break;
                 default: // an ExtensionBlockMetadata object
+                    // subCategory 是产品库子分类标签，不对应具体 opcode。
                     result = blockInfo && blockInfo.subCategory ?
                         {subCategory: maybeFormatMessage(blockInfo.subCategory)} :
                         this._prepareBlockInfo(serviceName, blockInfo);

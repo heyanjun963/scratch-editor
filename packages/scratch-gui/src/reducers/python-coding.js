@@ -11,8 +11,10 @@ const SET_SERIAL_BAUD_RATE = 'scratch-gui/python-coding/SET_SERIAL_BAUD_RATE';
 const SET_SERIAL_CONNECTED = 'scratch-gui/python-coding/SET_SERIAL_CONNECTED';
 const SET_SERIAL_BUSY = 'scratch-gui/python-coding/SET_SERIAL_BUSY';
 
+// 控制台文本存在 Redux 中只做轻量历史保留，完整交互输出由 xterm 自己渲染。
 const maxConsoleLines = 200;
 
+// Python 编码模式状态：代码文本、运行状态、脚本路径、串口选择都集中在这里。
 const initialState = {
     code: '',
     consoleText: '',
@@ -27,6 +29,7 @@ const initialState = {
     serialBusy: false
 };
 
+// reducer 保持纯状态更新，本机运行、终端、串口副作用都放在容器或 Electron 主进程。
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
@@ -40,6 +43,7 @@ const reducer = function (state, action) {
             action.consoleText
         ].filter(Boolean).join('\n');
         const lines = nextConsoleText.split('\n');
+        // 截断历史行数，避免长时间运行时 Redux 状态无限增长。
         return Object.assign({}, state, {
             consoleText: lines.slice(Math.max(lines.length - maxConsoleLines, 0)).join('\n')
         });
@@ -91,6 +95,7 @@ const reducer = function (state, action) {
     }
 };
 
+// 以下 action creator 只描述状态变化，不直接触发本机能力调用。
 const updatePythonCode = function (code) {
     return {
         type: UPDATE_PYTHON_CODE,

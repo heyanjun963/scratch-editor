@@ -88,6 +88,7 @@ const messages = defineMessages({
 
 const getLibraryTarget = library => library.manifest.source || library.manifest.target || 'python';
 
+// 旧版本地拓展库管理弹窗展示组件；新版整页拓展库已经内置同类能力。
 const LibraryManagerComponent = ({
     installedLibraries,
     intl,
@@ -103,12 +104,14 @@ const LibraryManagerComponent = ({
     const visibleLibraries = installedLibraries.filter(library => getLibraryTarget(library) === activeTab);
     const selectedLibrary = installedLibraries.find(library => library.manifest.id === selectedLibraryId);
 
+    // 通过隐藏 input 触发系统文件选择，兼容浏览器和桌面端。
     const handleChooseFile = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
         }
     };
 
+    // 导入后切到管理页，方便用户看到新库是否进入列表。
     const handleFileChange = event => {
         onImportFile(event);
         setActiveSection('manage');

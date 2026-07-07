@@ -15,12 +15,14 @@ const iconURI = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '</svg>'
 );
 
+// Python 原生类积木：既提供常用语法块，也给编辑器预览输出控制台事件。
 class Scratch3PythonNativeBlocks {
     constructor (runtime) {
         this.runtime = runtime;
         this._variables = Object.create(null);
     }
 
+    // 运行时预览信息通过 runtime event 给 GUI 控制台消费，不等同于本机 Python stdout。
     emitConsole (message) {
         if (this.runtime) {
             this.runtime.emit(PYTHON_NATIVE_CONSOLE, {
@@ -29,6 +31,7 @@ class Scratch3PythonNativeBlocks {
         }
     }
 
+    // getInfo 中 hideFromPalette 的积木用于内部复用，不直接展示在左侧工具箱。
     getInfo () {
         return {
             id: 'pythonNative',
@@ -347,6 +350,7 @@ class Scratch3PythonNativeBlocks {
         };
     }
 
+    // 预览态 print 写入 GUI 控制台；桌面运行时会由 Python 解释器真正执行 print。
     print (args) {
         const text = Cast.toString(args.TEXT);
         this.emitConsole(`[print] ${text}`);
@@ -354,6 +358,7 @@ class Scratch3PythonNativeBlocks {
         console.log('[Python Native]', text);
     }
 
+    // VM 预览用 Promise 模拟等待，生成 Python 时会转成 time.sleep。
     sleep (args) {
         const seconds = Math.max(0, Cast.toNumber(args.SECS));
         this.emitConsole(`[sleep] ${seconds} seconds`);
@@ -362,6 +367,7 @@ class Scratch3PythonNativeBlocks {
         });
     }
 
+    // 预览态用 JS 随机数，Python 生成时会导入 random.randint。
     randomInteger (args) {
         const a = Math.floor(Cast.toNumber(args.A));
         const b = Math.floor(Cast.toNumber(args.B));
@@ -372,18 +378,21 @@ class Scratch3PythonNativeBlocks {
         return value;
     }
 
+    // 预览态使用本地时间字符串，Python 生成时使用 time.strftime。
     currentTime () {
         const value = new Date().toLocaleTimeString();
         this.emitConsole(`[time] ${value}`);
         return value;
     }
 
+    // input 的真实交互依赖桌面 PTY；VM 预览态只打印提示并返回空字符串。
     input (args) {
         const prompt = Cast.toString(args.PROMPT);
         this.emitConsole(`[input] ${prompt}`);
         return '';
     }
 
+    // 隐藏变量块给内部组合使用，预览态保存在 _variables。
     setVariable (args) {
         const name = Cast.toString(args.NAME);
         const value = args.VALUE;
@@ -391,6 +400,7 @@ class Scratch3PythonNativeBlocks {
         this.emitConsole(`[set] ${name} = ${value}`);
     }
 
+    // 预览态读取 _variables，生成 Python 时只输出变量名。
     getVariable (args) {
         const name = Cast.toString(args.NAME);
         const value = this._variables[name] || '';
@@ -398,6 +408,7 @@ class Scratch3PythonNativeBlocks {
         return value;
     }
 
+    // 隐藏算术块用于组合表达式，预览态直接算出 JS 数值。
     arithmetic (args) {
         const a = Cast.toNumber(args.A);
         const b = Cast.toNumber(args.B);
@@ -429,6 +440,7 @@ class Scratch3PythonNativeBlocks {
         return value;
     }
 
+    // 预览态比较结果用于 if 等控制块判断。
     compare (args) {
         const a = args.A;
         const b = args.B;
@@ -457,24 +469,28 @@ class Scratch3PythonNativeBlocks {
         return value;
     }
 
+    // 预览态字符串拼接。
     join (args) {
         const value = `${Cast.toString(args.A)}${Cast.toString(args.B)}`;
         this.emitConsole(`[join] ${value}`);
         return value;
     }
 
+    // 预览态数字转换，Python 生成时转成 float(...)。
     toNumber (args) {
         const value = Cast.toNumber(args.VALUE);
         this.emitConsole(`[number] ${args.VALUE} -> ${value}`);
         return value;
     }
 
+    // 预览态字符串转换，Python 生成时转成 str(...)。
     toString (args) {
         const value = Cast.toString(args.VALUE);
         this.emitConsole(`[string] ${value}`);
         return value;
     }
 
+    // 预览态返回 JS 数组，Python 生成时转成列表字面量。
     makeList (args) {
         const value = [
             args.A,
@@ -485,6 +501,7 @@ class Scratch3PythonNativeBlocks {
         return value;
     }
 
+    // 同时兼容数组和字符串长度，贴近 Python len(...) 的使用场景。
     length (args) {
         const value = args.VALUE;
         const result = Array.isArray(value) ? value.length : Cast.toString(value).length;
@@ -492,6 +509,7 @@ class Scratch3PythonNativeBlocks {
         return result;
     }
 
+    // 预览态条件成立才启动分支；Python 生成时由 codegen 写 if 语句。
     ifThen (args, util) {
         const condition = Cast.toBoolean(args.CONDITION);
         this.emitConsole(`[if] condition -> ${condition}`);
@@ -500,6 +518,7 @@ class Scratch3PythonNativeBlocks {
         }
     }
 
+    // 预览态用 stackFrame 保存循环游标，避免每帧从 start 重新开始。
     forRange (args, util) {
         const start = Math.floor(Cast.toNumber(args.START));
         const stop = Math.floor(Cast.toNumber(args.STOP));

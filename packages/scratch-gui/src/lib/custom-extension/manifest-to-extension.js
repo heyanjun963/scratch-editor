@@ -1,3 +1,4 @@
+// 把声明式 manifest 转成 VM 可注册的 extension object；真正的 Python 生成在 codegen-registry 中完成。
 const createNoopBlockFunction = block => {
     switch (block.blockType) {
     case 'hat':
@@ -12,6 +13,7 @@ const createNoopBlockFunction = block => {
     }
 };
 
+// 单个 manifest block 转 Scratch extension block，供 scratch-blocks 渲染到左侧工具箱。
 const manifestBlockToExtensionBlock = block => ({
     opcode: block.opcode,
     blockType: block.scratchBlockType,
@@ -29,6 +31,7 @@ const manifestBlockToExtensionBlock = block => ({
         }, {})
     });
 
+// 处理产品子分类，把 categories 中的 blocks 顺序转换为 Scratch 工具箱中的 subCategory 分段。
 const manifestToExtensionBlocks = manifest => {
     const blocksByOpcode = manifest.blocks.reduce((result, block) => {
         result[block.opcode] = manifestBlockToExtensionBlock(block);
@@ -66,6 +69,7 @@ const manifestToExtensionBlocks = manifest => {
     return groupedBlocks.concat(ungroupedBlocks);
 };
 
+// getInfo 是 Scratch VM 识别拓展库的标准入口。
 const manifestToExtensionInfo = manifest => ({
     id: manifest.id,
     name: manifest.name,
@@ -78,6 +82,7 @@ const manifestToExtensionInfo = manifest => ({
     blocks: manifestToExtensionBlocks(manifest)
 });
 
+// 每个 opcode 都需要有同名函数，否则 VM 注册后点击/执行积木会找不到实现。
 const manifestToExtensionObject = manifest => {
     const extensionObject = {
         getInfo: () => manifestToExtensionInfo(manifest)

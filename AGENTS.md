@@ -32,6 +32,25 @@ Use these defaults unless the user asks otherwise:
 8. Do not add error handling, fallbacks, or validation for scenarios that cannot happen. Trust internal code and
    framework guarantees. Only validate at system boundaries (user input, external APIs).
 
+## Chinese comment policy for company changes
+
+For company-specific changes in this repository, prefer Chinese comments so future maintainers can quickly follow
+the business flow.
+
+1. New important source files should include a short Chinese comment describing the file or module responsibility.
+2. New or changed business functions should include a short Chinese comment describing what the function does and
+   where it sits in the flow.
+3. Add Chinese comments before non-obvious calls, event subscriptions, IPC calls, registration/unregistration calls,
+   code-generation steps, persistence steps, hardware/serial operations, and cross-package integration points.
+4. For declarative product manifests, extension libraries, and code-generation templates, comment the helper
+   functions and the rules that are easy to misunderstand, such as entry blocks, setup blocks, callback registration,
+   runtime preview versus generated Python code, and temporary TODO-compatible fields.
+5. Keep comments concise and current. Explain the current rule or reason, not the historical change process.
+6. Do not add mechanical comments for obvious assignments, simple JSX markup, CSS declarations, package lock files,
+   or one-line getters unless they hide business behavior.
+7. When reviewing a large feature, also create or update a Chinese review/progress document that lists changed files,
+   each file's role, review conclusions, and known TODOs.
+
 ## What this repository is
 
 `scratch-editor` is an npm workspaces monorepo containing the packages that make up the Scratch editor. It was

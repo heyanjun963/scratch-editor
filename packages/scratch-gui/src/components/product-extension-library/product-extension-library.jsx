@@ -234,6 +234,7 @@ const getInitials = name => name
     .slice(0, 2)
     .toUpperCase();
 
+// 目录数据按“主控/模块”两页铺平，并把内置 manifest 挂到可加载项上。
 const getFlatItems = activeTab => productExtensionCatalog
     .filter(section => (activeTab === 'main' ?
         mainCategoryIds.includes(section.id) :
@@ -248,6 +249,7 @@ const getFlatItems = activeTab => productExtensionCatalog
 
 const getAvailableMainItems = () => getFlatItems('main').filter(item => item.status === 'available');
 
+// 新版拓展库整页组件：负责产品筛选、本地库导入导出、内置产品加载和切换确认。
 const ProductExtensionLibraryComponent = ({
     installedLibraries,
     intl,
@@ -266,12 +268,14 @@ const ProductExtensionLibraryComponent = ({
     const [checking, setChecking] = useState(false);
     const [pendingSwitchItem, setPendingSwitchItem] = useState(null);
 
+    // 版本检查当前是占位交互，后续接远程 registry 后替换为真实请求。
     useEffect(() => {
         setChecking(true);
         const timer = setTimeout(() => setChecking(false), 650);
         return () => clearTimeout(timer);
     }, []);
 
+    // 桌面端启动时从 userData 恢复本地拓展库，再同步回 Redux/localStorage。
     useEffect(() => {
         loadDesktopInstalledCustomExtensionLibraries()
             .then(libraries => {
@@ -284,6 +288,7 @@ const ProductExtensionLibraryComponent = ({
             .catch(() => {});
     }, [onSetCustomExtensionLibraries]);
 
+    // 列表由内置产品目录和本地导入库组成，筛选条件统一在这里收敛。
     const items = useMemo(() => {
         const normalizedQuery = query.trim().toLowerCase();
         const localItems = activeTab === 'module' ? installedLibraries.map(library => ({
@@ -325,6 +330,7 @@ const ProductExtensionLibraryComponent = ({
         alert(intl.formatMessage(messages.uploadNotice));
     };
 
+    // 触发隐藏 file input，保持页面视觉形态接近原版拓展库。
     const handleLocalImportClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -334,6 +340,7 @@ const ProductExtensionLibraryComponent = ({
         alert(intl.formatMessage(messages.localImportNotice));
     };
 
+    // 加载完成后回到积木区，并切到对应拓展分类。
     const selectExtensionCategory = extensionId => {
         if (onCategorySelected) {
             onCategorySelected(extensionId);
@@ -341,6 +348,7 @@ const ProductExtensionLibraryComponent = ({
         onRequestClose();
     };
 
+    // VM 注册拓展是异步的，等待 EXTENSION_ADDED 可避免回到积木区后分类还没出现。
     const waitForExtensionAdded = extensionId => new Promise(resolve => {
         const handleExtensionAdded = categoryInfo => {
             if (!categoryInfo || categoryInfo.id !== extensionId) return;
@@ -354,6 +362,7 @@ const ProductExtensionLibraryComponent = ({
         }, 500);
     });
 
+    // 安装用户本地库：注册 Python 模板、注册 VM extension object、保存到本地。
     const installManifest = manifest => {
         const previousLibrary = installedLibraries.find(
             library => library.manifest.id === manifest.id
@@ -382,6 +391,7 @@ const ProductExtensionLibraryComponent = ({
             });
     };
 
+    // 安装内置产品库：不写入本地库列表，但同样注册 VM 和 Python codegen。
     const installBuiltinProductManifest = manifest => {
         registerPythonCodegenManifest(manifest);
         const extensionManager = vm.extensionManager;
@@ -398,10 +408,12 @@ const ProductExtensionLibraryComponent = ({
             .then(() => addedPromise);
     };
 
+    // 主控/机器人一次只允许加载一个，切换前用它判断是否需要确认清理。
     const getLoadedMainItem = nextItem => getAvailableMainItems().find(item => (
         item.id !== nextItem.id && vm.extensionManager.isExtensionLoaded(item.id)
     ));
 
+    // 切换主控时清掉旧主控和模块，避免不同机器人积木混用生成错误 Python。
     const clearLoadedProductExtensions = nextExtensionId => {
         const extensionManager = vm.extensionManager;
         Object.keys(builtinProductManifests)
@@ -433,6 +445,7 @@ const ProductExtensionLibraryComponent = ({
         });
     };
 
+    // 读取本地 .json/.zip/.sbext，解析失败时提示用户具体错误。
     const handleImportFile = event => {
         const file = event.target.files && event.target.files[0];
         if (!file) return;
@@ -448,6 +461,7 @@ const ProductExtensionLibraryComponent = ({
             });
     };
 
+    // 卡片点击根据来源分流：本地库跳分类、内置 manifest 直接安装、占位项只提示。
     const handleItemClick = (item, options = {}) => {
         if (item.source === 'local') {
             selectExtensionCategory(item.id);
@@ -483,6 +497,7 @@ const ProductExtensionLibraryComponent = ({
         }));
     };
 
+    // 用户确认切换主控后，先卸载旧拓展，再继续执行原来的卡片点击逻辑。
     const handleConfirmSwitch = () => {
         if (!pendingSwitchItem) return;
         const nextItem = pendingSwitchItem;
@@ -498,6 +513,7 @@ const ProductExtensionLibraryComponent = ({
         }));
     };
 
+    // 导出时使用 serialize，保证文件内容是用户可维护的配置格式。
     const handleExportLibrary = item => {
         if (!item.manifest) return;
         const blob = new Blob([
@@ -506,6 +522,7 @@ const ProductExtensionLibraryComponent = ({
         downloadBlob(`${item.manifest.id}.custom-extension.json`, blob);
     };
 
+    // 删除本地库需要同步卸载 VM 拓展和 Python 模板，避免左侧分类残留。
     const handleDeleteLibrary = item => {
         if (!item.manifest) return;
         unregisterPythonCodegenManifest(item.manifest);

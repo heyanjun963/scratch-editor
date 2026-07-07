@@ -15,6 +15,7 @@ const argumentTypeMap = {
     boolean: 'Boolean'
 };
 
+// manifest-schema 是所有自定义拓展库的入口校验层，负责把外部 JSON 规整成内部稳定结构。
 const normalizeColor = (value, fallback) => {
     if (!value) return fallback;
     if (!COLOR_PATTERN.test(value)) {
@@ -29,6 +30,7 @@ const assertObject = (value, message) => {
     }
 };
 
+// 从积木文案 [ARG] 中提取参数名，用于校验 arguments 是否完整。
 const extractTextArgs = text => {
     const args = new Set();
     String(text || '').replace(/\[([A-Za-z][A-Za-z0-9_]*)\]/g, (match, name) => {
@@ -38,6 +40,7 @@ const extractTextArgs = text => {
     return args;
 };
 
+// 从 Python 模板 {ARG} 中提取参数名，避免导入后才在代码生成阶段报错。
 const extractTemplateArgs = template => {
     const args = new Set();
     String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, name) => {
@@ -58,6 +61,7 @@ const validateArgumentReferences = (block, argumentNames) => {
     });
 };
 
+// 参数标准化会保留 Scratch 渲染所需类型，也保留 Python 模板所需的 literal/menu 信息。
 const normalizeArguments = (block, rawArguments) => {
     assertObject(rawArguments || {}, `积木 ${block.opcode} 的 arguments 必须是对象`);
 
@@ -79,6 +83,7 @@ const normalizeArguments = (block, rawArguments) => {
     }, {});
 };
 
+// 菜单项兼容纯字符串和 {text,value} 两种写法，方便手写和工具生成。
 const normalizeMenus = rawMenus => {
     if (!rawMenus || typeof rawMenus !== 'object' || Array.isArray(rawMenus)) return {};
     return Object.keys(rawMenus).reduce((menus, name) => {
@@ -97,6 +102,7 @@ const normalizeMenus = rawMenus => {
     }, {});
 };
 
+// Python 生成配置允许声明 import、变量初始化、入口模板和回调 footer。
 const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
     assertObject(rawPythonCodegen, `积木 ${opcode} 缺少 codegen.python 配置`);
     if (typeof rawPythonCodegen.template === 'undefined') {
@@ -123,6 +129,7 @@ const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
     };
 };
 
+// 单个 block 标准化后同时服务 Scratch 工具箱渲染和 Python 代码生成。
 const normalizeBlock = (rawBlock, seenOpcodes) => {
     assertObject(rawBlock, 'blocks 中的每一项都必须是对象');
 
@@ -164,6 +171,7 @@ const normalizeBlocks = rawBlocks => {
     return rawBlocks.map(block => normalizeBlock(block, seenOpcodes));
 };
 
+// categories 用来在同一个产品拓展下做子分类，最终会转成 Scratch Blocks 的 subCategory。
 const normalizeCategories = rawCategories => {
     if (!Array.isArray(rawCategories)) return [];
     return rawCategories.map(category => {
@@ -177,6 +185,7 @@ const normalizeCategories = rawCategories => {
     }).filter(category => category.id || category.name);
 };
 
+// v1/v2 共用字段统一在这里处理，避免目录包和单 JSON 包出现字段差异。
 const normalizeCommonManifestFields = rawManifest => {
     const id = String(rawManifest.id || '').trim();
     if (!ID_PATTERN.test(id)) {
@@ -197,6 +206,7 @@ const normalizeCommonManifestFields = rawManifest => {
     };
 };
 
+// v1 是最小 JSON 格式，适合用户快速手写单文件拓展。
 const normalizeCustomExtensionManifestV1 = rawManifest => ({
     formatVersion: 1,
     ...normalizeCommonManifestFields(rawManifest),
@@ -210,6 +220,7 @@ const normalizeCustomExtensionManifestV1 = rawManifest => ({
     blocks: normalizeBlocks(rawManifest.blocks)
 });
 
+// v2 面向目录/压缩包拓展，支持分类和运行时文件，结构参考 WonderCam 类包形态。
 const normalizeCustomExtensionManifestV2 = rawManifest => ({
     formatVersion: 2,
     ...normalizeCommonManifestFields(rawManifest),
@@ -230,6 +241,7 @@ const normalizeCustomExtensionManifestV2 = rawManifest => ({
     blocks: normalizeBlocks(rawManifest.blocks)
 });
 
+// 根据 formatVersion 分发到对应格式，后续新增新版协议时从这里扩展。
 const normalizeCustomExtensionManifest = rawManifest => {
     assertObject(rawManifest, '拓展库配置必须是 JSON 对象');
 
@@ -243,6 +255,7 @@ const normalizeCustomExtensionManifest = rawManifest => {
     throw new Error(`当前不支持 formatVersion = ${rawManifest.formatVersion} 的自定义拓展库`);
 };
 
+// 导出时只保留可发布字段，去掉运行时生成的 scratchBlockType 等内部派生字段。
 const serializeCustomExtensionManifest = manifest => {
     const serialized = {
         formatVersion: manifest.formatVersion,

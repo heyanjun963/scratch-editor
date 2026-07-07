@@ -56,16 +56,19 @@ const messages = defineMessages({
     }
 });
 
+// 通过 preload 暴露的非交互 Python API；浏览器环境下不存在。
 const getDesktopPythonApi = () => {
     if (typeof window === 'undefined') return null;
     return window.scratchDesktopPython || null;
 };
 
+// 通过 preload 暴露的 PTY 终端 API；桌面端优先使用它获得真实交互能力。
 const getDesktopTerminalApi = () => {
     if (typeof window === 'undefined') return null;
     return window.scratchDesktopTerminal || null;
 };
 
+// 每个 Electron 编辑器 tab 的 id 写在 URL 参数里，用来过滤本 tab 的进程输出。
 const getDesktopTabId = () => {
     if (typeof window === 'undefined') return null;
     const params = new URLSearchParams(window.location.search);
@@ -74,6 +77,7 @@ const getDesktopTabId = () => {
 
 const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 
+// 容器层负责连接 Redux、xterm 组件和 Electron IPC，展示层只负责布局。
 const PythonCodingPanel = props => {
     const {
         code,
@@ -101,6 +105,7 @@ const PythonCodingPanel = props => {
         rows: 24
     });
 
+    // 直接写入 xterm，避免所有实时输出都经过 Redux 造成频繁状态更新。
     const writeTerminal = useCallback(text => {
         if (terminalRef.current) {
             terminalRef.current.write(text);
@@ -115,6 +120,7 @@ const PythonCodingPanel = props => {
         }
     }, []);
 
+    // 清空 xterm 与 Redux 中保留的轻量控制台历史。
     const handleClearConsole = useCallback(() => {
         if (terminalRef.current) {
             terminalRef.current.clear();
@@ -123,6 +129,7 @@ const PythonCodingPanel = props => {
         onClearConsole();
     }, [onClearConsole]);
 
+    // 兼容旧的 Redux consoleText 来源，把增量文本同步进 xterm。
     useEffect(() => {
         if (!consoleText) {
             consoleTextRef.current = '';
@@ -143,6 +150,7 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // PTY 输出是首选通道，支持 input() 和实时终端控制字符。
     useEffect(() => {
         if (!desktopTerminalApi) return undefined;
         const removeDataListener = desktopTerminalApi.onData(data => {
@@ -179,6 +187,7 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // 如果没有 PTY，则降级监听普通 stdout/stderr 通道。
     useEffect(() => {
         if (desktopTerminalApi) return undefined;
         if (!desktopPythonApi) return undefined;
@@ -217,6 +226,7 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // 运行时优先启动 PTY；不可用时走普通 PythonRunner。
     const handleRun = useCallback(async () => {
         if (!desktopApiAvailable) {
             writeTerminalLine(intl.formatMessage(messages.noDesktopPython));
@@ -272,6 +282,7 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // 停止按钮同样按 PTY 优先、普通进程降级的顺序处理。
     const handleStop = useCallback(async () => {
         if (desktopTerminalApi) {
             await desktopTerminalApi.stop();
@@ -289,6 +300,7 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // xterm 输入只在运行中转发给 PTY，避免空闲时误写。
     const handleTerminalInput = useCallback(data => {
         if (!desktopTerminalApi || !isRunning) return;
         desktopTerminalApi.input(data);
@@ -297,6 +309,7 @@ const PythonCodingPanel = props => {
         isRunning
     ]);
 
+    // 记录最新终端尺寸，下一次运行和运行中 resize 都会同步给主进程。
     const handleTerminalResize = useCallback(size => {
         terminalSizeRef.current = size;
         if (!desktopTerminalApi || !isRunning) return;

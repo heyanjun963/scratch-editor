@@ -41,6 +41,7 @@ const messages = defineMessages({
     }
 });
 
+// 旧版弹窗式本地库管理器：当前主入口已迁到 ProductExtensionLibrary，这里保留兼容能力。
 class LibraryManager extends React.PureComponent {
     constructor (props) {
         super(props);
@@ -55,6 +56,7 @@ class LibraryManager extends React.PureComponent {
     componentDidMount () {
         this.restoreDesktopCustomExtensionLibraries();
     }
+    // 桌面端优先恢复 userData 中的库，再同步到 Redux 和 localStorage。
     restoreDesktopCustomExtensionLibraries () {
         loadDesktopInstalledCustomExtensionLibraries()
             .then(installedLibraries => {
@@ -70,6 +72,7 @@ class LibraryManager extends React.PureComponent {
             })
             .catch(() => {});
     }
+    // 安装流程和新版整页入口一致：注册模板、注册 VM、持久化 manifest。
     installManifest (manifest) {
         const previousLibrary = this.props.installedLibraries.find(
             library => library.manifest.id === manifest.id
@@ -96,6 +99,7 @@ class LibraryManager extends React.PureComponent {
                 alert(this.props.intl.formatMessage(messages.importSuccess, {name: manifest.name}));
             });
     }
+    // 读取本地配置文件或压缩包，失败时提示导入错误。
     handleImportFile (event) {
         const file = event.target.files && event.target.files[0];
         if (!file) return;
@@ -110,6 +114,7 @@ class LibraryManager extends React.PureComponent {
                 event.target.value = null;
             });
     }
+    // 导出为可再次导入的声明式 JSON manifest。
     handleExportLibrary (manifest) {
         if (!manifest) return;
         const blob = new Blob([
@@ -117,6 +122,7 @@ class LibraryManager extends React.PureComponent {
         ], {type: 'application/json'});
         downloadBlob(`${manifest.id}.custom-extension.json`, blob);
     }
+    // 删除时同步卸载 VM 和 Python codegen 模板。
     handleDeleteLibrary (manifest) {
         if (!manifest) return;
         unregisterPythonCodegenManifest(manifest);

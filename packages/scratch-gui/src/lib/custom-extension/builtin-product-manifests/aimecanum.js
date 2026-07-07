@@ -1,5 +1,6 @@
 import {normalizeCustomExtensionManifest} from '../manifest-schema';
 
+// AI机甲麦轮车内置 manifest：按新版自定义拓展库格式承载旧产品积木和 Python 模板。
 const hardwareImports = [
     'import Hiwonder',
     'import time',
@@ -11,16 +12,19 @@ const buzzerVariable = 'beep = Hiwonder.Buzzer()';
 const rgbVariable = 'rgb = Hiwonder.RGB()';
 const imuVariable = 'imu = Hiwonder.IMU()';
 
+// 菜单统一转成 manifest-schema 支持的 {text,value} 结构。
 const menu = items => ({
     items: items.map(([text, value]) => ({text, value: String(value)}))
 });
 
+// 参数 helper 减少重复字段，literal/menu 等扩展属性通过 options 注入。
 const arg = (type, defaultValue, options = {}) => ({
     type,
     defaultValue,
     ...options
 });
 
+// Python codegen 配置集中在这里，后续迁移其他产品可复用同样字段。
 const codegen = (template, options = {}) => ({
     python: {
         template,
@@ -34,6 +38,7 @@ const codegen = (template, options = {}) => ({
     }
 });
 
+// block helper 同时描述 Scratch 积木外观和 Python 生成模板。
 const block = (opcode, blockType, text, args, template, options = {}) => ({
     opcode,
     blockType,
@@ -42,6 +47,7 @@ const block = (opcode, blockType, text, args, template, options = {}) => ({
     codegen: codegen(template, options)
 });
 
+// 以下快捷函数让 manifest 列表保持接近旧版产品分类文案。
 const command = (opcode, text, args, template, options) => (
     block(opcode, 'command', text, args, template, options)
 );
@@ -54,6 +60,7 @@ const booleanBlock = (opcode, text, args, template, options) => (
     block(opcode, 'boolean', text, args, template, options)
 );
 
+// 主入口帽子默认带硬件 import，并按 main section 交给 codegen 包成入口函数。
 const mainHat = (opcode, text, args, options) => (
     block(opcode, 'hat', text, args, '', {
         imports: hardwareImports,

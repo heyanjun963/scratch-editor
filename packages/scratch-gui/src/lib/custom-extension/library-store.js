@@ -39,6 +39,7 @@ const deleteIconURL = svgToDataURI(deleteIconSvg);
 const importIconURL = svgToDataURI(importIconSvg);
 const exportIconURL = svgToDataURI(exportIconSvg);
 
+// 拓展库卡片优先使用 manifest 自带图标，没有则使用统一的本地库默认图标。
 const getManifestIconURL = manifest => manifest.icon || customExtensionIconURL;
 
 export {

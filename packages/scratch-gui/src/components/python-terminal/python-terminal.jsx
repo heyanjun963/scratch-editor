@@ -8,8 +8,10 @@ import Box from '../box/box.jsx';
 
 import styles from './python-terminal.css';
 
+// xterm 期望 CRLF，来自 Redux 或 Python stdout 的换行在这里统一规整。
 const normalizeTerminalText = text => String(text || '').replace(/\r?\n/g, '\r\n');
 
+// PythonTerminal 是展示组件，通过 imperative ref 给容器暴露 write/clear/fit。
 const PythonTerminal = forwardRef(({
     onInput,
     onResize
@@ -29,6 +31,7 @@ const PythonTerminal = forwardRef(({
         resizeHandlerRef.current = onResize;
     }, [onResize]);
 
+    // fit 会把终端尺寸回传给容器，再同步到桌面端 PTY。
     const fit = () => {
         const fitAddon = fitAddonRef.current;
         const terminal = terminalRef.current;
@@ -47,6 +50,7 @@ const PythonTerminal = forwardRef(({
         }
     };
 
+    // 容器不直接操作 xterm 实例，只使用这组受控方法。
     useImperativeHandle(ref, () => ({
         write: text => {
             if (terminalRef.current) {
@@ -66,6 +70,7 @@ const PythonTerminal = forwardRef(({
         fit
     }));
 
+    // xterm 只初始化一次，卸载时释放输入监听和 ResizeObserver。
     useEffect(() => {
         if (!hostRef.current) return undefined;
 

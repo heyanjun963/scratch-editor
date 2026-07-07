@@ -8,6 +8,7 @@ const skipGuiServer = process.env.SCRATCH_DESKTOP_SKIP_GUI_SERVER === '1';
 
 const log = message => console.log(`[desktop] ${message}`);
 
+// 开发启动脚本会先等 webpack dev server 可访问，再拉起 Electron 窗口。
 const waitForUrl = (url, timeoutMs = 60000) => new Promise((resolve, reject) => {
     const startedAt = Date.now();
 
@@ -42,6 +43,7 @@ const getElectronBinary = () => {
     }
 };
 
+// 清掉 NODE_OPTIONS，避免 fnm/Codex 调试参数透传到子进程引起 Electron 启动异常。
 const createChildEnv = extra => {
     const env = {
         ...process.env,
@@ -56,6 +58,7 @@ const spawnChild = (command, args, options = {}) => spawn(command, args, {
     ...options
 });
 
+// 使用 node 直接执行 npm-cli，规避 Windows shell=true 拼接参数导致的 spawn EINVAL。
 const startGuiServer = () => {
     if (skipGuiServer) {
         log('Skipping scratch-gui dev server because SCRATCH_DESKTOP_SKIP_GUI_SERVER=1');
@@ -79,6 +82,7 @@ const startGuiServer = () => {
     return child;
 };
 
+// Electron 子进程通过 SCRATCH_DESKTOP_URL 连接同一个 GUI dev server。
 const startElectron = electronBinary => {
     log(`Starting Electron from ${electronBinary}`);
     const child = spawnChild(electronBinary, ['desktop/main.js'], {
@@ -94,6 +98,7 @@ const startElectron = electronBinary => {
     return child;
 };
 
+// 一条命令启动桌面端：可选择自启 GUI server，也可复用外部已启动服务。
 const main = async () => {
     const electronBinary = getElectronBinary();
     const guiServer = startGuiServer();

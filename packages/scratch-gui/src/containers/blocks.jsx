@@ -79,6 +79,7 @@ const disabledFlyoutBlocks = {
 const disabledFlyoutBlockClass = 'company-disabled-flyout-block';
 const disabledFlyoutBlockListenerKey = '__companyDisabledFlyoutListener';
 
+// Python 模式只展示 Python 基础分类、内置产品库和用户已导入的自定义拓展分类。
 const makePythonToolboxXML = (categoriesXML, customExtensionIds) => {
     const allowedExtensionIds = pythonExtensionIds.concat(
         builtinProductExtensionIds,
@@ -380,6 +381,7 @@ class Blocks extends React.Component {
         queue.forEach(fn => fn());
     }
 
+    // 在 flyout 层禁用暂未开放的积木，阻止拖拽和点击并给出统一提示。
     applyFlyoutBlockAvailability () {
         const flyoutWorkspace = this.workspace &&
             this.workspace.getFlyout() &&
@@ -649,11 +651,13 @@ class Blocks extends React.Component {
             }
         }
     }
+    // Python 模式下工作区有变化就重新生成右侧代码文本。
     onPythonWorkspaceChange () {
         if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
         const code = generatePythonCode(this.workspace);
         this.props.updatePythonCodeState(code);
     }
+    // VM 内预览态的 Python 原生积木输出会走 runtime event 汇入控制台。
     onPythonConsole (data) {
         if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
         this.props.appendPythonConsoleLine(data && data.message ? data.message : String(data));
@@ -741,18 +745,21 @@ class Blocks extends React.Component {
         // @todo Later we should replace this to avoid all the warnings from redefining blocks.
         this.handleExtensionAdded(categoryInfo);
     }
+    // Python 基础拓展或自定义库加载完成后，需要重新生成 toolbox XML。
     refreshToolboxXML () {
         const toolboxXML = this.getToolboxXML();
         if (toolboxXML) {
             this.props.updateToolboxState(toolboxXML);
         }
     }
+    // 进入 Python 模式时自动加载基础 Python 拓展，并注册用户自定义拓展库。
     ensurePythonExtensions () {
         if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
         if (this.loadingPythonNativeExtension) return;
         const pendingExtensionIds = pythonExtensionIds.filter(
             extensionId => !this.props.vm.extensionManager.isExtensionLoaded(extensionId)
         );
+        // 自定义拓展库既要注册 VM 积木，也要注册 Python 模板，否则只显示不产码。
         const registerCustomExtensions = () => Promise.all(this.props.customExtensionLibraries.map(library => {
             const manifest = library.manifest;
             registerPythonCodegenManifest(manifest);

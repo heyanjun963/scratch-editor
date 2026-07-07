@@ -893,6 +893,7 @@ class Runtime extends EventEmitter {
      * @param {string} extensionId - the extension ID to remove.
      * @private
      */
+    // 卸载声明式拓展时，从 runtime block info 中移除对应分类，避免左侧工具箱残留。
     _unregisterExtensionPrimitives (extensionId) {
         const index = this._blockInfo.findIndex(info => info.id === extensionId);
         if (index >= 0) {
@@ -1258,6 +1259,7 @@ class Runtime extends EventEmitter {
      * @returns {ConvertedBlockInfo} - the converted sub-category information
      * @private
      */
+    // 自定义产品库的子分类最终转成 scratch-blocks 支持的 label XML。
     _convertSubCategoryForScratchBlocks (blockInfo) {
         return {
             info: blockInfo,

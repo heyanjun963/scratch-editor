@@ -4,6 +4,7 @@ const path = require('path');
 const guiDir = path.join(__dirname, '..', 'packages', 'scratch-gui');
 const webpackBin = path.join(__dirname, '..', 'node_modules', 'webpack', 'bin', 'webpack.js');
 
+// 桌面打包前先构建 scratch-gui，Electron 生产环境直接加载这个静态产物。
 const result = spawnSync(process.execPath, [webpackBin], {
     cwd: guiDir,
     env: {
