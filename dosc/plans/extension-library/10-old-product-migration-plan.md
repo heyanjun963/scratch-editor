@@ -617,3 +617,69 @@ aimecanum/motor.snapshot
 2. 迁移 `start_thread` / `start_run_thread`。
 3. 迁移蜂鸣器、打印、电机移动等第一批核心积木。
 4. 用快照测试锁定旧版期望的 Python 输出。
+
+---
+
+## 12. 2026-07-07 `aimecanum` 第一批迁移记录
+
+已完成 `aimecanum` 最小内置产品 manifest：
+
+- 新增 `packages/scratch-gui/src/lib/custom-extension/builtin-product-manifests/aimecanum.js`。
+- 新增 `builtin-product-manifests/index.js` 作为内置产品 manifest 注册入口。
+- 将拓展页面中的 **AI机甲麦轮车** 从占位状态改为可加载状态。
+- 点击 **AI机甲麦轮车** 后，直接注册 VM extension 和 Python codegen，不写入本地导入库持久化文件。
+- 已迁移第一批积木：
+  - `start_thread`：主程序。
+  - `print_str`：输出打印字符。
+  - `buzzer_tone_set`：蜂鸣器播放音调。
+  - `buzzer_tone_set_volume`：设置蜂鸣器音量。
+  - `close_buzzer`：关闭蜂鸣器。
+  - `get_battery_level`：读取电池电压。
+  - `set_motor_speed_all`：设置四轮速度。
+  - `move_oriention`：按方向移动。
+  - `move_stop`：停止麦轮车。
+
+当前取舍：
+
+- 暂未迁移旧版 `start_run_thread`，因为旧生成器的 `@Hiwonder.start_run` 线程启动语义还需要单独确认。
+- 暂未迁移旧版动态菜单，当前方向、音调等参数先用输入框表达。
+- 暂未迁移完整 `aimecanum` 66 个积木，先验证主函数、初始化变量和核心运动控制链路。
+
+人工验证建议：
+
+1. `npm run desktop`。
+2. 进入 Python 编码模式。
+3. 点击左下角拓展按钮。
+4. 在 **主控扩展** 中点击 **AI机甲麦轮车**。
+5. 返回编辑器后确认左侧出现 `AI机甲麦轮车` 分类。
+6. 拖入 `主程序`。
+7. 在 `主程序` 下方接入：
+   - `蜂鸣器播放音调`
+   - `设置蜂鸣器音量`
+   - `设置麦轮速度`
+   - `麦轮车方向`
+   - `停止麦轮车`
+8. 右侧 Python 代码应出现：
+
+```python
+import Hiwonder
+import Hiwonder_DEV
+import time
+
+# initialize variables
+beep = Hiwonder.Buzzer()
+mecanumCar = Hiwonder_DEV.DEV_MecanumCar()
+
+def start_main():
+    global beep
+    global mecanumCar
+    ...
+
+Hiwonder.startMain(start_main)
+```
+
+下一步：
+
+1. 补旧版菜单映射，让方向、音调、节拍等参数恢复下拉体验。
+2. 增加 `aimecanum` 专用代码生成快照测试。
+3. 再迁移按键、RGB、IMU、巡线、舵机等第二批积木。

@@ -536,9 +536,11 @@ const GUIComponent = props => {
                                         intl={intl}
                                         onExtensionButtonClick={onExtensionButtonClick}
                                     />
-                                    <Box className={styles.watermark}>
-                                        <Watermark />
-                                    </Box>
+                                    {!isPythonEditorMode ? (
+                                        <Box className={styles.watermark}>
+                                            <Watermark />
+                                        </Box>
+                                    ) : null}
                                 </TabPanel>
                                 {!isPythonEditorMode ? (
                                     <TabPanel

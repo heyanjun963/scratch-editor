@@ -7,6 +7,7 @@ import VM from '@scratch/scratch-vm';
 
 import intlShape from '../../lib/intlShape.js';
 import downloadBlob from '../../lib/download-blob';
+import {builtinProductManifests} from '../../lib/custom-extension/builtin-product-manifests';
 import {productExtensionCatalog} from '../../lib/custom-extension/product-extension-catalog.js';
 import {serializeCustomExtensionManifest} from '../../lib/custom-extension/manifest-schema';
 import {manifestToExtensionObject} from '../../lib/custom-extension/manifest-to-extension';
@@ -189,6 +190,26 @@ const messages = defineMessages({
         defaultMessage: '导出',
         description: 'Export local custom extension library menu item',
         id: 'gui.productExtensionLibrary.export'
+    },
+    switchProductTitle: {
+        defaultMessage: '提示',
+        description: 'Title for switching product confirmation dialog',
+        id: 'gui.productExtensionLibrary.switchProductTitle'
+    },
+    switchProductBody: {
+        defaultMessage: '上传模式加载新的机器人或控制器需要清除当前扩展，是否清除？',
+        description: 'Body for switching product confirmation dialog',
+        id: 'gui.productExtensionLibrary.switchProductBody'
+    },
+    switchProductCancel: {
+        defaultMessage: '返回',
+        description: 'Cancel button for switching product confirmation dialog',
+        id: 'gui.productExtensionLibrary.switchProductCancel'
+    },
+    switchProductConfirm: {
+        defaultMessage: '确定加载',
+        description: 'Confirm button for switching product confirmation dialog',
+        id: 'gui.productExtensionLibrary.switchProductConfirm'
     }
 });
 
@@ -220,14 +241,19 @@ const getFlatItems = activeTab => productExtensionCatalog
     .flatMap(section => section.children.map(item => ({
         ...item,
         categoryId: section.id,
-        categoryLabel: section.label
+        categoryLabel: section.label,
+        manifest: builtinProductManifests[item.id] || null,
+        source: builtinProductManifests[item.id] ? 'builtin-product' : item.source
     })));
+
+const getAvailableMainItems = () => getFlatItems('main').filter(item => item.status === 'available');
 
 const ProductExtensionLibraryComponent = ({
     installedLibraries,
     intl,
     onInstallCustomExtensionLibrary,
     onBuiltinExtensionSelect,
+    onCategorySelected,
     onRemoveCustomExtensionLibrary,
     onRequestClose,
     onSetCustomExtensionLibraries,
@@ -238,6 +264,7 @@ const ProductExtensionLibraryComponent = ({
     const [chip, setChip] = useState('all');
     const [query, setQuery] = useState('');
     const [checking, setChecking] = useState(false);
+    const [pendingSwitchItem, setPendingSwitchItem] = useState(null);
 
     useEffect(() => {
         setChecking(true);
@@ -307,6 +334,26 @@ const ProductExtensionLibraryComponent = ({
         alert(intl.formatMessage(messages.localImportNotice));
     };
 
+    const selectExtensionCategory = extensionId => {
+        if (onCategorySelected) {
+            onCategorySelected(extensionId);
+        }
+        onRequestClose();
+    };
+
+    const waitForExtensionAdded = extensionId => new Promise(resolve => {
+        const handleExtensionAdded = categoryInfo => {
+            if (!categoryInfo || categoryInfo.id !== extensionId) return;
+            vm.removeListener('EXTENSION_ADDED', handleExtensionAdded);
+            resolve();
+        };
+        vm.addListener('EXTENSION_ADDED', handleExtensionAdded);
+        setTimeout(() => {
+            vm.removeListener('EXTENSION_ADDED', handleExtensionAdded);
+            resolve();
+        }, 500);
+    });
+
     const installManifest = manifest => {
         const previousLibrary = installedLibraries.find(
             library => library.manifest.id === manifest.id
@@ -335,6 +382,57 @@ const ProductExtensionLibraryComponent = ({
             });
     };
 
+    const installBuiltinProductManifest = manifest => {
+        registerPythonCodegenManifest(manifest);
+        const extensionManager = vm.extensionManager;
+        const addedPromise = waitForExtensionAdded(manifest.id);
+        const unloadPromise = extensionManager.isExtensionLoaded(manifest.id) &&
+            extensionManager.unregisterExtensionObject ?
+            extensionManager.unregisterExtensionObject(manifest.id) :
+            Promise.resolve();
+        return unloadPromise
+            .then(() => extensionManager.registerExtensionObject(
+                manifest.id,
+                manifestToExtensionObject(manifest)
+            ))
+            .then(() => addedPromise);
+    };
+
+    const getLoadedMainItem = nextItem => getAvailableMainItems().find(item => (
+        item.id !== nextItem.id && vm.extensionManager.isExtensionLoaded(item.id)
+    ));
+
+    const clearLoadedProductExtensions = nextExtensionId => {
+        const extensionManager = vm.extensionManager;
+        Object.keys(builtinProductManifests)
+            .filter(extensionId => extensionId !== nextExtensionId)
+            .forEach(extensionId => unregisterPythonCodegenManifest(
+                builtinProductManifests[extensionId]
+            ));
+        installedLibraries.forEach(library => {
+            unregisterPythonCodegenManifest(library.manifest);
+        });
+
+        const extensionIds = new Set([
+            ...Object.keys(builtinProductManifests).filter(extensionId => extensionId !== nextExtensionId),
+            ...installedLibraries.map(library => library.manifest.id)
+        ]);
+        const unloadPromises = Array.from(extensionIds)
+            .filter(extensionId => extensionManager.isExtensionLoaded(extensionId))
+            .map(extensionId => (
+                extensionManager.unregisterExtensionObject ?
+                    extensionManager.unregisterExtensionObject(extensionId) :
+                    Promise.resolve()
+            ));
+
+        return Promise.all(unloadPromises).then(() => {
+            if (installedLibraries.length) {
+                saveInstalledCustomExtensionLibraries([]);
+                onSetCustomExtensionLibraries([]);
+            }
+        });
+    };
+
     const handleImportFile = event => {
         const file = event.target.files && event.target.files[0];
         if (!file) return;
@@ -350,9 +448,25 @@ const ProductExtensionLibraryComponent = ({
             });
     };
 
-    const handleItemClick = item => {
+    const handleItemClick = (item, options = {}) => {
         if (item.source === 'local') {
-            onRequestClose();
+            selectExtensionCategory(item.id);
+            return;
+        }
+        if (item.status === 'available' && item.manifest) {
+            if (vm.extensionManager.isExtensionLoaded(item.manifest.id)) {
+                selectExtensionCategory(item.manifest.id);
+                return;
+            }
+            if (mainCategoryIds.includes(item.categoryId) && !options.skipSwitchCheck) {
+                const loadedMainItem = getLoadedMainItem(item);
+                if (loadedMainItem || installedLibraries.length) {
+                    setPendingSwitchItem(item);
+                    return;
+                }
+            }
+            installBuiltinProductManifest(item.manifest)
+                .then(() => selectExtensionCategory(item.manifest.id));
             return;
         }
         if (item.status === 'available' && item.extensionId) {
@@ -360,13 +474,21 @@ const ProductExtensionLibraryComponent = ({
                 extensionId: item.extensionId,
                 disabled: false
             });
-            onRequestClose();
+            selectExtensionCategory(item.extensionId);
             return;
         }
         // eslint-disable-next-line no-alert
         alert(intl.formatMessage(messages.unavailableNotice, {
             name: item.name
         }));
+    };
+
+    const handleConfirmSwitch = () => {
+        if (!pendingSwitchItem) return;
+        const nextItem = pendingSwitchItem;
+        setPendingSwitchItem(null);
+        clearLoadedProductExtensions(nextItem.id)
+            .then(() => handleItemClick(nextItem, {skipSwitchCheck: true}));
     };
 
     const handleDetailsClick = item => {
@@ -519,7 +641,8 @@ const ProductExtensionLibraryComponent = ({
                     <div className={styles.cardGrid}>
                         {items.map(item => {
                             const isAvailable = item.status === 'available';
-                            const isLoaded = loadedExtensionIds.includes(item.id);
+                            const isLoaded = loadedExtensionIds.includes(item.id) ||
+                                vm.extensionManager.isExtensionLoaded(item.id);
                             const isLocal = item.source === 'local';
                             return (
                                 <article
@@ -527,16 +650,28 @@ const ProductExtensionLibraryComponent = ({
                                         [styles.cardDisabled]: !isAvailable
                                     })}
                                     key={item.id}
+                                    role="button"
+                                    tabIndex={0}
                                     title={isAvailable ? item.name :
                                         intl.formatMessage(messages.unavailableNotice, {
                                             name: item.name
                                         })}
+                                    onClick={() => handleItemClick(item)}
+                                    onKeyDown={event => {
+                                        if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            handleItemClick(item);
+                                        }
+                                    }}
                                 >
                                     {isLocal ? (
                                         <button
                                             className={styles.removeBadge}
                                             type="button"
-                                            onClick={() => handleDeleteLibrary(item)}
+                                            onClick={event => {
+                                                event.stopPropagation();
+                                                handleDeleteLibrary(item);
+                                            }}
                                         >
                                             {intl.formatMessage(messages.remove)}
                                         </button>
@@ -544,7 +679,10 @@ const ProductExtensionLibraryComponent = ({
                                         <button
                                             className={styles.removeBadge}
                                             type="button"
-                                            onClick={() => handleDetailsClick(item)}
+                                            onClick={event => {
+                                                event.stopPropagation();
+                                                handleItemClick(item);
+                                            }}
                                         >
                                             {intl.formatMessage(messages.loaded)}
                                         </button>
@@ -552,7 +690,10 @@ const ProductExtensionLibraryComponent = ({
                                         <button
                                             className={styles.downloadButton}
                                             type="button"
-                                            onClick={() => handleItemClick(item)}
+                                            onClick={event => {
+                                                event.stopPropagation();
+                                                handleItemClick(item);
+                                            }}
                                         >
                                             ↓
                                         </button>
@@ -588,7 +729,8 @@ const ProductExtensionLibraryComponent = ({
                                         <button
                                             className={styles.cardMenuButton}
                                             type="button"
-                                            onClick={() => {
+                                            onClick={event => {
+                                                event.stopPropagation();
                                                 if (isLocal) {
                                                     handleExportLibrary(item);
                                                     return;
@@ -610,6 +752,42 @@ const ProductExtensionLibraryComponent = ({
                     </div>
                 )}
             </main>
+            {pendingSwitchItem ? (
+                <div
+                    className={styles.confirmOverlay}
+                    role="presentation"
+                >
+                    <section
+                        aria-label={intl.formatMessage(messages.switchProductTitle)}
+                        className={styles.confirmDialog}
+                        role="dialog"
+                    >
+                        <header className={styles.confirmTitle}>
+                            <span className={styles.confirmIcon}>!</span>
+                            {intl.formatMessage(messages.switchProductTitle)}
+                        </header>
+                        <div className={styles.confirmBody}>
+                            {intl.formatMessage(messages.switchProductBody)}
+                        </div>
+                        <footer className={styles.confirmActions}>
+                            <button
+                                className={styles.confirmCancelButton}
+                                type="button"
+                                onClick={() => setPendingSwitchItem(null)}
+                            >
+                                {intl.formatMessage(messages.switchProductCancel)}
+                            </button>
+                            <button
+                                className={styles.confirmLoadButton}
+                                type="button"
+                                onClick={handleConfirmSwitch}
+                            >
+                                {intl.formatMessage(messages.switchProductConfirm)}
+                            </button>
+                        </footer>
+                    </section>
+                </div>
+            ) : null}
         </div>
     );
 };
@@ -625,6 +803,7 @@ ProductExtensionLibraryComponent.propTypes = {
     intl: intlShape.isRequired,
     onInstallCustomExtensionLibrary: PropTypes.func.isRequired,
     onBuiltinExtensionSelect: PropTypes.func.isRequired,
+    onCategorySelected: PropTypes.func,
     onRemoveCustomExtensionLibrary: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func.isRequired,
     onSetCustomExtensionLibraries: PropTypes.func.isRequired,
@@ -632,7 +811,8 @@ ProductExtensionLibraryComponent.propTypes = {
 };
 
 ProductExtensionLibraryComponent.defaultProps = {
-    installedLibraries: []
+    installedLibraries: [],
+    onCategorySelected: null
 };
 
 const mapStateToProps = state => ({

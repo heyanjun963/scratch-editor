@@ -95,3 +95,176 @@ test('multiple custom main hats receive stable entry names', t => {
     t.match(code, /Hiwonder\.startMain\(start_main1\)/);
     t.end();
 });
+
+test('custom event hat can render callback registration', t => {
+    const keyHat = new TestBlock('aimecanum_when_key_click_thread', {KEYS: 'A'});
+    const move = new TestBlock('aimecanum_set_motor_speed_all', {
+        SPEED1: 60,
+        SPEED2: 60,
+        SPEED3: 60,
+        SPEED4: 60
+    });
+    keyHat.next = move;
+
+    const templates = {
+        aimecanum_when_key_click_thread: {
+            blockType: 'hat',
+            section: 'main',
+            imports: ['import Hiwonder'],
+            variables: ['button{KEYS} = Hiwonder.Button(\'{KEYS}\')'],
+            arguments: {
+                KEYS: {
+                    defaultValue: 'A',
+                    literal: true
+                }
+            },
+            entryTemplate: 'def on_button{KEYS}_clicked():',
+            entryFooter: 'button{KEYS}.Clicked(on_button{KEYS}_clicked)',
+            template: ''
+        },
+        aimecanum_set_motor_speed_all: {
+            blockType: 'command',
+            imports: ['import Hiwonder_DEV'],
+            variables: ['mecanumCar = Hiwonder_DEV.DEV_MecanumCar()'],
+            arguments: {
+                SPEED1: {defaultValue: 60},
+                SPEED2: {defaultValue: 60},
+                SPEED3: {defaultValue: 60},
+                SPEED4: {defaultValue: 60}
+            },
+            template: 'mecanumCar.set_motors_speed({SPEED4},{SPEED3},{SPEED2},{SPEED1})'
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([keyHat]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.equal(code, [
+        'import Hiwonder',
+        'import Hiwonder_DEV',
+        '',
+        '# initialize variables',
+        'buttonA = Hiwonder.Button(\'A\')',
+        'mecanumCar = Hiwonder_DEV.DEV_MecanumCar()',
+        '',
+        'def on_buttonA_clicked():',
+        '    global mecanumCar',
+        '    mecanumCar.set_motors_speed(60,60,60,60)',
+        '',
+        'buttonA.Clicked(on_buttonA_clicked)'
+    ].join('\n'));
+    t.end();
+});
+
+test('loose command blocks are ignored outside an entry stack', t => {
+    const loosePrint = new TestBlock('aimecanum_print_str', {STR: 'loose'});
+
+    const templates = {
+        aimecanum_print_str: {
+            blockType: 'command',
+            arguments: {
+                STR: {
+                    defaultValue: 'Hello'
+                }
+            },
+            template: 'print({STR})'
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([loosePrint]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.equal(code, '# Drag Python blocks here to generate code.');
+    t.end();
+});
+
+test('custom setup hat renders top-level code', t => {
+    const startRun = new TestBlock('aimecanum_start_run_thread');
+    const print = new TestBlock('aimecanum_print_str', {STR: 'boot'});
+    startRun.next = print;
+
+    const templates = {
+        aimecanum_start_run_thread: {
+            blockType: 'hat',
+            section: 'setup',
+            imports: ['import Hiwonder'],
+            template: ''
+        },
+        aimecanum_print_str: {
+            blockType: 'command',
+            arguments: {
+                STR: {
+                    defaultValue: 'Hello'
+                }
+            },
+            template: 'print({STR})'
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([startRun]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.equal(code, [
+        'import Hiwonder',
+        '',
+        'print("boot")'
+    ].join('\n'));
+    t.end();
+});
+
+test('empty custom setup hat keeps preamble imports', t => {
+    const startRun = new TestBlock('aimecanum_start_run_thread');
+
+    const templates = {
+        aimecanum_start_run_thread: {
+            blockType: 'hat',
+            section: 'setup',
+            imports: ['import Hiwonder', 'import time', 'import Hiwonder_DEV'],
+            template: ''
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([startRun]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.equal(code, [
+        'import Hiwonder',
+        'import Hiwonder_DEV',
+        'import time',
+        ''
+    ].join('\n'));
+    t.end();
+});
+
+test('custom setup hats do not consume main entry names', t => {
+    const startRun = new TestBlock('aimecanum_start_run_thread');
+    const main = new TestBlock('aimecanum_start_thread');
+
+    const templates = {
+        aimecanum_start_run_thread: {
+            blockType: 'hat',
+            section: 'setup',
+            template: ''
+        },
+        aimecanum_start_thread: {
+            blockType: 'hat',
+            section: 'main',
+            launcher: 'Hiwonder.startMain({MAIN})',
+            template: ''
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([startRun, main]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.match(code, /def start_main\(\):/);
+    t.match(code, /Hiwonder\.startMain\(start_main\)/);
+    t.notMatch(code, /def start_main1\(\):/);
+    t.notMatch(code, /def start_run\(\):/);
+    t.end();
+});

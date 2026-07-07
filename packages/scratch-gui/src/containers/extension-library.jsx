@@ -54,6 +54,7 @@ class ExtensionLibrary extends React.PureComponent {
             return (
                 <ProductExtensionLibrary
                     onBuiltinExtensionSelect={this.handleItemSelect}
+                    onCategorySelected={this.props.onCategorySelected}
                     onRequestClose={this.props.onRequestClose}
                 />
             );

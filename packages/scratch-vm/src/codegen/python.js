@@ -197,7 +197,11 @@ const addCustomImports = (templateInfo, imports) => {
 
 const applyTemplateText = (template, templateInfo, block, imports) => (
     String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, inputName) => {
+        const argument = templateInfo.arguments && templateInfo.arguments[inputName];
         const fallback = getDefaultArgumentValue(templateInfo, inputName, '');
+        if (argument && argument.literal && !getInputBlock(block, inputName)) {
+            return getFieldValue(block, [inputName], fallback);
+        }
         return valueToPython(block, inputName, fallback, imports);
     })
 );
@@ -220,6 +224,32 @@ const addCustomGenerationMetadata = (templateInfo, block, imports) => {
 const applyCustomTemplate = (templateInfo, block, imports) => {
     addCustomGenerationMetadata(templateInfo, block, imports);
     return applyTemplateText(templateInfo.template, templateInfo, block, imports);
+};
+
+// 自定义帽子积木可以覆盖入口函数签名，例如按键事件需要生成 on_buttonA_clicked。
+const renderEntryHeader = (templateInfo, block, imports, entryName) => {
+    if (!templateInfo || !templateInfo.entryTemplate) {
+        return [`def ${entryName}():`];
+    }
+    return applyTemplateText(
+        String(templateInfo.entryTemplate).replace(/\{MAIN\}/g, entryName),
+        templateInfo,
+        block,
+        imports
+    ).split('\n');
+};
+
+// entryFooter 用来生成回调注册语句，保持函数体和硬件事件绑定分离。
+const renderEntryFooter = (templateInfo, block, imports, entryName) => {
+    if (!templateInfo || !templateInfo.entryFooter) {
+        return [];
+    }
+    return applyTemplateText(
+        String(templateInfo.entryFooter).replace(/\{MAIN\}/g, entryName),
+        templateInfo,
+        block,
+        imports
+    ).split('\n');
 };
 
 const getPythonCodegenTemplate = blockType => codegenContext.getTemplate(blockType);
@@ -392,16 +422,23 @@ const generateStack = (topBlock, imports, options = {}) => {
         if (templateInfo) {
             addCustomGenerationMetadata(templateInfo, topBlock, imports);
         }
+        const globalNamesBeforeBody = new Set(codegenContext.getGlobalNames());
         const body = stack.slice(1).flatMap(block => generateStatementLines(block, imports, 1));
-        const globalNames = codegenContext.getGlobalNames();
+        const usesEntryTemplate = Boolean(templateInfo && templateInfo.entryTemplate);
+        // 事件回调只声明函数体内新增使用的硬件对象，避免把事件源本身也写进 global。
+        const globalNames = codegenContext.getGlobalNames()
+            .filter(name => !usesEntryTemplate || !globalNamesBeforeBody.has(name));
         const globalLines = globalNames.map(name => `${indent(1)}global ${name}`);
         const entryName = options.entryName || 'start_main';
+        const headerLines = renderEntryHeader(templateInfo, topBlock, imports, entryName);
+        const footerLines = renderEntryFooter(templateInfo, topBlock, imports, entryName);
+        const launcherLines = usesEntryTemplate ? [] : ['', codegenContext.renderLauncher(entryName)];
         return [
-            `def ${entryName}():`,
+            ...headerLines,
             ...globalLines,
             ...(body.length ? body : ['    pass']),
-            '',
-            codegenContext.renderLauncher(entryName)
+            ...(footerLines.length ? ['', ...footerLines] : []),
+            ...launcherLines
         ];
     }
 
@@ -428,6 +465,12 @@ const isCustomMainHatBlock = block => {
 
 const isFunctionDefinitionBlock = block => isType(block, 'function', 'define');
 
+const usesGeneratedEntryName = block => {
+    if (!block) return false;
+    const templateInfo = getPythonCodegenTemplate(block.type);
+    return !templateInfo || !templateInfo.entryTemplate;
+};
+
 const generatePythonCode = (workspace, options = {}) => {
     codegenContext = new PythonCodegenContext({
         getPythonCodegenTemplate: options.getPythonCodegenTemplate
@@ -441,18 +484,14 @@ const generatePythonCode = (workspace, options = {}) => {
     const functionBlocks = topBlocks.filter(isFunctionDefinitionBlock);
     const setupHatBlocks = topBlocks.filter(isCustomSetupHatBlock);
     const entryBlocks = topBlocks.filter(isEntryBlock);
-    const otherBlocks = topBlocks.filter(block => (
-        !isFunctionDefinitionBlock(block) &&
-        !isCustomSetupHatBlock(block) &&
-        !isEntryBlock(block)
-    ));
+    // Python 模式只转换有明确入口的积木栈；画布上散落的普通积木不生成代码。
     const orderedBlocks = [
         ...functionBlocks,
         ...setupHatBlocks,
-        ...otherBlocks,
         ...entryBlocks
     ];
-    const entryIndexByBlock = new Map(entryBlocks.map((block, index) => [block, index]));
+    const generatedEntryBlocks = entryBlocks.filter(usesGeneratedEntryName);
+    const entryIndexByBlock = new Map(generatedEntryBlocks.map((block, index) => [block, index]));
     const sections = orderedBlocks.map(block => {
         const entryIndex = entryIndexByBlock.get(block);
         const entryName = typeof entryIndex === 'number' ?
@@ -461,7 +500,7 @@ const generatePythonCode = (workspace, options = {}) => {
         return generateStack(block, imports, {entryName});
     }).filter(section => section.length);
 
-    if (sections.length === 0) {
+    if (sections.length === 0 && !codegenContext.hasPreamble()) {
         return '# Drag Python blocks here to generate code.';
     }
 

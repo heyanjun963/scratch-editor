@@ -325,7 +325,9 @@ class ExtensionManager {
                     result = '---';
                     break;
                 default: // an ExtensionBlockMetadata object
-                    result = this._prepareBlockInfo(serviceName, blockInfo);
+                    result = blockInfo && blockInfo.subCategory ?
+                        {subCategory: maybeFormatMessage(blockInfo.subCategory)} :
+                        this._prepareBlockInfo(serviceName, blockInfo);
                     break;
                 }
                 results.push(result);

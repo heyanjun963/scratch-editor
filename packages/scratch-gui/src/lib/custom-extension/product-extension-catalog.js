@@ -15,9 +15,9 @@ const productExtensionCatalog = [
                 id: 'aimecanum',
                 name: 'AI机甲麦轮车',
                 sourceExtension: 'aimecanum',
-                version: '0.1.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
+                version: '0.2.1',
+                latestVersion: '0.2.1',
+                status: 'available'
             },
             {
                 id: 'aiquadruped',

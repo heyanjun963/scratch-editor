@@ -96,6 +96,8 @@ const normalizeGeneratorCollection = rawGenerator => {
         imports: Array.isArray(rawGenerator.imports) ? rawGenerator.imports.map(String) : [],
         variables: Array.isArray(rawGenerator.variables) ? rawGenerator.variables.map(String) : [],
         setups: Array.isArray(rawGenerator.setups) ? rawGenerator.setups.map(String) : [],
+        entryTemplate: rawGenerator.entryTemplate ? String(rawGenerator.entryTemplate) : '',
+        entryFooter: rawGenerator.entryFooter ? String(rawGenerator.entryFooter) : '',
         launcher: rawGenerator.launcher ? String(rawGenerator.launcher) : '',
         blocks: rawGenerator.blocks && typeof rawGenerator.blocks === 'object' ?
             rawGenerator.blocks :
@@ -127,6 +129,8 @@ const getBlockPythonCodegen = (rawBlock, generatorInfo, commonImports) => {
             ...(Array.isArray(inlinePython.setups) ? inlinePython.setups : []),
             ...(Array.isArray(generatorPython.setups) ? generatorPython.setups : [])
         ]),
+        entryTemplate: generatorPython.entryTemplate || inlinePython.entryTemplate || '',
+        entryFooter: generatorPython.entryFooter || inlinePython.entryFooter || '',
         launcher: generatorPython.launcher || inlinePython.launcher || '',
         section: generatorPython.section || inlinePython.section || '',
         runtimeFiles: uniqueStrings([
@@ -148,6 +152,10 @@ const mergePackageManifest = async (zipLookup, rawManifest, rawBlocks, rawGenera
                 ...(generatorCollection.blocks[opcode] || {}),
                 commonVariables: generatorCollection.variables,
                 commonSetups: generatorCollection.setups,
+                entryTemplate: (generatorCollection.blocks[opcode] && generatorCollection.blocks[opcode].entryTemplate) ||
+                    generatorCollection.entryTemplate,
+                entryFooter: (generatorCollection.blocks[opcode] && generatorCollection.blocks[opcode].entryFooter) ||
+                    generatorCollection.entryFooter,
                 launcher: (generatorCollection.blocks[opcode] && generatorCollection.blocks[opcode].launcher) ||
                     generatorCollection.launcher
             } : null,

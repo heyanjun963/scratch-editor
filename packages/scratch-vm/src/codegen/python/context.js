@@ -65,6 +65,15 @@ class PythonCodegenContext {
         ));
     }
 
+    hasPreamble () {
+        return Boolean(
+            this.imports.size ||
+            this.variables.size ||
+            this.functions.size ||
+            this.setups.size
+        );
+    }
+
     finish (sections) {
         const importLines = this.getImportLines();
         const variableLines = Array.from(this.variables);

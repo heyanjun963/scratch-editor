@@ -24,6 +24,7 @@ import {CAT_BLOCKS_THEME} from '../lib/settings/theme';
 import generatePythonCode from '../lib/python-codegen';
 import {manifestToExtensionObject} from '../lib/custom-extension/manifest-to-extension';
 import {registerPythonCodegenManifest} from '../lib/custom-extension/codegen-registry';
+import {builtinProductManifests} from '../lib/custom-extension/builtin-product-manifests';
 import {
     injectExtensionBlockIcons,
     injectExtensionCategoryMode,
@@ -69,6 +70,8 @@ const pythonExtensionIds = [
     'pythonNative'
 ];
 
+const builtinProductExtensionIds = Object.keys(builtinProductManifests);
+
 const disabledFlyoutBlocks = {
     pythonNative_currentTime: '当前时间积木暂未开放'
 };
@@ -78,6 +81,7 @@ const disabledFlyoutBlockListenerKey = '__companyDisabledFlyoutListener';
 
 const makePythonToolboxXML = (categoriesXML, customExtensionIds) => {
     const allowedExtensionIds = pythonExtensionIds.concat(
+        builtinProductExtensionIds,
         String(customExtensionIds || '').split(',').filter(Boolean)
     );
     return [

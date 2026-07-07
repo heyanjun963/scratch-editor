@@ -71,9 +71,29 @@ const normalizeArguments = (block, rawArguments) => {
         argumentsByName[name] = {
             type,
             scratchType: argumentTypeMap[type],
-            defaultValue: typeof argument.defaultValue === 'undefined' ? '' : argument.defaultValue
+            defaultValue: typeof argument.defaultValue === 'undefined' ? '' : argument.defaultValue,
+            menu: argument.menu ? String(argument.menu) : null,
+            literal: Boolean(argument.literal)
         };
         return argumentsByName;
+    }, {});
+};
+
+const normalizeMenus = rawMenus => {
+    if (!rawMenus || typeof rawMenus !== 'object' || Array.isArray(rawMenus)) return {};
+    return Object.keys(rawMenus).reduce((menus, name) => {
+        const menu = rawMenus[name];
+        if (!menu || typeof menu !== 'object' || !Array.isArray(menu.items)) return menus;
+        menus[name] = {
+            items: menu.items.map(item => {
+                if (typeof item === 'string') return item;
+                return {
+                    text: String(item.text),
+                    value: String(item.value)
+                };
+            })
+        };
+        return menus;
     }, {});
 };
 
@@ -96,6 +116,8 @@ const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
         setups: Array.isArray(rawPythonCodegen.setups) ?
             rawPythonCodegen.setups.map(String) :
             [],
+        entryTemplate: rawPythonCodegen.entryTemplate ? String(rawPythonCodegen.entryTemplate) : '',
+        entryFooter: rawPythonCodegen.entryFooter ? String(rawPythonCodegen.entryFooter) : '',
         launcher: rawPythonCodegen.launcher ? String(rawPythonCodegen.launcher) : '',
         section: rawPythonCodegen.section ? String(rawPythonCodegen.section) : ''
     };
@@ -149,6 +171,7 @@ const normalizeCategories = rawCategories => {
         return {
             id: String(category.id || category.name || ''),
             name: String(category.name || category.id || ''),
+            hideLabel: Boolean(category.hideLabel),
             blocks: Array.isArray(category.blocks) ? category.blocks.map(String) : []
         };
     }).filter(category => category.id || category.name);
@@ -183,6 +206,7 @@ const normalizeCustomExtensionManifestV1 = rawManifest => ({
         files: []
     },
     package: null,
+    menus: normalizeMenus(rawManifest.menus),
     blocks: normalizeBlocks(rawManifest.blocks)
 });
 
@@ -202,6 +226,7 @@ const normalizeCustomExtensionManifestV2 = rawManifest => ({
             []
     },
     package: rawManifest.package || null,
+    menus: normalizeMenus(rawManifest.menus),
     blocks: normalizeBlocks(rawManifest.blocks)
 });
 
@@ -231,6 +256,7 @@ const serializeCustomExtensionManifest = manifest => {
         target: manifest.target || 'python',
         source: manifest.source || manifest.target || 'python',
         categories: manifest.categories || [],
+        menus: manifest.menus || {},
         runtime: manifest.runtime || {pythonLibraries: [], files: []},
         blocks: manifest.blocks.map(block => ({
             opcode: block.opcode,
@@ -241,7 +267,9 @@ const serializeCustomExtensionManifest = manifest => {
                 const argument = block.arguments[name];
                 argumentsByName[name] = {
                     type: argument.type,
-                    defaultValue: argument.defaultValue
+                    defaultValue: argument.defaultValue,
+                    menu: argument.menu || undefined,
+                    literal: argument.literal || undefined
                 };
                 return argumentsByName;
             }, {}),
@@ -252,6 +280,8 @@ const serializeCustomExtensionManifest = manifest => {
                     runtimeFiles: block.codegen.python.runtimeFiles || [],
                     variables: block.codegen.python.variables || [],
                     setups: block.codegen.python.setups || [],
+                    entryTemplate: block.codegen.python.entryTemplate || '',
+                    entryFooter: block.codegen.python.entryFooter || '',
                     launcher: block.codegen.python.launcher || '',
                     section: block.codegen.python.section || ''
                 }
