@@ -1,9 +1,6 @@
-const codegenContext = {
-    getPythonCodegenTemplate: () => null,
-    launcher: '',
-    setups: new Set(),
-    variables: new Set()
-};
+const PythonCodegenContext = require('./python/context');
+
+let codegenContext = new PythonCodegenContext();
 
 const prefixByCategory = {
     control: 'pythonControl_',
@@ -29,18 +26,6 @@ const literalToPython = value => {
 };
 
 const indent = level => '    '.repeat(level);
-
-const getPythonAssignmentName = line => {
-    const match = String(line || '').match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=/);
-    return match ? match[1] : null;
-};
-
-const renderLauncher = (launcher, entryName) => {
-    if (!launcher) return `${entryName}()`;
-    return String(launcher)
-        .replace(/\{MAIN\}/g, entryName)
-        .replace(/\bstart_main\b/g, entryName);
-};
 
 const normalizePythonName = value => {
     const cleaned = String(value || 'value')
@@ -221,14 +206,14 @@ const addCustomGenerationMetadata = (templateInfo, block, imports) => {
     addCustomImports(templateInfo, imports);
     (templateInfo.variables || []).forEach(line => {
         const renderedLine = applyTemplateText(line, templateInfo, block, imports);
-        if (renderedLine) codegenContext.variables.add(renderedLine);
+        if (renderedLine) codegenContext.addVariable(renderedLine);
     });
     (templateInfo.setups || []).forEach(line => {
         const renderedLine = applyTemplateText(line, templateInfo, block, imports);
-        if (renderedLine) codegenContext.setups.add(renderedLine);
+        if (renderedLine) codegenContext.addSetup(renderedLine);
     });
     if (templateInfo.launcher) {
-        codegenContext.launcher = templateInfo.launcher;
+        codegenContext.setLauncher(templateInfo.launcher);
     }
 };
 
@@ -237,7 +222,7 @@ const applyCustomTemplate = (templateInfo, block, imports) => {
     return applyTemplateText(templateInfo.template, templateInfo, block, imports);
 };
 
-const getPythonCodegenTemplate = blockType => codegenContext.getPythonCodegenTemplate(blockType);
+const getPythonCodegenTemplate = blockType => codegenContext.getTemplate(blockType);
 
 const customBlockToPythonExpression = (block, imports) => {
     const templateInfo = getPythonCodegenTemplate(block.type);
@@ -408,10 +393,7 @@ const generateStack = (topBlock, imports, options = {}) => {
             addCustomGenerationMetadata(templateInfo, topBlock, imports);
         }
         const body = stack.slice(1).flatMap(block => generateStatementLines(block, imports, 1));
-        const globalNames = Array.from(codegenContext.variables)
-            .map(getPythonAssignmentName)
-            .filter(Boolean)
-            .sort();
+        const globalNames = codegenContext.getGlobalNames();
         const globalLines = globalNames.map(name => `${indent(1)}global ${name}`);
         const entryName = options.entryName || 'start_main';
         return [
@@ -419,7 +401,7 @@ const generateStack = (topBlock, imports, options = {}) => {
             ...globalLines,
             ...(body.length ? body : ['    pass']),
             '',
-            renderLauncher(codegenContext.launcher, entryName)
+            codegenContext.renderLauncher(entryName)
         ];
     }
 
@@ -447,15 +429,14 @@ const isCustomMainHatBlock = block => {
 const isFunctionDefinitionBlock = block => isType(block, 'function', 'define');
 
 const generatePythonCode = (workspace, options = {}) => {
-    codegenContext.getPythonCodegenTemplate = options.getPythonCodegenTemplate || (() => null);
-    codegenContext.launcher = '';
-    codegenContext.setups = new Set();
-    codegenContext.variables = new Set();
+    codegenContext = new PythonCodegenContext({
+        getPythonCodegenTemplate: options.getPythonCodegenTemplate
+    });
     if (!workspace || typeof workspace.getTopBlocks !== 'function') {
         return '# Python coding mode is waiting for the blocks workspace.';
     }
 
-    const imports = new Set();
+    const imports = codegenContext.imports;
     const topBlocks = workspace.getTopBlocks(true);
     const functionBlocks = topBlocks.filter(isFunctionDefinitionBlock);
     const setupHatBlocks = topBlocks.filter(isCustomSetupHatBlock);
@@ -475,7 +456,7 @@ const generatePythonCode = (workspace, options = {}) => {
     const sections = orderedBlocks.map(block => {
         const entryIndex = entryIndexByBlock.get(block);
         const entryName = typeof entryIndex === 'number' ?
-            (entryIndex === 0 ? 'start_main' : `start_main${entryIndex}`) :
+            codegenContext.getEntryName(entryIndex) :
             undefined;
         return generateStack(block, imports, {entryName});
     }).filter(section => section.length);
@@ -484,18 +465,7 @@ const generatePythonCode = (workspace, options = {}) => {
         return '# Drag Python blocks here to generate code.';
     }
 
-    const importLines = Array.from(imports).sort().map(name => (
-        /^(?:from|import)\s/.test(name) ? name : `import ${name}`
-    ));
-    const variableLines = Array.from(codegenContext.variables);
-    const setupLines = Array.from(codegenContext.setups);
-    return [
-        ...importLines,
-        ...(importLines.length ? [''] : []),
-        ...(variableLines.length ? ['# initialize variables', ...variableLines, ''] : []),
-        ...(setupLines.length ? [...setupLines, ''] : []),
-        ...sections.flatMap((section, index) => (index === 0 ? section : ['', ...section]))
-    ].join('\n');
+    return codegenContext.finish(sections);
 };
 
 module.exports = generatePythonCode;

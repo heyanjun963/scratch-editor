@@ -599,3 +599,21 @@ aimecanum/motor.snapshot
 2. 手工迁移 `aimecanum` 的 10 个核心积木，验证从拓展页面到 Python 生成结果的完整链路。
 
 等 `aimecanum` 闭环稳定后，再写提取脚本批量转换旧 `index.js` 的积木元数据。
+
+---
+
+## 11. 2026-07-07 实施记录
+
+已完成第一步基础设施：
+
+- 新增 `packages/scratch-vm/src/codegen/python/context.js`。
+- 将原来散在 `python.js` 里的 `imports`、`variables`、`setups`、`launcher` 和最终拼装逻辑收敛到 `PythonCodegenContext`。
+- 保留现有简单模板库能力，当前 `codegen-registry` 的 `template/imports/variables/setups/launcher` 仍可继续工作。
+- 新增 `packages/scratch-vm/test/unit/python_codegen.js`，覆盖自定义主函数、硬件变量初始化、`global` 注入、launcher 和多个主函数命名。
+
+下一步进入 `aimecanum` 最小闭环：
+
+1. 新增产品 generator 接入点。
+2. 迁移 `start_thread` / `start_run_thread`。
+3. 迁移蜂鸣器、打印、电机移动等第一批核心积木。
+4. 用快照测试锁定旧版期望的 Python 输出。
