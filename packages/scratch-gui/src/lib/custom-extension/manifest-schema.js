@@ -12,7 +12,9 @@ const blockTypeMap = {
 const argumentTypeMap = {
     string: 'string',
     number: 'number',
-    boolean: 'Boolean'
+    boolean: 'Boolean',
+    // line6 对应 scratch-vm 的 ArgumentType.LINE6，用于六路巡线传感器位掩码选择器。
+    line6: 'line6'
 };
 
 // manifest-schema 是所有自定义拓展库的入口校验层，负责把外部 JSON 规整成内部稳定结构。

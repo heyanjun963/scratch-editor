@@ -107,15 +107,6 @@ const aimecanumManifest = normalizeCustomExtensionManifest({
         line6Mask: menu([['1', 1], ['2', 2], ['3', 4], ['4', 8], ['5', 16], ['6', 32]]),
         linefollows6: menu([['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5], ['6', 6]]),
         linedot2: menu([['◌', '== 0'], ['●', '> 0']]),
-        line6Status: menu([
-            ['000000', '00'],
-            ['000001', '01'],
-            ['000011', '03'],
-            ['000111', '07'],
-            ['001111', '0f'],
-            ['011111', '1f'],
-            ['111111', '3f']
-        ]),
         moveDirection: menu([['前进', 1], ['后退', -1]]),
         nums: menu([['全部', 0], ['1', 1], ['2', 2], ['3', 3]]),
         rgb: menu([['红', 1], ['绿', 2], ['蓝', 3]]),
@@ -454,8 +445,7 @@ const aimecanumManifest = normalizeCustomExtensionManifest({
         }),
         booleanBlock('linefollower6_status', '[SENSOR] 六路巡线传感器检测到 [LINE]', {
             SENSOR: arg('string', 'LF1', {menu: 'line6Sensor', literal: true}),
-            // 组合状态后续需要接入自定义 LINE6 输入控件，当前先用下拉值承载代码生成。
-            LINE: arg('string', '00', {menu: 'line6Status', literal: true})
+            LINE: arg('line6', '00')
         }, 'mecanumCar.{SENSOR}.get_result_data() == 0x{LINE}', {
             imports: ['import Hiwonder_DEV'],
             variables: [mecanumCarVariable]

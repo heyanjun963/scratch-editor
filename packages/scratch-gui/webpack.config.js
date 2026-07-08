@@ -47,6 +47,10 @@ const baseConfig = new ScratchWebpackConfigBuilder(
             clean: false
         },
         resolve: {
+            alias: {
+                // 开发阶段固定读取工作区 scratch-blocks 构建产物，避免解析到旧包导致自定义字段缺失。
+                'scratch-blocks$': path.resolve(__dirname, '../scratch-blocks/dist/main.mjs')
+            },
             fallback: {
                 Buffer: require.resolve('buffer/'),
                 stream: require.resolve('stream-browserify')

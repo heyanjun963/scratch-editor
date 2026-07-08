@@ -163,6 +163,9 @@ const expressionFromSelf = (block, imports, fallback = '') => {
         return getFieldValue(block, ['NUM'], fallback);
     case 'text':
         return quotePythonString(getFieldValue(block, ['TEXT'], fallback));
+    case 'line6':
+        // 六路巡线 shadow 字段内部保存十六进制掩码，生成 Python 时直接拼到 0x 后面。
+        return getFieldValue(block, ['LINE6'], fallback);
     default: {
         const customExpression = customBlockToPythonExpression(block, imports);
         if (customExpression) return customExpression;
