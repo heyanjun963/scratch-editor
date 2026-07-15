@@ -33,8 +33,10 @@ const getRegistryConfig = targetDirectory => {
     if (config.formatVersion !== 1 || config.repositoryType !== REGISTRY_TYPE) {
         throw new Error(`目标目录不是受支持的产品配置仓库: ${targetDirectory}`);
     }
-    if (!config.provider || !config.repository || !config.releaseDownloadBaseUrl) {
-        throw new Error(`${REGISTRY_CONFIG_FILE} 缺少 provider、repository 或 releaseDownloadBaseUrl`);
+    if (!config.provider || !config.repository || !config.packageDownloadBaseUrl || !config.releaseDownloadBaseUrl) {
+        throw new Error(
+            `${REGISTRY_CONFIG_FILE} 缺少 provider、repository、packageDownloadBaseUrl 或 releaseDownloadBaseUrl`
+        );
     }
     return config;
 };
@@ -86,7 +88,9 @@ const syncPackage = ({manifest, sourceDirectory}, targetDirectory, registryConfi
         repository: registryConfig.repository,
         tag,
         asset,
-        downloadUrl: `${registryConfig.releaseDownloadBaseUrl.replace(/\/$/, '')}/${tag}/${asset}`,
+        // Raw 文件支持浏览器 CORS；Release 下载地址保留给用户手动下载和版本追溯。
+        downloadUrl: `${registryConfig.packageDownloadBaseUrl.replace(/\/$/, '')}/${asset}`,
+        releaseDownloadUrl: `${registryConfig.releaseDownloadBaseUrl.replace(/\/$/, '')}/${tag}/${asset}`,
         sha256,
         status: sameVersion && previousEntry.status ? previousEntry.status : 'draft'
     };

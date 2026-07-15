@@ -21,6 +21,7 @@ describe('product extension repository sync', () => {
             repositoryType: 'scratch-product-extension-registry',
             provider: 'github',
             repository: 'company/scratch-product-extensions',
+            packageDownloadBaseUrl: 'https://raw.githubusercontent.com/company/scratch-product-extensions/main/dist',
             releaseDownloadBaseUrl: 'https://github.com/company/scratch-product-extensions/releases/download'
         }));
         fs.writeFileSync(path.join(targetDirectory, 'catalog.json'), JSON.stringify({
@@ -52,6 +53,9 @@ describe('product extension repository sync', () => {
             version: productManifest.version,
             tag: `${productManifest.id}-v${productManifest.version}`,
             asset: assetName,
+            downloadUrl: `https://raw.githubusercontent.com/company/scratch-product-extensions/main/dist/${assetName}`,
+            releaseDownloadUrl: `https://github.com/company/scratch-product-extensions/releases/download/` +
+                `${productManifest.id}-v${productManifest.version}/${assetName}`,
             sha256: createHash('sha256').update(firstAsset).digest('hex'),
             status: 'draft'
         });

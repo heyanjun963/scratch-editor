@@ -6,13 +6,19 @@ const LIBRARY_SOURCE_TYPES = Object.freeze({
 });
 
 // 离线优先使用最近一次校验成功的缓存包；内置配置只在没有有效缓存时作为最后兜底。
-const resolveProductLibraryItem = (catalogItem, bundledManifest, cachedRemotePackage = null) => {
+const resolveProductLibraryItem = (
+    catalogItem,
+    bundledManifest,
+    cachedRemotePackage = null,
+    remoteCatalogPackage = null
+) => {
     const packageId = catalogItem.packageId || catalogItem.id;
     const hasBundledDefault = Boolean(bundledManifest || catalogItem.extensionId);
     const cachedRemoteManifest = cachedRemotePackage && cachedRemotePackage.manifest ?
         cachedRemotePackage.manifest :
         null;
     const offlineManifest = cachedRemoteManifest || bundledManifest || null;
+    const hasRemotePackage = Boolean(remoteCatalogPackage);
     return {
         ...catalogItem,
         packageId,
@@ -23,14 +29,16 @@ const resolveProductLibraryItem = (catalogItem, bundledManifest, cachedRemotePac
         offlineManifest,
         cachedRemoteManifest,
         bundledDefaultManifest: bundledManifest || null,
-        status: cachedRemoteManifest ? 'available' : catalogItem.status,
+        status: offlineManifest ? 'available' : (hasRemotePackage ? 'downloadable' : catalogItem.status),
         version: offlineManifest && offlineManifest.version ? offlineManifest.version : catalogItem.version,
-        latestVersion: cachedRemotePackage && cachedRemotePackage.version ?
-            cachedRemotePackage.version :
-            catalogItem.latestVersion,
+        latestVersion: hasRemotePackage ? remoteCatalogPackage.version :
+            (cachedRemotePackage && cachedRemotePackage.version ?
+                cachedRemotePackage.version :
+                catalogItem.latestVersion),
         remoteSource: {
             type: LIBRARY_SOURCE_TYPES.REMOTE_REGISTRY,
-            packageId
+            packageId,
+            package: remoteCatalogPackage
         }
     };
 };

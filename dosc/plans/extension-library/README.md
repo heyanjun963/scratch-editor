@@ -21,7 +21,8 @@
 | [15 AI机甲麦轮车 SBEXT 外置执行记录](./15-aimecanum-sbext-extraction-progress.md) | 记录内置 JS manifest 外置为标准源包、生成 `.sbext`、重新导入测试和后续远程更新接口准备情况 |
 | [16 用户拓展分类与产品包来源模型](./16-user-extension-tab-and-product-source-progress.md) | 记录用户拓展独立 Tab、加载/卸载/删除、启用状态持久化，以及后台包覆盖内置默认产品配置的预留模型 |
 | [17 产品配置总仓库与同步命令执行记录](./17-product-extension-repository-sync-progress.md) | 记录独立多产品配置仓库、源配置与 SBEXT 同步命令、catalog 增量更新、稳定 SHA256 和人工 Release 步骤 |
+| [18 GitHub 产品拓展自动更新执行记录](./18-github-remote-update-progress.md) | 记录公开 catalog、版本比较、SBEXT 下载、SHA256、离线缓存、CORS 双地址和浏览器更新验证 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。AI机甲麦轮车已使用标准源包维护，并可生成重新导入的 `.sbext`。本地包现已归入独立“用户拓展”分类，支持保留包的加载/卸载和彻底删除。下一步产品化重点是接入 GitHub/Gitee 或公司后台的包下载、校验、缓存和项目版本锁定。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。AI机甲麦轮车已使用标准源包维护，并可生成重新导入的 `.sbext`。本地包现已归入独立“用户拓展”分类，支持保留包的加载/卸载和彻底删除。GitHub 公开 catalog、版本比较、SBEXT 下载、SHA256 和离线缓存链路已经打通；下一步产品化重点是项目版本锁定和真机产品验证。

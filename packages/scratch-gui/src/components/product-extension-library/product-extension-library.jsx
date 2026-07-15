@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {defineMessages, injectIntl} from 'react-intl';
 import VM from '@scratch/scratch-vm';
 
@@ -16,7 +16,21 @@ import {
 } from '../../lib/custom-extension/library-sources';
 import {serializeCustomExtensionManifest} from '../../lib/custom-extension/manifest-schema';
 import {manifestToExtensionObject} from '../../lib/custom-extension/manifest-to-extension';
-import {readCustomExtensionPackage} from '../../lib/custom-extension/package-reader';
+import {
+    readCustomExtensionPackage,
+    readCustomExtensionPackageBuffer
+} from '../../lib/custom-extension/package-reader';
+import {
+    compareVersions,
+    downloadRemoteLibraryPackage,
+    loadRemoteLibraryCatalog
+} from '../../lib/custom-extension/remote-library-client';
+import {
+    getLatestCachedRemotePackage,
+    loadCachedRemotePackages,
+    saveCachedRemotePackages,
+    upsertCachedRemotePackage
+} from '../../lib/custom-extension/remote-library-cache';
 import {
     registerPythonCodegenManifest,
     unregisterPythonCodegenManifest
@@ -127,6 +141,36 @@ const messages = defineMessages({
         defaultMessage: '检查中...',
         description: 'Button label while checking extension versions',
         id: 'gui.productExtensionLibrary.checkingVersion'
+    },
+    updatingVersion: {
+        defaultMessage: '更新中...',
+        description: 'Button label while updating a product extension',
+        id: 'gui.productExtensionLibrary.updatingVersion'
+    },
+    noUpdates: {
+        defaultMessage: '当前产品拓展已经是最新版本。',
+        description: 'Notice shown when all product extensions are current',
+        id: 'gui.productExtensionLibrary.noUpdates'
+    },
+    checkVersionFailure: {
+        defaultMessage: '检查产品拓展版本失败：{message}',
+        description: 'Failure notice for the remote product extension catalog',
+        id: 'gui.productExtensionLibrary.checkVersionFailure'
+    },
+    updateConfirm: {
+        defaultMessage: '发现 {name} {latestVersion}，当前版本为 {currentVersion}。是否下载更新？',
+        description: 'Confirmation before downloading a product extension update',
+        id: 'gui.productExtensionLibrary.updateConfirm'
+    },
+    updateSuccess: {
+        defaultMessage: '{name} 已更新到 {version}，离线时将继续使用此版本。',
+        description: 'Success notice after caching a product extension update',
+        id: 'gui.productExtensionLibrary.updateSuccess'
+    },
+    updateFailure: {
+        defaultMessage: '{name} 更新失败：{message}',
+        description: 'Failure notice after downloading a product extension update',
+        id: 'gui.productExtensionLibrary.updateFailure'
     },
     importLocal: {
         defaultMessage: '导入本地库',
@@ -288,15 +332,45 @@ const getInitials = name => name
     .toUpperCase();
 
 // 产品目录按主控/模块铺平；内置默认包和后续后台包通过统一来源模型解析。
-const getFlatItems = activeTab => (activeTab === 'user' ? [] : productExtensionCatalog
-    .filter(section => (activeTab === 'main') === mainCategoryIds.includes(section.id))
-    .flatMap(section => section.children.map(item => ({
-        ...resolveProductLibraryItem(item, builtinProductManifests[item.id] || null),
-        categoryId: section.id,
-        categoryLabel: section.label
-    }))));
+const getFlatCatalogItems = () => productExtensionCatalog.flatMap(section => section.children);
 
-const getAvailableMainItems = () => getFlatItems('main').filter(item => item.status === 'available');
+const getFlatItems = (activeTab, remoteCatalog = [], cachedRemotePackages = []) => (
+    activeTab === 'user' ? [] : productExtensionCatalog
+    .filter(section => (activeTab === 'main') === mainCategoryIds.includes(section.id))
+    .flatMap(section => section.children.map(item => {
+        const remotePackage = remoteCatalog.find(candidate => candidate.packageId === item.id) || null;
+        const cachedRemotePackage = getLatestCachedRemotePackage(cachedRemotePackages, item.id);
+        return {
+            ...resolveProductLibraryItem(
+                item,
+                builtinProductManifests[item.id] || null,
+                cachedRemotePackage,
+                remotePackage
+            ),
+            categoryId: section.id,
+            categoryLabel: section.label
+        };
+    }))
+);
+
+const getAvailableMainItems = (remoteCatalog, cachedRemotePackages) => getFlatItems(
+    'main',
+    remoteCatalog,
+    cachedRemotePackages
+).filter(item => item.status === 'available');
+
+const getAvailableRemoteUpdates = (remoteCatalog, cachedRemotePackages) => {
+    const localItems = new Map(getFlatCatalogItems().map(item => [item.id, item]));
+    return remoteCatalog.filter(remotePackage => {
+        const localItem = localItems.get(remotePackage.packageId);
+        if (!localItem) return false;
+        const cachedPackage = getLatestCachedRemotePackage(cachedRemotePackages, remotePackage.packageId);
+        const bundledManifest = builtinProductManifests[remotePackage.packageId];
+        const currentVersion = cachedPackage ? cachedPackage.version :
+            (bundledManifest ? bundledManifest.version : localItem.version);
+        return compareVersions(remotePackage.version, currentVersion) > 0;
+    });
+};
 
 // 新版拓展库整页组件：负责产品筛选、本地库导入导出、内置产品加载和切换确认。
 const ProductExtensionLibraryComponent = ({
@@ -316,15 +390,26 @@ const ProductExtensionLibraryComponent = ({
     const [chip, setChip] = useState('all');
     const [query, setQuery] = useState('');
     const [checking, setChecking] = useState(false);
+    const [updatingPackageId, setUpdatingPackageId] = useState(null);
+    const [remoteCatalog, setRemoteCatalog] = useState([]);
+    const [cachedRemotePackages, setCachedRemotePackages] = useState(() => loadCachedRemotePackages());
     const [pendingSwitchItem, setPendingSwitchItem] = useState(null);
     const [, setExtensionStateVersion] = useState(0);
 
-    // 版本检查当前是占位交互，后续接远程 registry 后替换为真实请求。
-    useEffect(() => {
+    // 目录请求只更新远程版本信息；失败时继续使用已经校验的缓存或软件内置默认包。
+    const refreshRemoteCatalog = useCallback(() => {
         setChecking(true);
-        const timer = setTimeout(() => setChecking(false), 650);
-        return () => clearTimeout(timer);
+        return loadRemoteLibraryCatalog()
+            .then(catalog => {
+                setRemoteCatalog(catalog);
+                return catalog;
+            })
+            .finally(() => setChecking(false));
     }, []);
+
+    useEffect(() => {
+        refreshRemoteCatalog().catch(() => {});
+    }, [refreshRemoteCatalog]);
 
     // 桌面端启动时从 userData 恢复本地拓展库，再同步回 Redux/localStorage。
     useEffect(() => {
@@ -343,7 +428,7 @@ const ProductExtensionLibraryComponent = ({
     const items = useMemo(() => {
         const normalizedQuery = query.trim().toLowerCase();
         const localItems = activeTab === 'user' ? installedLibraries.map(createUserLibraryItem) : [];
-        return getFlatItems(activeTab).concat(localItems).filter(item => {
+        return getFlatItems(activeTab, remoteCatalog, cachedRemotePackages).concat(localItems).filter(item => {
             if (chip !== 'all' && item.categoryId !== chip) return false;
             if (!normalizedQuery) return true;
             return [
@@ -356,15 +441,12 @@ const ProductExtensionLibraryComponent = ({
         });
     }, [
         activeTab,
+        cachedRemotePackages,
         chip,
         installedLibraries,
-        query
+        query,
+        remoteCatalog
     ]);
-
-    const handleCheckVersions = () => {
-        setChecking(true);
-        setTimeout(() => setChecking(false), 650);
-    };
 
     const handleUploadClick = () => {
         // eslint-disable-next-line no-alert
@@ -500,24 +582,30 @@ const ProductExtensionLibraryComponent = ({
     };
 
     // 主控/机器人一次只允许加载一个，切换前用它判断是否需要确认清理。
-    const getLoadedMainItem = nextItem => getAvailableMainItems().find(item => (
+    const getLoadedMainItem = nextItem => getAvailableMainItems(
+        remoteCatalog,
+        cachedRemotePackages
+    ).find(item => (
         item.id !== nextItem.id && vm.extensionManager.isExtensionLoaded(item.id)
     ));
 
     // 切换主控时清掉旧主控和模块，避免不同机器人积木混用生成错误 Python。
     const clearLoadedProductExtensions = nextExtensionId => {
         const extensionManager = vm.extensionManager;
-        Object.keys(builtinProductManifests)
+        const productExtensionIds = getFlatCatalogItems().map(item => item.id);
+        productExtensionIds
             .filter(extensionId => extensionId !== nextExtensionId)
-            .forEach(extensionId => unregisterPythonCodegenManifest(
-                builtinProductManifests[extensionId]
-            ));
+            .forEach(extensionId => {
+                const cachedPackage = getLatestCachedRemotePackage(cachedRemotePackages, extensionId);
+                const manifest = cachedPackage ? cachedPackage.manifest : builtinProductManifests[extensionId];
+                if (manifest) unregisterPythonCodegenManifest(manifest);
+            });
         installedLibraries.forEach(library => {
             unregisterPythonCodegenManifest(library.manifest);
         });
 
         const extensionIds = new Set([
-            ...Object.keys(builtinProductManifests).filter(extensionId => extensionId !== nextExtensionId),
+            ...productExtensionIds.filter(extensionId => extensionId !== nextExtensionId),
             ...installedLibraries.map(library => library.manifest.id)
         ]);
         const unloadPromises = Array.from(extensionIds)
@@ -535,6 +623,81 @@ const ProductExtensionLibraryComponent = ({
             vm.emitWorkspaceUpdate();
             setExtensionStateVersion(version => version + 1);
         });
+    };
+
+    // 远程包通过 SHA256 和包内 id/version 双重校验后才写入离线缓存。
+    const installRemoteUpdate = remotePackage => {
+        setUpdatingPackageId(remotePackage.packageId);
+        return downloadRemoteLibraryPackage(remotePackage)
+            .then(({data}) => readCustomExtensionPackageBuffer(data, remotePackage.asset))
+            .then(manifest => {
+                if (manifest.id !== remotePackage.packageId || manifest.version !== remotePackage.version) {
+                    throw new Error('拓展包内的产品 ID 或版本与 catalog 不一致');
+                }
+                const cachedPackage = {
+                    ...remotePackage,
+                    cachedAt: new Date().toISOString(),
+                    manifest
+                };
+                const nextCachedPackages = upsertCachedRemotePackage(loadCachedRemotePackages(), cachedPackage);
+                // 先持久化再切换运行态，写入失败时继续保留原版本。
+                saveCachedRemotePackages(nextCachedPackages);
+                setCachedRemotePackages(nextCachedPackages);
+                const reloadPromise = vm.extensionManager.isExtensionLoaded(manifest.id) ?
+                    installBuiltinProductManifest(manifest).then(() => vm.emitWorkspaceUpdate()) :
+                    Promise.resolve();
+                return reloadPromise.then(() => {
+                    // eslint-disable-next-line no-alert
+                    alert(intl.formatMessage(messages.updateSuccess, {
+                        name: manifest.name,
+                        version: manifest.version
+                    }));
+                    return manifest;
+                });
+            })
+            .catch(error => {
+                // eslint-disable-next-line no-alert
+                alert(intl.formatMessage(messages.updateFailure, {
+                    name: remotePackage.name || remotePackage.packageId,
+                    message: error.message
+                }));
+                return null;
+            })
+            .finally(() => setUpdatingPackageId(null));
+    };
+
+    // 用户显式检查后逐个确认更新，不进行静默下载或自动替换。
+    const handleCheckVersions = () => {
+        refreshRemoteCatalog()
+            .then(catalog => {
+                const updates = getAvailableRemoteUpdates(catalog, cachedRemotePackages);
+                if (!updates.length) {
+                    // eslint-disable-next-line no-alert
+                    alert(intl.formatMessage(messages.noUpdates));
+                    return;
+                }
+                updates.reduce((promise, remotePackage) => promise.then(() => {
+                    const cachedPackage = getLatestCachedRemotePackage(
+                        cachedRemotePackages,
+                        remotePackage.packageId
+                    );
+                    const bundledManifest = builtinProductManifests[remotePackage.packageId];
+                    const localItem = getFlatCatalogItems().find(item => item.id === remotePackage.packageId);
+                    const currentVersion = cachedPackage ? cachedPackage.version :
+                        (bundledManifest ? bundledManifest.version : localItem.version);
+                    // eslint-disable-next-line no-alert
+                    const shouldUpdate = confirm(intl.formatMessage(messages.updateConfirm, {
+                        name: remotePackage.name || remotePackage.packageId,
+                        currentVersion,
+                        latestVersion: remotePackage.version
+                    }));
+                    return shouldUpdate ? installRemoteUpdate(remotePackage) : null;
+                }), Promise.resolve());
+            })
+            .catch(error => {
+                // eslint-disable-next-line no-alert
+                alert(intl.formatMessage(messages.checkVersionFailure, {message: error.message}));
+            });
     };
 
     // 读取本地 .json/.zip/.sbext，解析失败时提示用户具体错误。
@@ -561,6 +724,24 @@ const ProductExtensionLibraryComponent = ({
                 return;
             }
             loadUserLibrary(item).then(() => selectExtensionCategory(item.id));
+            return;
+        }
+        if (item.status === 'downloadable' && item.remoteSource.package) {
+            if (mainCategoryIds.includes(item.categoryId) && !options.skipSwitchCheck) {
+                const loadedMainItem = getLoadedMainItem(item);
+                const hasLoadedUserLibrary = installedLibraries.some(library => (
+                    vm.extensionManager.isExtensionLoaded(library.manifest.id)
+                ));
+                if (loadedMainItem || hasLoadedUserLibrary) {
+                    setPendingSwitchItem(item);
+                    return;
+                }
+            }
+            installRemoteUpdate(item.remoteSource.package).then(manifest => {
+                if (!manifest) return;
+                installBuiltinProductManifest(manifest)
+                    .then(() => selectExtensionCategory(manifest.id));
+            });
             return;
         }
         if (item.status === 'available' && item.manifest) {
@@ -770,13 +951,13 @@ const ProductExtensionLibraryComponent = ({
                             </button>
                             <button
                                 className={styles.toolbarButton}
-                                disabled={checking}
+                                disabled={checking || Boolean(updatingPackageId)}
                                 type="button"
                                 onClick={handleCheckVersions}
                             >
-                                {checking ?
-                                    intl.formatMessage(messages.checkingVersion) :
-                                    intl.formatMessage(messages.checkVersion)}
+                                {updatingPackageId ? intl.formatMessage(messages.updatingVersion) :
+                                    (checking ? intl.formatMessage(messages.checkingVersion) :
+                                        intl.formatMessage(messages.checkVersion))}
                             </button>
                         </React.Fragment>
                     )}

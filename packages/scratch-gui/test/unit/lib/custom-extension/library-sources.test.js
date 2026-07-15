@@ -46,6 +46,35 @@ describe('custom extension library sources', () => {
         });
     });
 
+    test('shows the catalog version while continuing to use the offline manifest', () => {
+        expect(resolveProductLibraryItem(catalogItem, bundledManifest, null, {
+            packageId: 'aimecanum',
+            version: '0.3.0'
+        })).toMatchObject({
+            source: LIBRARY_SOURCE_TYPES.BUNDLED_DEFAULT,
+            manifest: bundledManifest,
+            version: '0.2.1',
+            latestVersion: '0.3.0',
+            remoteSource: {
+                package: {version: '0.3.0'}
+            }
+        });
+    });
+
+    test('marks a remote-only product as downloadable before it is cached', () => {
+        expect(resolveProductLibraryItem(
+            {...catalogItem, id: 'new-product', status: 'planned'},
+            null,
+            null,
+            {packageId: 'new-product', version: '1.0.0'}
+        )).toMatchObject({
+            source: LIBRARY_SOURCE_TYPES.REMOTE_REGISTRY,
+            manifest: null,
+            status: 'downloadable',
+            latestVersion: '1.0.0'
+        });
+    });
+
     test('maps an installed local package to the user source', () => {
         expect(createUserLibraryItem({
             enabled: false,
