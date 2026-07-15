@@ -10,9 +10,9 @@
     left: 0;
     right: 0;
     z-index: $z-index-extension-button;
-    background: $looks-secondary;
+    background: #f78a2a;
 
-    border: 1px solid $looks-secondary;
+    border: 1px solid #f78a2a;
     box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
 }
 

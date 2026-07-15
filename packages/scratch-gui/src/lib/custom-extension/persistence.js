@@ -14,13 +14,21 @@ const canUseLocalStorage = () => {
     }
 };
 
-// Redux 中保存 library 包装对象，manifest 保持原始可导出结构。
-const manifestToLibrary = manifest => ({
+// Redux 中同时保存安装包和启用状态；enabled=false 表示保留包但不注册到 VM。
+const manifestToLibrary = (manifest, enabled = true) => ({
     id: manifest.id,
     name: manifest.name,
     version: manifest.version,
+    enabled,
     manifest
 });
+
+// 兼容旧版只保存 manifest 的记录，新记录使用 {manifest, enabled} 保存卸载状态。
+const storedValueToLibrary = storedValue => {
+    const rawManifest = storedValue && storedValue.manifest ? storedValue.manifest : storedValue;
+    const enabled = storedValue && storedValue.manifest ? storedValue.enabled !== false : true;
+    return manifestToLibrary(normalizeCustomExtensionManifest(rawManifest), enabled);
+};
 
 // 通过 preload 暴露的桌面持久化 API，浏览器运行时不存在。
 const getDesktopCustomExtensionApi = () => (
@@ -41,7 +49,7 @@ const loadInstalledCustomExtensionLibraries = () => {
         return manifests
             .map(manifest => {
                 try {
-                    return manifestToLibrary(normalizeCustomExtensionManifest(manifest));
+                    return storedValueToLibrary(manifest);
                 } catch {
                     return null;
                 }
@@ -54,9 +62,10 @@ const loadInstalledCustomExtensionLibraries = () => {
 
 // 保存时同时写 localStorage 和桌面 userData，保证浏览器/桌面两种入口兼容。
 const saveInstalledCustomExtensionLibraries = installedLibraries => {
-    const manifests = installedLibraries.map(library => (
-        serializeCustomExtensionManifest(library.manifest)
-    ));
+    const manifests = installedLibraries.map(library => ({
+        enabled: library.enabled !== false,
+        manifest: serializeCustomExtensionManifest(library.manifest)
+    }));
 
     if (canUseLocalStorage()) {
         try {
@@ -82,7 +91,7 @@ const loadDesktopInstalledCustomExtensionLibraries = async () => {
     return manifests
         .map(manifest => {
             try {
-                return manifestToLibrary(normalizeCustomExtensionManifest(manifest));
+                return storedValueToLibrary(manifest);
             } catch {
                 return null;
             }
@@ -94,7 +103,14 @@ const loadDesktopInstalledCustomExtensionLibraries = async () => {
 const upsertInstalledCustomExtensionLibrary = (installedLibraries, manifest) => (
     installedLibraries
         .filter(library => library.manifest.id !== manifest.id)
-        .concat([manifestToLibrary(manifest)])
+        .concat([manifestToLibrary(manifest, true)])
+);
+
+// 加载/卸载只切换 enabled，不删除用户已经导入的包内容。
+const setInstalledCustomExtensionLibraryEnabled = (installedLibraries, extensionId, enabled) => (
+    installedLibraries.map(library => (
+        library.manifest.id === extensionId ? {...library, enabled} : library
+    ))
 );
 
 // 删除库时只按 manifest id 过滤，调用方负责卸载 VM 和 codegen 模板。
@@ -107,5 +123,6 @@ export {
     loadDesktopInstalledCustomExtensionLibraries,
     removeInstalledCustomExtensionLibrary,
     saveInstalledCustomExtensionLibraries,
+    setInstalledCustomExtensionLibraryEnabled,
     upsertInstalledCustomExtensionLibrary
 };

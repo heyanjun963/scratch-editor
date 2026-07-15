@@ -760,17 +760,19 @@ class Blocks extends React.Component {
             extensionId => !this.props.vm.extensionManager.isExtensionLoaded(extensionId)
         );
         // 自定义拓展库既要注册 VM 积木，也要注册 Python 模板，否则只显示不产码。
-        const registerCustomExtensions = () => Promise.all(this.props.customExtensionLibraries.map(library => {
-            const manifest = library.manifest;
-            registerPythonCodegenManifest(manifest);
-            if (this.props.vm.extensionManager.isExtensionLoaded(manifest.id)) {
-                return Promise.resolve();
-            }
-            return this.props.vm.extensionManager.registerExtensionObject(
-                manifest.id,
-                manifestToExtensionObject(manifest)
-            );
-        }));
+        const registerCustomExtensions = () => Promise.all(this.props.customExtensionLibraries
+            .filter(library => library.enabled !== false)
+            .map(library => {
+                const manifest = library.manifest;
+                registerPythonCodegenManifest(manifest);
+                if (this.props.vm.extensionManager.isExtensionLoaded(manifest.id)) {
+                    return Promise.resolve();
+                }
+                return this.props.vm.extensionManager.registerExtensionObject(
+                    manifest.id,
+                    manifestToExtensionObject(manifest)
+                );
+            }));
         if (!pendingExtensionIds.length) {
             registerCustomExtensions()
                 .then(() => {
@@ -939,6 +941,7 @@ Blocks.propTypes = {
     canUseCloud: PropTypes.bool,
     customExtensionIds: PropTypes.string,
     customExtensionLibraries: PropTypes.arrayOf(PropTypes.shape({
+        enabled: PropTypes.bool,
         manifest: PropTypes.shape({
             id: PropTypes.string
         })
@@ -1009,25 +1012,29 @@ Blocks.defaultProps = {
     customExtensionLibraries: []
 };
 
-const mapStateToProps = state => ({
-    anyModalVisible: (
-        Object.keys(state.scratchGui.modals).some(key => state.scratchGui.modals[key]) ||
-        state.scratchGui.mode.isFullScreen
-    ),
-    extensionLibraryVisible: state.scratchGui.modals.extensionLibrary,
-    isRtl: state.locales.isRtl,
-    locale: state.locales.locale,
-    messages: state.locales.messages,
-    toolboxXML: state.scratchGui.toolbox.toolboxXML,
-    editorMode: state.scratchGui.mode.editorMode,
-    customExtensionIds: state.scratchGui.customExtensions.installedLibraries
-        .map(library => library.manifest.id)
-        .join(','),
-    customExtensionLibraries: state.scratchGui.customExtensions.installedLibraries,
-    customProceduresVisible: state.scratchGui.customProcedures.active,
-    workspaceMetrics: state.scratchGui.workspaceMetrics,
-    useCatBlocks: isTimeTravel2020(state) || state.scratchGui.settings.theme === CAT_BLOCKS_THEME
-});
+const mapStateToProps = state => {
+    const customExtensionLibraries = state.scratchGui.customExtensions.installedLibraries
+        .filter(library => library.enabled !== false);
+    return {
+        anyModalVisible: (
+            Object.keys(state.scratchGui.modals).some(key => state.scratchGui.modals[key]) ||
+            state.scratchGui.mode.isFullScreen
+        ),
+        extensionLibraryVisible: state.scratchGui.modals.extensionLibrary,
+        isRtl: state.locales.isRtl,
+        locale: state.locales.locale,
+        messages: state.locales.messages,
+        toolboxXML: state.scratchGui.toolbox.toolboxXML,
+        editorMode: state.scratchGui.mode.editorMode,
+        customExtensionIds: customExtensionLibraries
+            .map(library => library.manifest.id)
+            .join(','),
+        customExtensionLibraries,
+        customProceduresVisible: state.scratchGui.customProcedures.active,
+        workspaceMetrics: state.scratchGui.workspaceMetrics,
+        useCatBlocks: isTimeTravel2020(state) || state.scratchGui.settings.theme === CAT_BLOCKS_THEME
+    };
+};
 
 const mapDispatchToProps = dispatch => ({
     onActivateColorPicker: callback => dispatch(activateColorPicker(callback)),

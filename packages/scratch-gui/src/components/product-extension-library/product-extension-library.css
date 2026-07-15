@@ -122,6 +122,12 @@
     font-size: .8rem;
 }
 
+.userLibraryHeading {
+    color: #4e5968;
+    font-size: .9rem;
+    font-weight: 800;
+}
+
 .chipGroup,
 .toolbarActions {
     display: flex;
@@ -271,7 +277,10 @@
     white-space: nowrap;
 }
 
-.versionSelect {
+.versionLabel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 4.8rem;
     height: 1.25rem;
     border: 1px solid #ffc66f;
@@ -279,6 +288,7 @@
     background: #fff;
     color: #ff9f1a;
     font-size: .68rem;
+    cursor: default;
 }
 
 .cardMenuButton {
@@ -306,6 +316,32 @@
     background: #fff;
     color: #ff9f1a;
     font-weight: 900;
+}
+
+.userCardActions {
+    position: absolute;
+    top: .45rem;
+    right: .45rem;
+    z-index: 1;
+    display: flex;
+    gap: .35rem;
+}
+
+.userCardAction {
+    min-height: 1.6rem;
+    padding: 0 .55rem;
+    border: 1px solid #ffad22;
+    border-radius: .35rem;
+    background: #fff;
+    color: #ff9f1a;
+    font-size: .7rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.userCardDeleteAction {
+    border-color: #d5dae0;
+    color: #687383;
 }
 
 .removeBadge {
@@ -402,4 +438,33 @@
     color: #fff;
     font-weight: 700;
     box-shadow: 0 .08rem .18rem rgba(0, 0, 0, .24);
+}
+
+@media (max-width: 860px) {
+    .topBar {
+        grid-template-columns: auto minmax(10rem, 1fr);
+    }
+
+    .tabs {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        min-height: 2.7rem;
+    }
+
+    .topRight {
+        min-width: 0;
+    }
+
+    .filterBar,
+    .toolbarActions {
+        flex-wrap: wrap;
+    }
+
+    .filterBar {
+        padding: .7rem .9rem;
+    }
+
+    .toolbarActions {
+        justify-content: flex-end;
+    }
 }

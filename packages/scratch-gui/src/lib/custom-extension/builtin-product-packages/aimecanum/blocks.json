@@ -1,0 +1,917 @@
+{
+  "categories": [
+    {
+      "id": "main",
+      "name": "主程序",
+      "hideLabel": true,
+      "blocks": [
+        "start_thread",
+        "start_run_thread"
+      ]
+    },
+    {
+      "id": "boardResource",
+      "name": "板载资源",
+      "hideLabel": false,
+      "blocks": [
+        "buzzer_tone_set",
+        "buzzer_tone_set_arg",
+        "buzzer_tone_set_volume",
+        "close_buzzer",
+        "close_lowpower_warning",
+        "get_battery_level"
+      ]
+    },
+    {
+      "id": "rgb",
+      "name": "RGB彩灯",
+      "hideLabel": false,
+      "blocks": [
+        "set_led_color",
+        "set_led_color_arg",
+        "rgb_module_breath_one",
+        "rgb_module_breath",
+        "close_led"
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出打印",
+      "hideLabel": false,
+      "blocks": [
+        "print_str",
+        "print_number"
+      ]
+    },
+    {
+      "id": "button",
+      "name": "按键",
+      "hideLabel": false,
+      "blocks": [
+        "when_key_click_thread",
+        "when_key_longclick_thread",
+        "key_is_pressed"
+      ]
+    },
+    {
+      "id": "motion",
+      "name": "运动控制",
+      "hideLabel": false,
+      "blocks": [
+        "set_motor_speed_all",
+        "set_motor_speed_one",
+        "set_motor_speed_two",
+        "move_oriention",
+        "move_oriention_angle",
+        "set_x_y_speed",
+        "move_stop",
+        "move_distance",
+        "move_distance_arg",
+        "move_all",
+        "move_all_angle",
+        "turn_percent",
+        "turn_speed",
+        "get_motor_angle",
+        "reset_motor",
+        "is_motor_ready",
+        "is_all_ready",
+        "pd_set_pd_line"
+      ]
+    },
+    {
+      "id": "imu",
+      "name": "IMU传感器",
+      "hideLabel": false,
+      "blocks": [
+        "imu_init",
+        "imu_cali",
+        "get_euler_angle_element_value"
+      ]
+    },
+    {
+      "id": "lineFollower",
+      "name": "六路巡线传感器",
+      "hideLabel": false,
+      "blocks": [
+        "linefollower6_one_status",
+        "linefollower6_status",
+        "linefollower6_set_threshold",
+        "linefollower6_get_value",
+        "linefollower6_read_offset"
+      ]
+    },
+    {
+      "id": "ultrasonic",
+      "name": "超声波传感器",
+      "hideLabel": false,
+      "blocks": [
+        "get_led_ultrasonic_distance",
+        "set_led_ultrasonic_color",
+        "set_led_ultrasonic_color_arg",
+        "close_led_ultrasonic",
+        "set_led_ultrasonic_breath",
+        "set_led_ultrasonic_random"
+      ]
+    },
+    {
+      "id": "bluetooth",
+      "name": "蓝牙通信",
+      "hideLabel": false,
+      "blocks": [
+        "set_ble_mode",
+        "ble_is_connected",
+        "get_ble_mac",
+        "ble_wait_end",
+        "read_ble_data",
+        "get_ble_cmd",
+        "get_ble_args",
+        "ble_write"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "opcode": "start_thread",
+      "blockType": "hat",
+      "text": "主程序",
+      "arguments": {}
+    },
+    {
+      "opcode": "start_run_thread",
+      "blockType": "hat",
+      "text": "当启动时",
+      "arguments": {}
+    },
+    {
+      "opcode": "buzzer_tone_set",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 模式为 [MODE]",
+      "arguments": {
+        "TONES": {
+          "type": "string",
+          "defaultValue": "65",
+          "menu": "tones",
+          "literal": true
+        },
+        "RHYTHMS": {
+          "type": "string",
+          "defaultValue": "500",
+          "menu": "rhythms",
+          "literal": true
+        },
+        "MODE": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "buzzerMode",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_arg",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 模式为 [MODE]",
+      "arguments": {
+        "TONES": {
+          "type": "number",
+          "defaultValue": 65
+        },
+        "RHYTHMS": {
+          "type": "number",
+          "defaultValue": 500
+        },
+        "MODE": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "buzzerMode",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_volume",
+      "blockType": "command",
+      "text": "设置蜂鸣器音量为 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 100
+        }
+      }
+    },
+    {
+      "opcode": "close_buzzer",
+      "blockType": "command",
+      "text": "关闭蜂鸣器",
+      "arguments": {}
+    },
+    {
+      "opcode": "close_lowpower_warning",
+      "blockType": "command",
+      "text": "关闭低压报警",
+      "arguments": {}
+    },
+    {
+      "opcode": "get_battery_level",
+      "blockType": "reporter",
+      "text": "电量值(mV)",
+      "arguments": {}
+    },
+    {
+      "opcode": "set_led_color",
+      "blockType": "command",
+      "text": "设置RGB彩灯颜色 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "#ffbf00"
+        }
+      }
+    },
+    {
+      "opcode": "set_led_color_arg",
+      "blockType": "command",
+      "text": "设置RGB彩灯红色 [RED] 绿色 [GREEN] 蓝色 [BLUE]",
+      "arguments": {
+        "RED": {
+          "type": "number",
+          "defaultValue": 255
+        },
+        "GREEN": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "BLUE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      }
+    },
+    {
+      "opcode": "rgb_module_breath_one",
+      "blockType": "command",
+      "text": "设置RGB彩灯呼吸灯模式 颜色 [COLOR] 变化周期 [CYCLE] 秒",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "lightColors",
+          "literal": true
+        },
+        "CYCLE": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      }
+    },
+    {
+      "opcode": "rgb_module_breath",
+      "blockType": "command",
+      "text": "设置RGB彩灯炫彩模式",
+      "arguments": {}
+    },
+    {
+      "opcode": "close_led",
+      "blockType": "command",
+      "text": "关闭RGB彩灯",
+      "arguments": {}
+    },
+    {
+      "opcode": "print_str",
+      "blockType": "command",
+      "text": "输出打印字符 [STR]",
+      "arguments": {
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hello"
+        }
+      }
+    },
+    {
+      "opcode": "print_number",
+      "blockType": "command",
+      "text": "输出打印数字 [NUM]",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "when_key_click_thread",
+      "blockType": "hat",
+      "text": "当 [KEYS] 键短按时",
+      "arguments": {
+        "KEYS": {
+          "type": "string",
+          "defaultValue": "A",
+          "menu": "keys",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "when_key_longclick_thread",
+      "blockType": "hat",
+      "text": "当 [KEYS] 键长按时",
+      "arguments": {
+        "KEYS": {
+          "type": "string",
+          "defaultValue": "A",
+          "menu": "keys",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "key_is_pressed",
+      "blockType": "boolean",
+      "text": "[KEYS] 键被按下",
+      "arguments": {
+        "KEYS": {
+          "type": "string",
+          "defaultValue": "A",
+          "menu": "keys",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_speed_all",
+      "blockType": "command",
+      "text": "设置麦轮速度 左前 [SPEED1] 左后 [SPEED2] 右前 [SPEED3] 右后 [SPEED4] RPM",
+      "arguments": {
+        "SPEED1": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "SPEED2": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "SPEED3": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "SPEED4": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_speed_one",
+      "blockType": "command",
+      "text": "设置麦轮 [WHEEL] 速度为 [SPEED] RPM",
+      "arguments": {
+        "WHEEL": {
+          "type": "string",
+          "defaultValue": "4",
+          "menu": "wheels",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_speed_two",
+      "blockType": "command",
+      "text": "设置麦轮 [SIDE] 轮组速度为 [SPEED] RPM",
+      "arguments": {
+        "SIDE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "sides",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "move_oriention",
+      "blockType": "command",
+      "text": "麦轮车方向 [ORIENTION] 速度 [SPEED] RPM",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oriention8",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "move_oriention_angle",
+      "blockType": "command",
+      "text": "麦轮车方向 [ORIENTION] 度 速度 [SPEED] RPM",
+      "arguments": {
+        "ORIENTION": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "set_x_y_speed",
+      "blockType": "command",
+      "text": "设置麦轮 X轴速度 [SPEED1] Y轴速度 [SPEED2]",
+      "arguments": {
+        "SPEED1": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "SPEED2": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "move_stop",
+      "blockType": "command",
+      "text": "停止麦轮车",
+      "arguments": {}
+    },
+    {
+      "opcode": "move_distance",
+      "blockType": "command",
+      "text": "麦轮车向 [ORIENTION] 移动 [DISTANCE] cm 速度 [SPEED] RPM",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oriention4",
+          "literal": true
+        },
+        "DISTANCE": {
+          "type": "number",
+          "defaultValue": 10
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "move_distance_arg",
+      "blockType": "command",
+      "text": "麦轮车方向 [ORIENTION] 度移动 [DISTANCE] cm 速度 [SPEED] RPM",
+      "arguments": {
+        "ORIENTION": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "DISTANCE": {
+          "type": "number",
+          "defaultValue": 10
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "move_all",
+      "blockType": "command",
+      "text": "麦轮车 [ORIENTION] 速度百分比 [SPEED]",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oriention8",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "move_all_angle",
+      "blockType": "command",
+      "text": "麦轮车方向 [ORIENTION] 度 速度百分比 [SPEED]",
+      "arguments": {
+        "ORIENTION": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "turn_percent",
+      "blockType": "command",
+      "text": "麦轮车 [ORIENTION] 速度百分比 [SPEED]",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "orientionTurn",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "turn_speed",
+      "blockType": "command",
+      "text": "麦轮车 [ORIENTION] 速度 [SPEED] RPM",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "orientionTurn",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      }
+    },
+    {
+      "opcode": "get_motor_angle",
+      "blockType": "reporter",
+      "text": "读取麦轮 [ID] 角度",
+      "arguments": {
+        "ID": {
+          "type": "string",
+          "defaultValue": "4",
+          "menu": "wheelMotors",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "reset_motor",
+      "blockType": "command",
+      "text": "重置麦轮里程",
+      "arguments": {}
+    },
+    {
+      "opcode": "is_motor_ready",
+      "blockType": "boolean",
+      "text": "麦轮 [ID] 运动是否完成",
+      "arguments": {
+        "ID": {
+          "type": "string",
+          "defaultValue": "4",
+          "menu": "wheelMotors",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "is_all_ready",
+      "blockType": "boolean",
+      "text": "全部麦轮运动是否完成",
+      "arguments": {}
+    },
+    {
+      "opcode": "pd_set_pd_line",
+      "blockType": "command",
+      "text": "巡线偏移 [OFFSET] 速度 [SPEED] 最大速度 [MAXSPEED] KP [KP] KD [KD] 方向 [ORIENTION]",
+      "arguments": {
+        "OFFSET": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 40
+        },
+        "MAXSPEED": {
+          "type": "number",
+          "defaultValue": 80
+        },
+        "KP": {
+          "type": "number",
+          "defaultValue": 0.3
+        },
+        "KD": {
+          "type": "number",
+          "defaultValue": 0.1
+        },
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "moveDirection",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "imu_init",
+      "blockType": "command",
+      "text": "初始化IMU传感器",
+      "arguments": {}
+    },
+    {
+      "opcode": "imu_cali",
+      "blockType": "command",
+      "text": "校准IMU传感器",
+      "arguments": {}
+    },
+    {
+      "opcode": "get_euler_angle_element_value",
+      "blockType": "reporter",
+      "text": "获取欧拉角 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "eulerElement",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_one_status",
+      "blockType": "boolean",
+      "text": "[SENSOR] 六路巡线传感器通道 [NUM] 检测到 [LINE]",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "LF1",
+          "menu": "line6Sensor",
+          "literal": true
+        },
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "line6Mask",
+          "literal": true
+        },
+        "LINE": {
+          "type": "string",
+          "defaultValue": "> 0",
+          "menu": "linedot2",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_status",
+      "blockType": "boolean",
+      "text": "[SENSOR] 六路巡线传感器检测到 [LINE]",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "LF1",
+          "menu": "line6Sensor",
+          "literal": true
+        },
+        "LINE": {
+          "type": "line6",
+          "defaultValue": "00"
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_set_threshold",
+      "blockType": "command",
+      "text": "设置 [SENSOR] 六路巡线传感器阈值比例(范围1~9)为 [VALUE]",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "LF1",
+          "menu": "line6Sensor",
+          "literal": true
+        },
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 7
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_get_value",
+      "blockType": "reporter",
+      "text": "[SENSOR] 六路巡线传感器通道 [NUM] 灰度值(0~100)",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "LF1",
+          "menu": "line6Sensor",
+          "literal": true
+        },
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "linefollows6",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_read_offset",
+      "blockType": "reporter",
+      "text": "获取 [SENSOR] 六路巡线传感器偏移值",
+      "arguments": {
+        "SENSOR": {
+          "type": "string",
+          "defaultValue": "LF1",
+          "menu": "line6Sensor",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "get_led_ultrasonic_distance",
+      "blockType": "reporter",
+      "text": "超声波传感器距离(cm)",
+      "arguments": {}
+    },
+    {
+      "opcode": "set_led_ultrasonic_color",
+      "blockType": "command",
+      "text": "设置超声波传感器灯 [NUMS] 颜色 [COLOR]",
+      "arguments": {
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        },
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "#ffbf00"
+        }
+      }
+    },
+    {
+      "opcode": "set_led_ultrasonic_color_arg",
+      "blockType": "command",
+      "text": "设置超声波传感器灯 [NUMS] 红 [RED] 绿 [GREEN] 蓝 [BLUE]",
+      "arguments": {
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        },
+        "RED": {
+          "type": "number",
+          "defaultValue": 255
+        },
+        "GREEN": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "BLUE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      }
+    },
+    {
+      "opcode": "close_led_ultrasonic",
+      "blockType": "command",
+      "text": "关闭超声波传感器灯 [NUMS]",
+      "arguments": {
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        }
+      }
+    },
+    {
+      "opcode": "set_led_ultrasonic_breath",
+      "blockType": "command",
+      "text": "设置超声波传感器灯 [NUM] 呼吸颜色 [RGB] 周期 [TIME] 秒",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        },
+        "RGB": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "rgb",
+          "literal": true
+        },
+        "TIME": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      }
+    },
+    {
+      "opcode": "set_led_ultrasonic_random",
+      "blockType": "command",
+      "text": "设置超声波传感器灯炫彩模式",
+      "arguments": {}
+    },
+    {
+      "opcode": "set_ble_mode",
+      "blockType": "command",
+      "text": "设置蓝牙模式 [MODE] 名称 [NAME]",
+      "arguments": {
+        "MODE": {
+          "type": "string",
+          "defaultValue": "BLE.MODE_BLE_SLAVE",
+          "menu": "bleMode",
+          "literal": true
+        },
+        "NAME": {
+          "type": "string",
+          "defaultValue": "Hiwonder"
+        }
+      }
+    },
+    {
+      "opcode": "ble_is_connected",
+      "blockType": "boolean",
+      "text": "蓝牙是否已连接",
+      "arguments": {}
+    },
+    {
+      "opcode": "get_ble_mac",
+      "blockType": "reporter",
+      "text": "获取蓝牙MAC地址",
+      "arguments": {}
+    },
+    {
+      "opcode": "ble_wait_end",
+      "blockType": "boolean",
+      "text": "蓝牙是否收到 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "OK"
+        }
+      }
+    },
+    {
+      "opcode": "read_ble_data",
+      "blockType": "reporter",
+      "text": "读取蓝牙数据",
+      "arguments": {}
+    },
+    {
+      "opcode": "get_ble_cmd",
+      "blockType": "reporter",
+      "text": "解析蓝牙数据 [DATA] 命令",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "data"
+        }
+      }
+    },
+    {
+      "opcode": "get_ble_args",
+      "blockType": "reporter",
+      "text": "解析蓝牙数据 [DATA] 参数 [NUM]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "data"
+        },
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      }
+    },
+    {
+      "opcode": "ble_write",
+      "blockType": "command",
+      "text": "蓝牙发送 [DATA]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "Hello"
+        }
+      }
+    }
+  ]
+}

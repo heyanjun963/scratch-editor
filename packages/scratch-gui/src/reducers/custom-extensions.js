@@ -1,12 +1,14 @@
 import {
     loadInstalledCustomExtensionLibraries,
     removeInstalledCustomExtensionLibrary,
+    setInstalledCustomExtensionLibraryEnabled,
     upsertInstalledCustomExtensionLibrary
 } from '../lib/custom-extension/persistence';
 
 const INSTALL_CUSTOM_EXTENSION_LIBRARY = 'scratch-gui/custom-extensions/INSTALL_CUSTOM_EXTENSION_LIBRARY';
 const REMOVE_CUSTOM_EXTENSION_LIBRARY = 'scratch-gui/custom-extensions/REMOVE_CUSTOM_EXTENSION_LIBRARY';
 const SET_CUSTOM_EXTENSION_LIBRARIES = 'scratch-gui/custom-extensions/SET_CUSTOM_EXTENSION_LIBRARIES';
+const SET_CUSTOM_EXTENSION_LIBRARY_ENABLED = 'scratch-gui/custom-extensions/SET_CUSTOM_EXTENSION_LIBRARY_ENABLED';
 
 // 自定义拓展库状态只保存已安装库清单，真正解析/持久化在 custom-extension lib 中完成。
 const initialState = {
@@ -35,6 +37,15 @@ const reducer = function (state, action) {
             ...state,
             installedLibraries: removeInstalledCustomExtensionLibrary(state.installedLibraries, action.extensionId)
         };
+    case SET_CUSTOM_EXTENSION_LIBRARY_ENABLED:
+        return {
+            ...state,
+            installedLibraries: setInstalledCustomExtensionLibraryEnabled(
+                state.installedLibraries,
+                action.extensionId,
+                action.enabled
+            )
+        };
     default:
         return state;
     }
@@ -55,10 +66,17 @@ const setCustomExtensionLibraries = installedLibraries => ({
     installedLibraries
 });
 
+const setCustomExtensionLibraryEnabled = (extensionId, enabled) => ({
+    type: SET_CUSTOM_EXTENSION_LIBRARY_ENABLED,
+    extensionId,
+    enabled
+});
+
 export {
     reducer as default,
     initialState as customExtensionsInitialState,
     installCustomExtensionLibrary,
     removeCustomExtensionLibrary,
-    setCustomExtensionLibraries
+    setCustomExtensionLibraries,
+    setCustomExtensionLibraryEnabled
 };

@@ -9,6 +9,11 @@ import intlShape from '../../lib/intlShape.js';
 import downloadBlob from '../../lib/download-blob';
 import {builtinProductManifests} from '../../lib/custom-extension/builtin-product-manifests';
 import {productExtensionCatalog} from '../../lib/custom-extension/product-extension-catalog.js';
+import {
+    LIBRARY_SOURCE_TYPES,
+    createUserLibraryItem,
+    resolveProductLibraryItem
+} from '../../lib/custom-extension/library-sources';
 import {serializeCustomExtensionManifest} from '../../lib/custom-extension/manifest-schema';
 import {manifestToExtensionObject} from '../../lib/custom-extension/manifest-to-extension';
 import {readCustomExtensionPackage} from '../../lib/custom-extension/package-reader';
@@ -20,12 +25,14 @@ import {
     loadDesktopInstalledCustomExtensionLibraries,
     removeInstalledCustomExtensionLibrary,
     saveInstalledCustomExtensionLibraries,
+    setInstalledCustomExtensionLibraryEnabled,
     upsertInstalledCustomExtensionLibrary
 } from '../../lib/custom-extension/persistence';
 import {
     installCustomExtensionLibrary,
     removeCustomExtensionLibrary,
-    setCustomExtensionLibraries
+    setCustomExtensionLibraries,
+    setCustomExtensionLibraryEnabled
 } from '../../reducers/custom-extensions';
 
 import styles from './product-extension-library.css';
@@ -55,6 +62,11 @@ const messages = defineMessages({
         defaultMessage: '模块扩展',
         description: 'Module extensions tab in the product extension library',
         id: 'gui.productExtensionLibrary.moduleExtensions'
+    },
+    userExtensions: {
+        defaultMessage: '用户拓展',
+        description: 'User extensions tab in the product extension library',
+        id: 'gui.productExtensionLibrary.userExtensions'
     },
     searchPlaceholder: {
         defaultMessage: '搜索',
@@ -136,6 +148,11 @@ const messages = defineMessages({
         description: 'Empty extension library state',
         id: 'gui.productExtensionLibrary.empty'
     },
+    userEmpty: {
+        defaultMessage: '尝试导入你的拓展试试看吧',
+        description: 'Empty state for user extensions',
+        id: 'gui.productExtensionLibrary.userEmpty'
+    },
     unavailableNotice: {
         defaultMessage: '{name} 是占位拓展。后台发布积木包后，可在这里获取最新版。',
         description: 'Notice shown when a placeholder extension is clicked',
@@ -156,10 +173,30 @@ const messages = defineMessages({
         description: 'Notice shown for reserved local import entry',
         id: 'gui.productExtensionLibrary.localImportNotice'
     },
-    remove: {
-        defaultMessage: '移除',
-        description: 'Remove loaded extension button',
-        id: 'gui.productExtensionLibrary.remove'
+    load: {
+        defaultMessage: '加载',
+        description: 'Load an installed user extension',
+        id: 'gui.productExtensionLibrary.load'
+    },
+    unload: {
+        defaultMessage: '卸载',
+        description: 'Unload an installed user extension',
+        id: 'gui.productExtensionLibrary.unload'
+    },
+    delete: {
+        defaultMessage: '删除',
+        description: 'Delete an installed user extension package',
+        id: 'gui.productExtensionLibrary.delete'
+    },
+    urlImport: {
+        defaultMessage: 'URL 导入',
+        description: 'Import a user extension from a URL',
+        id: 'gui.productExtensionLibrary.urlImport'
+    },
+    urlImportNotice: {
+        defaultMessage: 'URL 导入入口已预留，后续接入 GitHub、Gitee 或公司拓展包地址。',
+        description: 'Notice shown for the reserved URL import entry',
+        id: 'gui.productExtensionLibrary.urlImportNotice'
     },
     availableDescription: {
         defaultMessage: '当前内置可加载的基础拓展。',
@@ -175,6 +212,21 @@ const messages = defineMessages({
         defaultMessage: '已导入的本地拓展库，可继续管理和使用。',
         description: 'Description for local custom extension libraries',
         id: 'gui.productExtensionLibrary.localDescription'
+    },
+    bundledSource: {
+        defaultMessage: '内置默认',
+        description: 'Bundled default product source label',
+        id: 'gui.productExtensionLibrary.bundledSource'
+    },
+    remoteSource: {
+        defaultMessage: '后台拓展库',
+        description: 'Remote registry product source label',
+        id: 'gui.productExtensionLibrary.remoteSource'
+    },
+    userSource: {
+        defaultMessage: '用户导入',
+        description: 'User imported package source label',
+        id: 'gui.productExtensionLibrary.userSource'
     },
     importSuccess: {
         defaultMessage: '已导入本地拓展库：{name}',
@@ -226,7 +278,8 @@ const categoryFilters = {
         {id: 'output', message: messages.outputModule},
         {id: 'communication', message: messages.communicationModule},
         {id: 'function', message: messages.functionModule}
-    ]
+    ],
+    user: []
 };
 
 const getInitials = name => name
@@ -234,31 +287,28 @@ const getInitials = name => name
     .slice(0, 2)
     .toUpperCase();
 
-// 目录数据按“主控/模块”两页铺平，并把内置 manifest 挂到可加载项上。
-const getFlatItems = activeTab => productExtensionCatalog
-    .filter(section => (activeTab === 'main' ?
-        mainCategoryIds.includes(section.id) :
-        !mainCategoryIds.includes(section.id)))
+// 产品目录按主控/模块铺平；内置默认包和后续后台包通过统一来源模型解析。
+const getFlatItems = activeTab => (activeTab === 'user' ? [] : productExtensionCatalog
+    .filter(section => (activeTab === 'main') === mainCategoryIds.includes(section.id))
     .flatMap(section => section.children.map(item => ({
-        ...item,
+        ...resolveProductLibraryItem(item, builtinProductManifests[item.id] || null),
         categoryId: section.id,
-        categoryLabel: section.label,
-        manifest: builtinProductManifests[item.id] || null,
-        source: builtinProductManifests[item.id] ? 'builtin-product' : item.source
-    })));
+        categoryLabel: section.label
+    }))));
 
 const getAvailableMainItems = () => getFlatItems('main').filter(item => item.status === 'available');
 
 // 新版拓展库整页组件：负责产品筛选、本地库导入导出、内置产品加载和切换确认。
 const ProductExtensionLibraryComponent = ({
-    installedLibraries,
+    installedLibraries = [],
     intl,
     onInstallCustomExtensionLibrary,
     onBuiltinExtensionSelect,
-    onCategorySelected,
+    onCategorySelected = null,
     onRemoveCustomExtensionLibrary,
     onRequestClose,
     onSetCustomExtensionLibraries,
+    onSetCustomExtensionLibraryEnabled,
     vm
 }) => {
     const fileInputRef = useRef(null);
@@ -267,6 +317,7 @@ const ProductExtensionLibraryComponent = ({
     const [query, setQuery] = useState('');
     const [checking, setChecking] = useState(false);
     const [pendingSwitchItem, setPendingSwitchItem] = useState(null);
+    const [, setExtensionStateVersion] = useState(0);
 
     // 版本检查当前是占位交互，后续接远程 registry 后替换为真实请求。
     useEffect(() => {
@@ -288,20 +339,10 @@ const ProductExtensionLibraryComponent = ({
             .catch(() => {});
     }, [onSetCustomExtensionLibraries]);
 
-    // 列表由内置产品目录和本地导入库组成，筛选条件统一在这里收敛。
+    // 用户导入包只出现在“用户拓展”，不再和产品模块混排。
     const items = useMemo(() => {
         const normalizedQuery = query.trim().toLowerCase();
-        const localItems = activeTab === 'module' ? installedLibraries.map(library => ({
-            id: library.manifest.id,
-            name: library.manifest.name,
-            version: library.manifest.version,
-            latestVersion: library.manifest.version,
-            status: 'available',
-            categoryId: 'local',
-            categoryLabel: '本地拓展库',
-            source: 'local',
-            manifest: library.manifest
-        })) : [];
+        const localItems = activeTab === 'user' ? installedLibraries.map(createUserLibraryItem) : [];
         return getFlatItems(activeTab).concat(localItems).filter(item => {
             if (chip !== 'all' && item.categoryId !== chip) return false;
             if (!normalizedQuery) return true;
@@ -328,6 +369,11 @@ const ProductExtensionLibraryComponent = ({
     const handleUploadClick = () => {
         // eslint-disable-next-line no-alert
         alert(intl.formatMessage(messages.uploadNotice));
+    };
+
+    const handleUrlImportClick = () => {
+        // eslint-disable-next-line no-alert
+        alert(intl.formatMessage(messages.urlImportNotice));
     };
 
     // 触发隐藏 file input，保持页面视觉形态接近原版拓展库。
@@ -386,9 +432,54 @@ const ProductExtensionLibraryComponent = ({
                     upsertInstalledCustomExtensionLibrary(installedLibraries, manifest)
                 );
                 onInstallCustomExtensionLibrary(manifest);
+                setActiveTab('user');
+                setChip('all');
+                setExtensionStateVersion(version => version + 1);
                 // eslint-disable-next-line no-alert
                 alert(intl.formatMessage(messages.importSuccess, {name: manifest.name}));
             });
+    };
+
+    // 加载已安装的用户包只恢复 VM 和 codegen，不重复写入或覆盖包内容。
+    const loadUserLibrary = item => {
+        const manifest = item.manifest;
+        if (!manifest) return Promise.resolve();
+        registerPythonCodegenManifest(manifest);
+        const addedPromise = waitForExtensionAdded(manifest.id);
+        return vm.extensionManager.registerExtensionObject(
+            manifest.id,
+            manifestToExtensionObject(manifest)
+        ).then(() => addedPromise).then(() => {
+            const nextLibraries = setInstalledCustomExtensionLibraryEnabled(
+                installedLibraries,
+                manifest.id,
+                true
+            );
+            saveInstalledCustomExtensionLibraries(nextLibraries);
+            onSetCustomExtensionLibraryEnabled(manifest.id, true);
+            setExtensionStateVersion(version => version + 1);
+        });
+    };
+
+    // 卸载只移除运行态分类和模板，保留用户包，后续可以再次加载。
+    const unloadUserLibrary = item => {
+        const manifest = item.manifest;
+        if (!manifest) return Promise.resolve();
+        unregisterPythonCodegenManifest(manifest);
+        const unloadPromise = vm.extensionManager.unregisterExtensionObject ?
+            vm.extensionManager.unregisterExtensionObject(manifest.id) :
+            Promise.resolve();
+        return unloadPromise.then(() => {
+            const nextLibraries = setInstalledCustomExtensionLibraryEnabled(
+                installedLibraries,
+                manifest.id,
+                false
+            );
+            saveInstalledCustomExtensionLibraries(nextLibraries);
+            onSetCustomExtensionLibraryEnabled(manifest.id, false);
+            vm.emitWorkspaceUpdate();
+            setExtensionStateVersion(version => version + 1);
+        });
     };
 
     // 安装内置产品库：不写入本地库列表，但同样注册 VM 和 Python codegen。
@@ -438,10 +529,11 @@ const ProductExtensionLibraryComponent = ({
             ));
 
         return Promise.all(unloadPromises).then(() => {
-            if (installedLibraries.length) {
-                saveInstalledCustomExtensionLibraries([]);
-                onSetCustomExtensionLibraries([]);
-            }
+            const nextLibraries = installedLibraries.map(library => ({...library, enabled: false}));
+            saveInstalledCustomExtensionLibraries(nextLibraries);
+            onSetCustomExtensionLibraries(nextLibraries);
+            vm.emitWorkspaceUpdate();
+            setExtensionStateVersion(version => version + 1);
         });
     };
 
@@ -461,10 +553,14 @@ const ProductExtensionLibraryComponent = ({
             });
     };
 
-    // 卡片点击根据来源分流：本地库跳分类、内置 manifest 直接安装、占位项只提示。
+    // 卡片点击根据来源分流：用户包按需加载，产品包优先远程版本并保留内置兜底。
     const handleItemClick = (item, options = {}) => {
-        if (item.source === 'local') {
-            selectExtensionCategory(item.id);
+        if (item.source === LIBRARY_SOURCE_TYPES.USER_LOCAL) {
+            if (vm.extensionManager.isExtensionLoaded(item.id)) {
+                selectExtensionCategory(item.id);
+                return;
+            }
+            loadUserLibrary(item).then(() => selectExtensionCategory(item.id));
             return;
         }
         if (item.status === 'available' && item.manifest) {
@@ -474,7 +570,10 @@ const ProductExtensionLibraryComponent = ({
             }
             if (mainCategoryIds.includes(item.categoryId) && !options.skipSwitchCheck) {
                 const loadedMainItem = getLoadedMainItem(item);
-                if (loadedMainItem || installedLibraries.length) {
+                const hasLoadedUserLibrary = installedLibraries.some(library => (
+                    vm.extensionManager.isExtensionLoaded(library.manifest.id)
+                ));
+                if (loadedMainItem || hasLoadedUserLibrary) {
                     setPendingSwitchItem(item);
                     return;
                 }
@@ -522,7 +621,7 @@ const ProductExtensionLibraryComponent = ({
         downloadBlob(`${item.manifest.id}.custom-extension.json`, blob);
     };
 
-    // 删除本地库需要同步卸载 VM 拓展和 Python 模板，避免左侧分类残留。
+    // 删除会同时卸载运行态和移除持久化包；与“卸载但保留”是两个独立动作。
     const handleDeleteLibrary = item => {
         if (!item.manifest) return;
         unregisterPythonCodegenManifest(item.manifest);
@@ -534,6 +633,8 @@ const ProductExtensionLibraryComponent = ({
                 removeInstalledCustomExtensionLibrary(installedLibraries, item.manifest.id)
             );
             onRemoveCustomExtensionLibrary(item.manifest.id);
+            vm.emitWorkspaceUpdate();
+            setExtensionStateVersion(version => version + 1);
         });
     };
 
@@ -581,6 +682,18 @@ const ProductExtensionLibraryComponent = ({
                     >
                         {intl.formatMessage(messages.moduleExtensions)}
                     </button>
+                    <button
+                        className={classNames(styles.tabButton, {
+                            [styles.tabButtonActive]: activeTab === 'user'
+                        })}
+                        type="button"
+                        onClick={() => {
+                            setActiveTab('user');
+                            setChip('all');
+                        }}
+                    >
+                        {intl.formatMessage(messages.userExtensions)}
+                    </button>
                 </nav>
                 <div className={styles.topRight}>
                     <label className={styles.searchBox}>
@@ -596,23 +709,31 @@ const ProductExtensionLibraryComponent = ({
                 </div>
             </header>
             <div className={styles.filterBar}>
-                <div className={styles.advancedButton}>
-                    {intl.formatMessage(messages.advancedFilter)}⌄
-                </div>
-                <div className={styles.chipGroup}>
-                    {categoryFilters[activeTab].map(category => (
-                        <button
-                            className={classNames(styles.chip, {
-                                [styles.chipActive]: chip === category.id
-                            })}
-                            key={category.id}
-                            type="button"
-                            onClick={() => setChip(chip === category.id ? 'all' : category.id)}
-                        >
-                            {intl.formatMessage(category.message)}
-                        </button>
-                    ))}
-                </div>
+                {activeTab === 'user' ? (
+                    <div className={styles.userLibraryHeading}>
+                        {intl.formatMessage(messages.userExtensions)}
+                    </div>
+                ) : (
+                    <React.Fragment>
+                        <div className={styles.advancedButton}>
+                            {intl.formatMessage(messages.advancedFilter)}⌄
+                        </div>
+                        <div className={styles.chipGroup}>
+                            {categoryFilters[activeTab].map(category => (
+                                <button
+                                    className={classNames(styles.chip, {
+                                        [styles.chipActive]: chip === category.id
+                                    })}
+                                    key={category.id}
+                                    type="button"
+                                    onClick={() => setChip(chip === category.id ? 'all' : category.id)}
+                                >
+                                    {intl.formatMessage(category.message)}
+                                </button>
+                            ))}
+                        </div>
+                    </React.Fragment>
+                )}
                 <div className={styles.toolbarActions}>
                     <input
                         accept=".json,.zip,.sbext"
@@ -621,30 +742,44 @@ const ProductExtensionLibraryComponent = ({
                         type="file"
                         onChange={handleImportFile}
                     />
-                    <button
-                        className={classNames(styles.toolbarButton, styles.toolbarButtonSecondary)}
-                        type="button"
-                        onClick={handleLocalImportClick}
-                    >
-                        {intl.formatMessage(messages.importLocal)}
-                    </button>
-                    <button
-                        className={classNames(styles.toolbarButton, styles.toolbarButtonSecondary)}
-                        type="button"
-                        onClick={handleUploadClick}
-                    >
-                        {intl.formatMessage(messages.uploadLibrary)}
-                    </button>
-                    <button
-                        className={styles.toolbarButton}
-                        disabled={checking}
-                        type="button"
-                        onClick={handleCheckVersions}
-                    >
-                        {checking ?
-                            intl.formatMessage(messages.checkingVersion) :
-                            intl.formatMessage(messages.checkVersion)}
-                    </button>
+                    {activeTab === 'user' ? (
+                        <React.Fragment>
+                            <button
+                                className={classNames(styles.toolbarButton, styles.toolbarButtonSecondary)}
+                                type="button"
+                                onClick={handleLocalImportClick}
+                            >
+                                {intl.formatMessage(messages.importLocal)}
+                            </button>
+                            <button
+                                className={classNames(styles.toolbarButton, styles.toolbarButtonSecondary)}
+                                type="button"
+                                onClick={handleUrlImportClick}
+                            >
+                                {intl.formatMessage(messages.urlImport)}
+                            </button>
+                        </React.Fragment>
+                    ) : (
+                        <React.Fragment>
+                            <button
+                                className={classNames(styles.toolbarButton, styles.toolbarButtonSecondary)}
+                                type="button"
+                                onClick={handleUploadClick}
+                            >
+                                {intl.formatMessage(messages.uploadLibrary)}
+                            </button>
+                            <button
+                                className={styles.toolbarButton}
+                                disabled={checking}
+                                type="button"
+                                onClick={handleCheckVersions}
+                            >
+                                {checking ?
+                                    intl.formatMessage(messages.checkingVersion) :
+                                    intl.formatMessage(messages.checkVersion)}
+                            </button>
+                        </React.Fragment>
+                    )}
                     <button
                         className={styles.sortButton}
                         type="button"
@@ -660,7 +795,13 @@ const ProductExtensionLibraryComponent = ({
                             const isAvailable = item.status === 'available';
                             const isLoaded = loadedExtensionIds.includes(item.id) ||
                                 vm.extensionManager.isExtensionLoaded(item.id);
-                            const isLocal = item.source === 'local';
+                            const isUser = item.source === LIBRARY_SOURCE_TYPES.USER_LOCAL;
+                            const sourceMessage = isUser ? messages.userSource :
+                                ([
+                                    LIBRARY_SOURCE_TYPES.REMOTE_CACHE,
+                                    LIBRARY_SOURCE_TYPES.REMOTE_REGISTRY
+                                ].includes(item.source) ?
+                                    messages.remoteSource : messages.bundledSource);
                             return (
                                 <article
                                     className={classNames(styles.card, {
@@ -673,7 +814,11 @@ const ProductExtensionLibraryComponent = ({
                                         intl.formatMessage(messages.unavailableNotice, {
                                             name: item.name
                                         })}
-                                    onClick={() => handleItemClick(item)}
+                                    onClick={event => {
+                                        // 版本号只用于展示，点击时不触发整张产品卡片的加载操作。
+                                        if (event.target.closest('[data-version-display]')) return;
+                                        handleItemClick(item);
+                                    }}
                                     onKeyDown={event => {
                                         if (event.key === 'Enter' || event.key === ' ') {
                                             event.preventDefault();
@@ -681,17 +826,36 @@ const ProductExtensionLibraryComponent = ({
                                         }
                                     }}
                                 >
-                                    {isLocal ? (
-                                        <button
-                                            className={styles.removeBadge}
-                                            type="button"
-                                            onClick={event => {
-                                                event.stopPropagation();
-                                                handleDeleteLibrary(item);
-                                            }}
-                                        >
-                                            {intl.formatMessage(messages.remove)}
-                                        </button>
+                                    {isUser ? (
+                                        <div className={styles.userCardActions}>
+                                            <button
+                                                className={styles.userCardAction}
+                                                type="button"
+                                                onClick={event => {
+                                                    event.stopPropagation();
+                                                    if (isLoaded) {
+                                                        unloadUserLibrary(item);
+                                                    } else {
+                                                        loadUserLibrary(item);
+                                                    }
+                                                }}
+                                            >
+                                                {intl.formatMessage(isLoaded ? messages.unload : messages.load)}
+                                            </button>
+                                            <button
+                                                className={classNames(
+                                                    styles.userCardAction,
+                                                    styles.userCardDeleteAction
+                                                )}
+                                                type="button"
+                                                onClick={event => {
+                                                    event.stopPropagation();
+                                                    handleDeleteLibrary(item);
+                                                }}
+                                            >
+                                                {intl.formatMessage(messages.delete)}
+                                            </button>
+                                        </div>
                                     ) : isLoaded ? (
                                         <button
                                             className={styles.removeBadge}
@@ -726,35 +890,34 @@ const ProductExtensionLibraryComponent = ({
                                         </div>
                                         <div className={styles.cardDescription}>
                                             {item.status === 'available' ?
-                                                (isLocal ?
+                                                (isUser ?
                                                     intl.formatMessage(messages.localDescription) :
                                                     intl.formatMessage(messages.availableDescription)) :
                                                 intl.formatMessage(messages.placeholderDescription)}
                                         </div>
                                     </div>
                                     <footer className={styles.cardFooter}>
-                                        <span className={styles.vendor}>⌂ Company</span>
-                                        <select
-                                            className={styles.versionSelect}
-                                            value={item.latestVersion}
-                                            onChange={event => event.target.blur()}
+                                        <span className={styles.vendor}>
+                                            {intl.formatMessage(sourceMessage)}
+                                        </span>
+                                        <span
+                                            className={styles.versionLabel}
+                                            data-version-display
                                         >
-                                            <option value={item.latestVersion}>
-                                                {checking ? '--' : item.latestVersion}
-                                            </option>
-                                        </select>
+                                            {checking ? '--' : item.latestVersion}
+                                        </span>
                                         <button
                                             className={styles.cardMenuButton}
                                             type="button"
                                             onClick={event => {
                                                 event.stopPropagation();
-                                                if (isLocal) {
+                                                if (isUser) {
                                                     handleExportLibrary(item);
                                                     return;
                                                 }
                                                 handleDetailsClick(item);
                                             }}
-                                            title={isLocal ? intl.formatMessage(messages.export) : ''}
+                                            title={isUser ? intl.formatMessage(messages.export) : ''}
                                         >
                                             ⋮
                                         </button>
@@ -765,7 +928,7 @@ const ProductExtensionLibraryComponent = ({
                     </div>
                 ) : (
                     <div className={styles.emptyState}>
-                        {intl.formatMessage(messages.empty)}
+                        {intl.formatMessage(activeTab === 'user' ? messages.userEmpty : messages.empty)}
                     </div>
                 )}
             </main>
@@ -811,6 +974,7 @@ const ProductExtensionLibraryComponent = ({
 
 ProductExtensionLibraryComponent.propTypes = {
     installedLibraries: PropTypes.arrayOf(PropTypes.shape({
+        enabled: PropTypes.bool,
         manifest: PropTypes.shape({
             id: PropTypes.string.isRequired,
             name: PropTypes.string.isRequired,
@@ -824,12 +988,8 @@ ProductExtensionLibraryComponent.propTypes = {
     onRemoveCustomExtensionLibrary: PropTypes.func.isRequired,
     onRequestClose: PropTypes.func.isRequired,
     onSetCustomExtensionLibraries: PropTypes.func.isRequired,
+    onSetCustomExtensionLibraryEnabled: PropTypes.func.isRequired,
     vm: PropTypes.instanceOf(VM).isRequired
-};
-
-ProductExtensionLibraryComponent.defaultProps = {
-    installedLibraries: [],
-    onCategorySelected: null
 };
 
 const mapStateToProps = state => ({
@@ -840,10 +1000,17 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     onInstallCustomExtensionLibrary: manifest => dispatch(installCustomExtensionLibrary(manifest)),
     onRemoveCustomExtensionLibrary: extensionId => dispatch(removeCustomExtensionLibrary(extensionId)),
-    onSetCustomExtensionLibraries: installedLibraries => dispatch(setCustomExtensionLibraries(installedLibraries))
+    onSetCustomExtensionLibraries: installedLibraries => dispatch(setCustomExtensionLibraries(installedLibraries)),
+    onSetCustomExtensionLibraryEnabled: (extensionId, enabled) => dispatch(
+        setCustomExtensionLibraryEnabled(extensionId, enabled)
+    )
 });
 
 export default injectIntl(connect(
     mapStateToProps,
     mapDispatchToProps
 )(ProductExtensionLibraryComponent));
+
+export {
+    ProductExtensionLibraryComponent
+};

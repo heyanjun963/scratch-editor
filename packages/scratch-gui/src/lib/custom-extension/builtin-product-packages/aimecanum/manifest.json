@@ -1,0 +1,473 @@
+{
+  "formatVersion": 2,
+  "id": "aimecanum",
+  "name": "AI机甲麦轮车",
+  "version": "0.2.1",
+  "description": "适用于 AI机甲麦轮车的 Python 积木拓展包。",
+  "color1": "#1874cd",
+  "color2": "#145fa8",
+  "color3": "#104b85",
+  "target": "python",
+  "source": "python",
+  "entry": {
+    "blocks": "blocks.json",
+    "python": "generator/python.json"
+  },
+  "runtime": {
+    "pythonLibraries": []
+  },
+  "menus": {
+    "tones": {
+      "items": [
+        {
+          "text": "C2",
+          "value": "65"
+        },
+        {
+          "text": "D2",
+          "value": "73"
+        },
+        {
+          "text": "E2",
+          "value": "82"
+        },
+        {
+          "text": "F2",
+          "value": "87"
+        },
+        {
+          "text": "G2",
+          "value": "98"
+        },
+        {
+          "text": "A2",
+          "value": "110"
+        },
+        {
+          "text": "B2",
+          "value": "123"
+        },
+        {
+          "text": "C3",
+          "value": "131"
+        },
+        {
+          "text": "D3",
+          "value": "147"
+        },
+        {
+          "text": "E3",
+          "value": "165"
+        },
+        {
+          "text": "F3",
+          "value": "175"
+        },
+        {
+          "text": "G3",
+          "value": "196"
+        },
+        {
+          "text": "A3",
+          "value": "220"
+        },
+        {
+          "text": "B3",
+          "value": "247"
+        },
+        {
+          "text": "C4",
+          "value": "262"
+        },
+        {
+          "text": "D4",
+          "value": "294"
+        },
+        {
+          "text": "E4",
+          "value": "330"
+        },
+        {
+          "text": "F4",
+          "value": "349"
+        },
+        {
+          "text": "G4",
+          "value": "392"
+        },
+        {
+          "text": "A4",
+          "value": "440"
+        },
+        {
+          "text": "B4",
+          "value": "494"
+        }
+      ]
+    },
+    "rhythms": {
+      "items": [
+        {
+          "text": "二分之一",
+          "value": "500"
+        },
+        {
+          "text": "四分之一",
+          "value": "250"
+        },
+        {
+          "text": "八分之一",
+          "value": "125"
+        },
+        {
+          "text": "一拍",
+          "value": "1000"
+        },
+        {
+          "text": "两拍",
+          "value": "2000"
+        },
+        {
+          "text": "长音",
+          "value": "5000"
+        },
+        {
+          "text": "0",
+          "value": "0"
+        }
+      ]
+    },
+    "buzzerMode": {
+      "items": [
+        {
+          "text": "后台播放",
+          "value": "False"
+        },
+        {
+          "text": "前台播放(阻塞)",
+          "value": "True"
+        }
+      ]
+    },
+    "keys": {
+      "items": [
+        {
+          "text": "A",
+          "value": "A"
+        },
+        {
+          "text": "B",
+          "value": "B"
+        }
+      ]
+    },
+    "wheels": {
+      "items": [
+        {
+          "text": "左前",
+          "value": "4"
+        },
+        {
+          "text": "左后",
+          "value": "3"
+        },
+        {
+          "text": "右前",
+          "value": "2"
+        },
+        {
+          "text": "右后",
+          "value": "1"
+        }
+      ]
+    },
+    "wheelMotors": {
+      "items": [
+        {
+          "text": "左前轮(EM4)",
+          "value": "4"
+        },
+        {
+          "text": "左后轮(EM3)",
+          "value": "3"
+        },
+        {
+          "text": "右前轮(EM2)",
+          "value": "2"
+        },
+        {
+          "text": "右后轮(EM1)",
+          "value": "1"
+        }
+      ]
+    },
+    "sides": {
+      "items": [
+        {
+          "text": "左侧",
+          "value": "0"
+        },
+        {
+          "text": "右侧",
+          "value": "1"
+        }
+      ]
+    },
+    "lightColors": {
+      "items": [
+        {
+          "text": "红",
+          "value": "0"
+        },
+        {
+          "text": "绿",
+          "value": "1"
+        },
+        {
+          "text": "蓝",
+          "value": "2"
+        },
+        {
+          "text": "黄",
+          "value": "3"
+        },
+        {
+          "text": "紫",
+          "value": "4"
+        },
+        {
+          "text": "青",
+          "value": "5"
+        },
+        {
+          "text": "白",
+          "value": "6"
+        }
+      ]
+    },
+    "oriention8": {
+      "items": [
+        {
+          "text": "前进",
+          "value": "0"
+        },
+        {
+          "text": "后退",
+          "value": "180"
+        },
+        {
+          "text": "左移",
+          "value": "90"
+        },
+        {
+          "text": "右移",
+          "value": "-90"
+        },
+        {
+          "text": "左前",
+          "value": "45"
+        },
+        {
+          "text": "右前",
+          "value": "-45"
+        },
+        {
+          "text": "左后",
+          "value": "135"
+        },
+        {
+          "text": "右后",
+          "value": "-135"
+        }
+      ]
+    },
+    "oriention4": {
+      "items": [
+        {
+          "text": "前进",
+          "value": "0"
+        },
+        {
+          "text": "后退",
+          "value": "180"
+        },
+        {
+          "text": "左移",
+          "value": "90"
+        },
+        {
+          "text": "右移",
+          "value": "-90"
+        }
+      ]
+    },
+    "orientionTurn": {
+      "items": [
+        {
+          "text": "原地左转",
+          "value": "1"
+        },
+        {
+          "text": "原地右转",
+          "value": "-1"
+        }
+      ]
+    },
+    "eulerElement": {
+      "items": [
+        {
+          "text": "Z轴角度",
+          "value": "0"
+        },
+        {
+          "text": "X轴角度",
+          "value": "1"
+        },
+        {
+          "text": "Y轴角度",
+          "value": "2"
+        }
+      ]
+    },
+    "line6Sensor": {
+      "items": [
+        {
+          "text": "前置",
+          "value": "LF1"
+        },
+        {
+          "text": "后置",
+          "value": "LF2"
+        }
+      ]
+    },
+    "line6Mask": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "4"
+        },
+        {
+          "text": "4",
+          "value": "8"
+        },
+        {
+          "text": "5",
+          "value": "16"
+        },
+        {
+          "text": "6",
+          "value": "32"
+        }
+      ]
+    },
+    "linefollows6": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "4",
+          "value": "4"
+        },
+        {
+          "text": "5",
+          "value": "5"
+        },
+        {
+          "text": "6",
+          "value": "6"
+        }
+      ]
+    },
+    "linedot2": {
+      "items": [
+        {
+          "text": "◌",
+          "value": "== 0"
+        },
+        {
+          "text": "●",
+          "value": "> 0"
+        }
+      ]
+    },
+    "moveDirection": {
+      "items": [
+        {
+          "text": "前进",
+          "value": "1"
+        },
+        {
+          "text": "后退",
+          "value": "-1"
+        }
+      ]
+    },
+    "nums": {
+      "items": [
+        {
+          "text": "全部",
+          "value": "0"
+        },
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "3"
+        }
+      ]
+    },
+    "rgb": {
+      "items": [
+        {
+          "text": "红",
+          "value": "1"
+        },
+        {
+          "text": "绿",
+          "value": "2"
+        },
+        {
+          "text": "蓝",
+          "value": "3"
+        }
+      ]
+    },
+    "bleMode": {
+      "items": [
+        {
+          "text": "从机模式",
+          "value": "BLE.MODE_BLE_SLAVE"
+        },
+        {
+          "text": "主机模式",
+          "value": "BLE.MODE_BLE_MASTER"
+        }
+      ]
+    }
+  }
+}

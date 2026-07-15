@@ -16,7 +16,12 @@
 | [08 产品/模块式拓展面板执行方案](./08-product-module-extension-panel-plan.md) | 参考 Mind+ 竞品形态，把自定义拓展库入口迁回拓展面板，设计主控扩展/模块扩展 Tab、产品兼容关系、灰色禁用状态、工具箱启用策略和分阶段落地计划 |
 | [09 MakeCode-like 云端拓展库框架方案](./09-makecode-like-cloud-extension-registry-plan.md) | 参考 Microsoft MakeCode 扩展机制，设计公司后台上传、云端目录、远程 `.sbext` 下载、审核、版本锁定、本地导入兜底和后续只维护拓展包的框架 |
 | [10 旧产品拓展迁移计划](./10-old-product-migration-plan.md) | 结合旧 `scratch-vm/src/extensions` 和旧 `python-generator`，规划旧产品、公共模块、启动帽子块、初始化变量、Python 生成器和测试基线的迁移路线 |
+| [13 AI机甲麦轮车二次迁移记录](./13-aimecanum-second-migration-record.md) | 记录 AI机甲麦轮车按声明式 manifest 迁移后的积木、Python 入口和遗留项 |
+| [14 六路巡线字段迁移计划](./14-line6-field-migration-plan.md) | 记录六路巡线位掩码字段从临时菜单迁移为 LINE6 自定义字段的实现方案 |
+| [15 AI机甲麦轮车 SBEXT 外置执行记录](./15-aimecanum-sbext-extraction-progress.md) | 记录内置 JS manifest 外置为标准源包、生成 `.sbext`、重新导入测试和后续远程更新接口准备情况 |
+| [16 用户拓展分类与产品包来源模型](./16-user-extension-tab-and-product-source-progress.md) | 记录用户拓展独立 Tab、加载/卸载/删除、启用状态持久化，以及后台包覆盖内置默认产品配置的预留模型 |
+| [17 产品配置总仓库与同步命令执行记录](./17-product-extension-repository-sync-progress.md) | 记录独立多产品配置仓库、源配置与 SBEXT 同步命令、catalog 增量更新、稳定 SHA256 和人工 Release 步骤 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。下一步产品化重点不是继续强化顶部菜单里的独立库管理器，而是把导入、管理、主控选择、模块选择、云端目录、上传审核和版本锁定收敛到拓展面板与统一拓展库框架里。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。AI机甲麦轮车已使用标准源包维护，并可生成重新导入的 `.sbext`。本地包现已归入独立“用户拓展”分类，支持保留包的加载/卸载和彻底删除。下一步产品化重点是接入 GitHub/Gitee 或公司后台的包下载、校验、缓存和项目版本锁定。

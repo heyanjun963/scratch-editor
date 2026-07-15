@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 
 import {normalizeCustomExtensionManifest} from './manifest-schema';
+import {createPackageManifest} from './package-manifest';
 
 const JSON_EXTENSIONS = ['.json'];
 const ZIP_EXTENSIONS = ['.zip', '.sbext'];
@@ -74,139 +75,29 @@ const readOptionalRuntimeFiles = async (lookup, paths) => {
     return files;
 };
 
-const uniqueStrings = values => Array.from(new Set(values.filter(Boolean).map(String)));
-
-// blocks.json 兼容数组和 {categories, blocks} 两种写法。
-const normalizeBlockCollection = rawBlocks => {
-    if (Array.isArray(rawBlocks)) {
-        return {
-            categories: [],
-            blocks: rawBlocks
-        };
-    }
-    if (rawBlocks && typeof rawBlocks === 'object') {
-        if (!Array.isArray(rawBlocks.blocks)) {
-            throw new Error('blocks.json must contain a blocks array');
-        }
-        return {
-            categories: Array.isArray(rawBlocks.categories) ? rawBlocks.categories : [],
-            blocks: rawBlocks.blocks
-        };
-    }
-    throw new Error('blocks.json must be an array, or an object with a blocks array');
-};
-
-// generator/python.json 可以写公共配置，也可以按 opcode 覆盖每个积木的生成规则。
-const normalizeGeneratorCollection = rawGenerator => {
-    if (!rawGenerator || typeof rawGenerator !== 'object' || Array.isArray(rawGenerator)) {
-        throw new Error('generator/python.json must be an object');
-    }
-    return {
-        imports: Array.isArray(rawGenerator.imports) ? rawGenerator.imports.map(String) : [],
-        variables: Array.isArray(rawGenerator.variables) ? rawGenerator.variables.map(String) : [],
-        setups: Array.isArray(rawGenerator.setups) ? rawGenerator.setups.map(String) : [],
-        entryTemplate: rawGenerator.entryTemplate ? String(rawGenerator.entryTemplate) : '',
-        entryFooter: rawGenerator.entryFooter ? String(rawGenerator.entryFooter) : '',
-        launcher: rawGenerator.launcher ? String(rawGenerator.launcher) : '',
-        blocks: rawGenerator.blocks && typeof rawGenerator.blocks === 'object' ?
-            rawGenerator.blocks :
-            rawGenerator
-    };
-};
-
-// 合并 block 内联 codegen 和独立 generator 配置，独立 generator 优先补齐模板。
-const getBlockPythonCodegen = (rawBlock, generatorInfo, commonImports) => {
-    const inlinePython = rawBlock.codegen && rawBlock.codegen.python ? rawBlock.codegen.python : {};
-    const generatorPython = generatorInfo || {};
-    const template = typeof generatorPython.template === 'undefined' ?
-        inlinePython.template :
-        generatorPython.template;
-
-    return {
-        template,
-        imports: uniqueStrings([
-            ...commonImports,
-            ...(Array.isArray(inlinePython.imports) ? inlinePython.imports : []),
-            ...(Array.isArray(generatorPython.imports) ? generatorPython.imports : [])
-        ]),
-        variables: uniqueStrings([
-            ...(Array.isArray(generatorPython.commonVariables) ? generatorPython.commonVariables : []),
-            ...(Array.isArray(inlinePython.variables) ? inlinePython.variables : []),
-            ...(Array.isArray(generatorPython.variables) ? generatorPython.variables : [])
-        ]),
-        setups: uniqueStrings([
-            ...(Array.isArray(generatorPython.commonSetups) ? generatorPython.commonSetups : []),
-            ...(Array.isArray(inlinePython.setups) ? inlinePython.setups : []),
-            ...(Array.isArray(generatorPython.setups) ? generatorPython.setups : [])
-        ]),
-        entryTemplate: generatorPython.entryTemplate || inlinePython.entryTemplate || '',
-        entryFooter: generatorPython.entryFooter || inlinePython.entryFooter || '',
-        launcher: generatorPython.launcher || inlinePython.launcher || '',
-        section: generatorPython.section || inlinePython.section || '',
-        runtimeFiles: uniqueStrings([
-            ...(Array.isArray(inlinePython.runtimeFiles) ? inlinePython.runtimeFiles : []),
-            ...(Array.isArray(generatorPython.runtimeFiles) ? generatorPython.runtimeFiles : [])
-        ])
-    };
-};
-
 // 目录包合并入口：manifest/config + blocks + generator + runtime files -> v2 manifest。
 const mergePackageManifest = async (zipLookup, rawManifest, rawBlocks, rawGenerator, packageFileName) => {
-    const blockCollection = normalizeBlockCollection(rawBlocks);
-    const generatorCollection = normalizeGeneratorCollection(rawGenerator);
-    const blocks = blockCollection.blocks.map(rawBlock => {
-        const safeRawBlock = rawBlock || {};
-        const opcode = safeRawBlock.opcode;
-        const python = getBlockPythonCodegen(
-            safeRawBlock,
-            opcode ? {
-                ...(generatorCollection.blocks[opcode] || {}),
-                commonVariables: generatorCollection.variables,
-                commonSetups: generatorCollection.setups,
-                entryTemplate: (generatorCollection.blocks[opcode] && generatorCollection.blocks[opcode].entryTemplate) ||
-                    generatorCollection.entryTemplate,
-                entryFooter: (generatorCollection.blocks[opcode] && generatorCollection.blocks[opcode].entryFooter) ||
-                    generatorCollection.entryFooter,
-                launcher: (generatorCollection.blocks[opcode] && generatorCollection.blocks[opcode].launcher) ||
-                    generatorCollection.launcher
-            } : null,
-            generatorCollection.imports
-        );
-        return {
-            ...safeRawBlock,
-            codegen: {
-                ...(safeRawBlock.codegen || {}),
-                python
-            }
-        };
+    // 先合并一次得到完整运行库路径，再读取包内文件并写回最终 manifest。
+    const packageManifest = createPackageManifest({
+        rawManifest,
+        rawBlocks,
+        rawGenerator,
+        packageFileName
     });
-    const runtime = rawManifest.runtime || {};
-    const runtimeFilePaths = uniqueStrings([
-        ...(Array.isArray(runtime.pythonLibraries) ? runtime.pythonLibraries : []),
-        ...blocks.flatMap(block => block.codegen.python.runtimeFiles || [])
-    ]);
-    const runtimeFiles = await readOptionalRuntimeFiles(zipLookup, runtimeFilePaths);
+    const runtimeFiles = await readOptionalRuntimeFiles(zipLookup, packageManifest.runtime.pythonLibraries);
 
-    return normalizeCustomExtensionManifest({
-        ...rawManifest,
-        formatVersion: 2,
-        categories: blockCollection.categories.length ? blockCollection.categories : rawManifest.categories,
-        runtime: {
-            ...runtime,
-            pythonLibraries: runtimeFilePaths,
-            files: runtimeFiles
-        },
-        package: {
-            fileName: packageFileName,
-            structure: 'company-scratch-extension-package-v2'
-        },
-        blocks
+    return createPackageManifest({
+        rawManifest,
+        rawBlocks,
+        rawGenerator,
+        runtimeFiles,
+        packageFileName
     });
 };
 
-// 读取 WonderCam 类目录包压缩文件，保留新协议但兼容常见文件命名。
-const readZipPackage = async file => {
-    const zip = await JSZip.loadAsync(await readFileAsArrayBuffer(file));
+// 读取内存中的目录包数据，供浏览器文件、内置产物和后续远程下载共同复用。
+const readZipPackageData = async (data, packageFileName) => {
+    const zip = await JSZip.loadAsync(data);
     const lookup = createZipLookup(zip);
     const rawManifest = await readZipJson(lookup, ['manifest.json', 'config.json'], 'config.json/manifest.json');
     const entry = rawManifest.entry || {};
@@ -223,7 +114,19 @@ const readZipPackage = async file => {
         'generator/python.json'
     );
 
-    return mergePackageManifest(lookup, rawManifest, rawBlocks, rawGenerator, file.name);
+    return mergePackageManifest(lookup, rawManifest, rawBlocks, rawGenerator, packageFileName);
+};
+
+// 读取 WonderCam 类目录包压缩文件，保留新协议但兼容常见文件命名。
+const readZipPackage = async file => readZipPackageData(await readFileAsArrayBuffer(file), file.name);
+
+// 二进制包入口不依赖 FileReader，方便测试、Electron 和远程 Release 下载后直接解析。
+const readCustomExtensionPackageBuffer = (data, packageFileName) => {
+    const extension = getFileExtension(packageFileName);
+    if (!ZIP_EXTENSIONS.includes(extension)) {
+        return Promise.reject(new Error('Only .zip or .sbext binary extension library files are supported'));
+    }
+    return readZipPackageData(data, packageFileName);
 };
 
 // 单 JSON 文件走最小格式，适合用户快速分享自定义积木。
@@ -248,5 +151,6 @@ const readCustomExtensionPackage = file => {
 };
 
 export {
-    readCustomExtensionPackage
+    readCustomExtensionPackage,
+    readCustomExtensionPackageBuffer
 };
