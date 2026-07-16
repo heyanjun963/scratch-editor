@@ -8,6 +8,19 @@ const skipGuiServer = process.env.SCRATCH_DESKTOP_SKIP_GUI_SERVER === '1';
 
 const log = message => console.log(`[desktop] ${message}`);
 
+// 已有开发服务时直接复用，避免再次监听同一端口触发 EADDRINUSE。
+const isUrlAvailable = url => new Promise(resolve => {
+    const request = http.get(url, response => {
+        response.resume();
+        resolve(true);
+    });
+    request.on('error', () => resolve(false));
+    request.setTimeout(2000, () => {
+        request.destroy();
+        resolve(false);
+    });
+});
+
 // 开发启动脚本会先等 webpack dev server 可访问，再拉起 Electron 窗口。
 const waitForUrl = (url, timeoutMs = 60000) => new Promise((resolve, reject) => {
     const startedAt = Date.now();
@@ -101,7 +114,14 @@ const startElectron = electronBinary => {
 // 一条命令启动桌面端：可选择自启 GUI server，也可复用外部已启动服务。
 const main = async () => {
     const electronBinary = getElectronBinary();
-    const guiServer = startGuiServer();
+    let guiServer = null;
+    if (skipGuiServer) {
+        guiServer = startGuiServer();
+    } else if (await isUrlAvailable(guiUrl)) {
+        log(`Reusing existing scratch-gui dev server on ${guiUrl}`);
+    } else {
+        guiServer = startGuiServer();
+    }
 
     try {
         log(`Waiting for ${guiUrl}`);

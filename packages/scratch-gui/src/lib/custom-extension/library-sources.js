@@ -1,9 +1,15 @@
+import {compareVersions} from './remote-library-client';
+
 const LIBRARY_SOURCE_TYPES = Object.freeze({
     BUNDLED_DEFAULT: 'bundled-default',
     REMOTE_CACHE: 'remote-cache',
     REMOTE_REGISTRY: 'remote-registry',
     USER_LOCAL: 'user-local'
 });
+
+const getHighestVersion = versions => versions
+    .filter(Boolean)
+    .sort((left, right) => compareVersions(right, left))[0];
 
 // 离线优先使用最近一次校验成功的缓存包；内置配置只在没有有效缓存时作为最后兜底。
 const resolveProductLibraryItem = (
@@ -17,12 +23,15 @@ const resolveProductLibraryItem = (
     const cachedRemoteManifest = cachedRemotePackage && cachedRemotePackage.manifest ?
         cachedRemotePackage.manifest :
         null;
-    const offlineManifest = cachedRemoteManifest || bundledManifest || null;
+    const useCachedRemoteManifest = Boolean(cachedRemoteManifest) && (
+        !bundledManifest || compareVersions(cachedRemoteManifest.version, bundledManifest.version) >= 0
+    );
+    const offlineManifest = useCachedRemoteManifest ? cachedRemoteManifest : (bundledManifest || null);
     const hasRemotePackage = Boolean(remoteCatalogPackage);
     return {
         ...catalogItem,
         packageId,
-        source: cachedRemoteManifest ?
+        source: useCachedRemoteManifest ?
             LIBRARY_SOURCE_TYPES.REMOTE_CACHE :
             (hasBundledDefault ? LIBRARY_SOURCE_TYPES.BUNDLED_DEFAULT : LIBRARY_SOURCE_TYPES.REMOTE_REGISTRY),
         manifest: offlineManifest,
@@ -31,10 +40,12 @@ const resolveProductLibraryItem = (
         bundledDefaultManifest: bundledManifest || null,
         status: offlineManifest ? 'available' : (hasRemotePackage ? 'downloadable' : catalogItem.status),
         version: offlineManifest && offlineManifest.version ? offlineManifest.version : catalogItem.version,
-        latestVersion: hasRemotePackage ? remoteCatalogPackage.version :
-            (cachedRemotePackage && cachedRemotePackage.version ?
-                cachedRemotePackage.version :
-                catalogItem.latestVersion),
+        latestVersion: getHighestVersion([
+            offlineManifest && offlineManifest.version,
+            cachedRemotePackage && cachedRemotePackage.version,
+            remoteCatalogPackage && remoteCatalogPackage.version,
+            catalogItem.latestVersion
+        ]),
         remoteSource: {
             type: LIBRARY_SOURCE_TYPES.REMOTE_REGISTRY,
             packageId,

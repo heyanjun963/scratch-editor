@@ -103,10 +103,20 @@ describe('ProductExtensionLibrary user extensions', () => {
     });
 
     test('renders the product version as an inert label', async () => {
+        loadRemoteLibraryCatalog.mockResolvedValueOnce([{
+            packageId: 'aimecanum',
+            name: 'AI机甲麦轮车',
+            version: '0.2.2',
+            status: 'published',
+            asset: 'aimecanum-0.2.2.sbext',
+            downloadUrl: 'https://raw.githubusercontent.com/company/extensions/aimecanum-0.2.2.sbext',
+            sha256: 'a'.repeat(64)
+        }]);
         loadedExtensionIds.clear();
         render(<ProductExtensionLibraryComponent {...props} />);
 
         await waitFor(() => expect(screen.getByText('0.2.1')).toBeTruthy());
+        expect(screen.queryByText('0.2.2')).toBeNull();
         expect(screen.queryByRole('combobox')).toBeNull();
 
         fireEvent.click(screen.getByText('0.2.1'));

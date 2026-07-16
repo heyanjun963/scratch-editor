@@ -366,8 +366,11 @@ const getAvailableRemoteUpdates = (remoteCatalog, cachedRemotePackages) => {
         if (!localItem) return false;
         const cachedPackage = getLatestCachedRemotePackage(cachedRemotePackages, remotePackage.packageId);
         const bundledManifest = builtinProductManifests[remotePackage.packageId];
-        const currentVersion = cachedPackage ? cachedPackage.version :
-            (bundledManifest ? bundledManifest.version : localItem.version);
+        const currentVersion = resolveProductLibraryItem(
+            localItem,
+            bundledManifest || null,
+            cachedPackage
+        ).version;
         return compareVersions(remotePackage.version, currentVersion) > 0;
     });
 };
@@ -683,8 +686,11 @@ const ProductExtensionLibraryComponent = ({
                     );
                     const bundledManifest = builtinProductManifests[remotePackage.packageId];
                     const localItem = getFlatCatalogItems().find(item => item.id === remotePackage.packageId);
-                    const currentVersion = cachedPackage ? cachedPackage.version :
-                        (bundledManifest ? bundledManifest.version : localItem.version);
+                    const currentVersion = resolveProductLibraryItem(
+                        localItem,
+                        bundledManifest || null,
+                        cachedPackage
+                    ).version;
                     // eslint-disable-next-line no-alert
                     const shouldUpdate = confirm(intl.formatMessage(messages.updateConfirm, {
                         name: remotePackage.name || remotePackage.packageId,
@@ -1085,7 +1091,7 @@ const ProductExtensionLibraryComponent = ({
                                             className={styles.versionLabel}
                                             data-version-display
                                         >
-                                            {checking ? '--' : item.latestVersion}
+                                            {checking ? '--' : (item.manifest ? item.version : item.latestVersion)}
                                         </span>
                                         <button
                                             className={styles.cardMenuButton}

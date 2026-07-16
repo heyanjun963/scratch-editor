@@ -63,13 +63,16 @@ scratchGui.remoteProductExtensionPackages.v1
 
 缓存保存规范化 manifest、来源仓库、tag、asset、SHA256 和校验时间。Web 和 Electron 的 Chromium localStorage 都会落盘；同一产品的历史版本不会删除，为后续项目版本锁定预留恢复数据。
 
-页面离线解析优先级：
+页面离线解析规则：
 
 ```text
-最高版本的有效 remote-cache
-  -> bundled-default
+remote-cache 与 bundled-default 比较版本
+  -> 使用版本更高者
+  -> 版本相同时优先 remote-cache
   -> remote-registry 占位卡片
 ```
+
+卡片版本标签显示当前实际使用版本，不直接显示远程最新版本。远程新版本只在“检查版本”确认框中展示，避免卡片显示 `0.2.2`、确认框却把当前版本写成 `0.2.1`。
 
 ## 变更文件
 

@@ -46,6 +46,22 @@ describe('custom extension library sources', () => {
         });
     });
 
+    test('uses a newer bundled package instead of an older remote cache', () => {
+        const newerBundledManifest = {id: 'aimecanum', version: '0.2.2'};
+        const olderCachedManifest = {id: 'aimecanum', version: '0.2.1'};
+        expect(resolveProductLibraryItem(
+            {...catalogItem, version: '0.2.2', latestVersion: '0.2.2'},
+            newerBundledManifest,
+            {manifest: olderCachedManifest, version: '0.2.1'},
+            {packageId: 'aimecanum', version: '0.2.1'}
+        )).toMatchObject({
+            source: LIBRARY_SOURCE_TYPES.BUNDLED_DEFAULT,
+            manifest: newerBundledManifest,
+            version: '0.2.2',
+            latestVersion: '0.2.2'
+        });
+    });
+
     test('shows the catalog version while continuing to use the offline manifest', () => {
         expect(resolveProductLibraryItem(catalogItem, bundledManifest, null, {
             packageId: 'aimecanum',
