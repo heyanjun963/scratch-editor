@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const {pathToFileURL} = require('url');
 const PythonRunner = require('./python-runner');
+const {selectPreferredSerialPort} = require('./serial-port-selection');
 const TerminalRunner = require('./terminal-runner');
 
 // Electron 主进程入口：负责桌面窗口、浏览器式标签页、本机 Python、串口和本地拓展库 IPC。
@@ -30,6 +31,7 @@ const tabs = new Map();
 const editorViews = new Map();
 const editorWebContentsIds = new Set();
 const editorWebContentsTabIds = new Map();
+const preferredSerialPortIds = new Map();
 
 app.commandLine.appendSwitch('host-resolver-rules', 'MAP device-manager.scratch.mit.edu 127.0.0.1');
 
@@ -444,6 +446,7 @@ const createEditorView = tab => {
     view.webContents.on('destroyed', () => {
         editorWebContentsIds.delete(webContentsId);
         editorWebContentsTabIds.delete(webContentsId);
+        preferredSerialPortIds.delete(webContentsId);
     });
 
     view.webContents.loadURL(createEditorUrl(tab));
@@ -504,6 +507,7 @@ const closeTab = tabId => {
         editorViews.delete(tabId);
         editorWebContentsIds.delete(view.webContents.id);
         editorWebContentsTabIds.delete(view.webContents.id);
+        preferredSerialPortIds.delete(view.webContents.id);
         if (!view.webContents.isDestroyed()) {
             view.webContents.close();
         }
@@ -594,6 +598,19 @@ const registerSerialIpc = () => {
         getSenderTabId(event);
         return true;
     });
+    // 下拉框选择按编辑器 WebContents 保存；真正授权时仍只接受 Electron 提供的候选端口。
+    ipcMain.handle('serial:select', (event, portId = '') => {
+        getSenderTabId(event);
+        if (typeof portId !== 'string' || portId.length > 512) {
+            throw new Error('Serial port id must be a string no longer than 512 characters.');
+        }
+        if (portId) {
+            preferredSerialPortIds.set(event.sender.id, portId);
+        } else {
+            preferredSerialPortIds.delete(event.sender.id);
+        }
+        return {ok: true};
+    });
 };
 
 // 本地拓展库持久化只开放给编辑器 tab，数据格式仍交给 GUI 侧 schema 校验。
@@ -619,7 +636,7 @@ const registerSerialDeviceHandlers = () => {
         }
         event.preventDefault();
         const ports = getSelectableSerialPorts(portList);
-        const selectedPort = ports[0];
+        const selectedPort = selectPreferredSerialPort(ports, preferredSerialPortIds.get(webContents.id));
         webContents.send('serial:ports', {
             ports,
             selectedPortId: selectedPort ? selectedPort.portId : ''
@@ -733,6 +750,7 @@ app.whenReady().then(() => {
         editorViews.clear();
         editorWebContentsIds.clear();
         editorWebContentsTabIds.clear();
+        preferredSerialPortIds.clear();
     });
     layoutViews();
     showHome();

@@ -1,5 +1,7 @@
 # 2026-07-15 串口上传代码静态审查
 
+> 后续状态：2026-07-17 已取得产品测试结果，并按 MicroPython Raw REPL 实现 `main.py` 写入、设备端字节数校验和软复位。当前实现见 [串口硬件输出、控制台拖拽与 Raw REPL 上传执行记录](./2026-07-17-serial-output-and-console-resize-progress.md)。下文保留当时静态审查结论，用于追溯问题来源。
+
 > 审查类型：代码静态 Review
 > 当前决策：记录问题，暂不修改代码；取得目标产品、固件和上传协议后再进入实现与真机测试。
 > 关联总进度：[阶段 G：串口和上传代码](./project-progress-and-commercial-gap.md#阶段-g串口和上传代码)

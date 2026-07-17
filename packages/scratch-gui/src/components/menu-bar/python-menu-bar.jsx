@@ -8,6 +8,8 @@ import Box from '../box/box.jsx';
 import SettingsMenu from './settings-menu.jsx';
 import FileMenu from './file-menu.jsx';
 import intlShape from '../../lib/intlShape.js';
+import {startSerialOutputMonitor} from '../../lib/serial-output-monitor';
+import {restartMicroPython, uploadMicroPythonFile} from '../../lib/serial-repl-uploader';
 import {
     appendPythonConsole,
     setSerialBaudRate,
@@ -52,8 +54,13 @@ const messages = defineMessages({
     },
     serialUploaded: {
         id: 'gui.pythonCoding.serialUploaded',
-        defaultMessage: '[serial] Uploaded {bytes} bytes to {path}.',
-        description: 'Console message shown when serial upload succeeds'
+        defaultMessage: '[serial] Wrote and verified main.py ({bytes} bytes) on {path}.',
+        description: 'Console message shown after main.py is written and verified on the device'
+    },
+    serialUploading: {
+        id: 'gui.pythonCoding.serialUploading',
+        defaultMessage: '[serial] Uploading and verifying main.py...',
+        description: 'Console message shown while main.py is being uploaded to the device'
     },
     serialSelected: {
         id: 'gui.pythonCoding.serialSelected',
@@ -129,6 +136,7 @@ const PythonMenuBar = ({
     const webSerialApi = getWebSerialApi();
     const serialApiAvailable = Boolean(desktopSerialApi && webSerialApi);
     const serialPortRef = useRef(null);
+    const serialOutputMonitorRef = useRef(null);
     const serialPortPathRef = useRef(serialPortPath);
     const selectedPortLabelRef = useRef('');
 
@@ -211,24 +219,65 @@ const PythonMenuBar = ({
         serialPorts
     ]);
 
-    // 连接阶段再次调用 requestPort 是 Web Serial 的授权要求，当前实现还不是自动直连指定 COM。
+    // 连接阶段再次调用 requestPort 是 Web Serial 的授权要求；连接成功后持续把硬件输出写入控制台。
     const handleSerialConnect = useCallback(async () => {
         if (!serialApiAvailable) {
             onWriteConsoleLine(intl.formatMessage(messages.serialUnavailable));
             return;
         }
         onSetSerialBusy(true);
+        let selectedPort = null;
         try {
-            const selectedPort = await webSerialApi.requestPort();
+            // requestPort 触发主进程候选回调前，先同步用户在下拉框中选择的 portId。
+            await desktopSerialApi.select(serialPortPath);
+            selectedPort = await webSerialApi.requestPort();
             const selectedPortInfo = selectedPort.getInfo();
             await selectedPort.open({baudRate: serialBaudRate});
             serialPortRef.current = selectedPort;
+            const outputMonitor = startSerialOutputMonitor(selectedPort, {
+                onError: error => {
+                    const message = error && error.message ? error.message : String(error);
+                    writeSerialError(messages.serialFailed, {message});
+                },
+                onOutput: output => onWriteConsoleLine(output)
+            });
+            serialOutputMonitorRef.current = outputMonitor;
+            // 设备拔出或可读流结束时同步连接状态；主动断开会先清空 ref，避免重复提示。
+            outputMonitor.done.then(async () => {
+                if (serialOutputMonitorRef.current !== outputMonitor) return;
+                serialOutputMonitorRef.current = null;
+                const disconnectedPort = serialPortRef.current;
+                serialPortRef.current = null;
+                if (disconnectedPort) {
+                    try {
+                        await disconnectedPort.close();
+                    } catch {
+                        // 设备已拔出时端口通常已经关闭。
+                    }
+                }
+                onSetSerialConnected(false);
+                onWriteConsoleLine(intl.formatMessage(messages.serialDisconnected));
+            });
             onSetSerialConnected(true);
             onWriteConsoleLine(intl.formatMessage(messages.serialConnected, {
                 path: selectedPortLabelRef.current || serialPortPath || selectedPortInfo.usbVendorId || 'serial port',
                 baudRate: serialBaudRate
             }));
+            try {
+                await restartMicroPython(outputMonitor);
+            } catch (restartError) {
+                const message = restartError && restartError.message ? restartError.message : String(restartError);
+                writeSerialError(messages.serialFailed, {message});
+            }
         } catch (error_) {
+            serialPortRef.current = null;
+            if (selectedPort) {
+                try {
+                    await selectedPort.close();
+                } catch {
+                    // 授权或打开失败时端口可能尚未进入可关闭状态。
+                }
+            }
             const errorMessage = error_ && error_.message ? error_.message : String(error_);
             const message = selectedPortLabelRef.current ?
                 `${selectedPortLabelRef.current}: ${errorMessage}` :
@@ -245,25 +294,31 @@ const PythonMenuBar = ({
         serialBaudRate,
         serialPortPath,
         serialApiAvailable,
+        desktopSerialApi,
         webSerialApi,
         writeSerialError
     ]);
 
-    // 断开时关闭 Web Serial Port，并清掉当前连接引用。
+    // 断开时先取消读取并释放 reader 锁，再关闭 Web Serial Port。
     const handleSerialDisconnect = useCallback(async () => {
         onSetSerialBusy(true);
         try {
+            const outputMonitor = serialOutputMonitorRef.current;
+            serialOutputMonitorRef.current = null;
             const port = serialPortRef.current;
             serialPortRef.current = null;
+            if (outputMonitor) {
+                await outputMonitor.stop();
+            }
             if (port) {
                 await port.close();
             }
-            onSetSerialConnected(false);
             onWriteConsoleLine(intl.formatMessage(messages.serialDisconnected));
         } catch (error_) {
             const message = error_ && error_.message ? error_.message : String(error_);
             writeSerialError(messages.serialFailed, {message});
         } finally {
+            onSetSerialConnected(false);
             onSetSerialBusy(false);
         }
     }, [
@@ -274,23 +329,32 @@ const PythonMenuBar = ({
         writeSerialError
     ]);
 
-    // MVP 上传只是把生成的 Python 文本写入串口；后续硬件烧录协议需要在这里替换。
+    // 页面卸载时只释放串口资源，不再向已卸载组件写状态或控制台消息。
+    useEffect(() => () => {
+        const outputMonitor = serialOutputMonitorRef.current;
+        const port = serialPortRef.current;
+        serialOutputMonitorRef.current = null;
+        serialPortRef.current = null;
+        const stopPromise = outputMonitor ? outputMonitor.stop() : Promise.resolve();
+        stopPromise.then(() => {
+            if (port) return port.close();
+            return null;
+        }).catch(() => {});
+    }, []);
+
+    // AI 机甲产品使用 MicroPython Raw REPL 写入 main.py，设备端字节数校验通过后才报告成功。
     const handleSerialUpload = useCallback(async () => {
-        if (!serialPortRef.current) {
+        const outputMonitor = serialOutputMonitorRef.current;
+        if (!serialPortRef.current || !outputMonitor) {
             onWriteConsoleLine(intl.formatMessage(messages.serialUnavailable));
             return;
         }
         onSetSerialBusy(true);
+        onWriteConsoleLine(intl.formatMessage(messages.serialUploading));
         try {
-            const writer = serialPortRef.current.writable.getWriter();
-            const bytes = new TextEncoder().encode(`${pythonCode}\n`);
-            try {
-                await writer.write(bytes);
-            } finally {
-                writer.releaseLock();
-            }
+            const result = await uploadMicroPythonFile(outputMonitor, pythonCode);
             onWriteConsoleLine(intl.formatMessage(messages.serialUploaded, {
-                bytes: bytes.byteLength,
+                bytes: result.bytes,
                 path: selectedPortLabelRef.current || serialPortPath || 'serial port'
             }));
         } catch (error_) {
@@ -500,3 +564,7 @@ export default injectIntl(connect(
     mapStateToProps,
     mapDispatchToProps
 )(PythonMenuBar));
+
+export {
+    PythonMenuBar as PythonMenuBarComponent
+};

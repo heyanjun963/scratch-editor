@@ -59,6 +59,7 @@ contextBridge.exposeInMainWorld('scratchDesktopTerminal', {
 // 串口选择仍走浏览器 Web Serial，preload 只转发主进程过滤后的端口列表。
 contextBridge.exposeInMainWorld('scratchDesktopSerial', {
     isAvailable: () => ipcRenderer.invoke('serial:available'),
+    select: portId => ipcRenderer.invoke('serial:select', portId),
     onPorts: handler => {
         const listener = (_event, payload) => handler(payload);
         ipcRenderer.on('serial:ports', listener);

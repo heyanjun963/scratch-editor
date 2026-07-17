@@ -65,7 +65,7 @@
 }
 
 .console-header {
-    border-top: 1px solid $ui-black-transparent;
+    border-top: 0;
 }
 
 .code-area {
@@ -81,9 +81,45 @@
 }
 
 .code-area {
-    flex: 1 1 70%;
+    flex: 1 1 auto;
     min-height: 0;
     padding: 0.75rem;
     color: #222;
     background: #fff;
+}
+
+.console-pane {
+    display: flex;
+    flex: 0 0 35%;
+    flex-direction: column;
+    min-height: 7.5rem;
+    width: 100%;
+}
+
+.console-resize-handle {
+    position: relative;
+    flex: 0 0 0.375rem;
+    width: 100%;
+    cursor: row-resize;
+    touch-action: none;
+    background: $ui-tertiary;
+    border-top: 1px solid $ui-black-transparent;
+}
+
+.console-resize-handle::after {
+    content: "";
+    position: absolute;
+    top: 0.125rem;
+    left: 50%;
+    width: 2rem;
+    height: 0.125rem;
+    transform: translateX(-50%);
+    border-radius: 1px;
+    background: $text-primary-transparent;
+}
+
+.console-resize-handle:hover,
+.console-resize-handle:focus-visible {
+    outline: none;
+    background: #f78a2a;
 }

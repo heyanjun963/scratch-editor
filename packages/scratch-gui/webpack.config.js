@@ -23,7 +23,9 @@ const commonHtmlWebpackPluginOptions = {
 
 const cssModuleExceptions = [
     /\.raw\.css$/, // Allow for overriding CSS classes from libraries
-    /[\\/]driver\.js[\\/].*\.css$/ // driver.js CSS
+    /[\\/]driver\.js[\\/].*\.css$/, // driver.js CSS
+    // xterm 运行时生成固定类名，官方样式必须保持全局选择器才能正确计算 viewport 和 canvas。
+    /[\\/]@xterm[\\/]xterm[\\/]css[\\/]xterm\.css$/
 ];
 
 const baseConfig = new ScratchWebpackConfigBuilder(

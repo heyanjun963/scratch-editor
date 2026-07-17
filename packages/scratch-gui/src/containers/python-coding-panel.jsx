@@ -77,6 +77,21 @@ const getDesktopTabId = () => {
 
 const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 
+// Redux 历史达到上限后会从头部裁行，这里只提取裁剪后新增的尾部文本，避免重复写入 xterm。
+const getConsoleTextDelta = (previousText, currentText) => {
+    if (!previousText) return currentText;
+    let retainedText = previousText;
+    while (retainedText) {
+        if (currentText.startsWith(retainedText)) {
+            return currentText.slice(retainedText.length).replace(/^\n/, '');
+        }
+        const newlineIndex = retainedText.indexOf('\n');
+        if (newlineIndex === -1) break;
+        retainedText = retainedText.slice(newlineIndex + 1);
+    }
+    return currentText;
+};
+
 // 容器层负责连接 Redux、xterm 组件和 Electron IPC，展示层只负责布局。
 const PythonCodingPanel = props => {
     const {
@@ -135,12 +150,7 @@ const PythonCodingPanel = props => {
             consoleTextRef.current = '';
             return;
         }
-        if (!consoleText.startsWith(consoleTextRef.current)) {
-            consoleTextRef.current = consoleText;
-            writeTerminalLine(consoleText);
-            return;
-        }
-        const nextText = consoleText.slice(consoleTextRef.current.length).replace(/^\n/, '');
+        const nextText = getConsoleTextDelta(consoleTextRef.current, consoleText);
         consoleTextRef.current = consoleText;
         if (nextText) {
             writeTerminalLine(nextText);
@@ -374,3 +384,7 @@ export default injectIntl(connect(
     mapStateToProps,
     mapDispatchToProps
 )(PythonCodingPanel));
+
+export {
+    getConsoleTextDelta
+};
