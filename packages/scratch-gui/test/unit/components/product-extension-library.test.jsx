@@ -164,9 +164,17 @@ describe('ProductExtensionLibrary user extensions', () => {
         loadRemoteLibraryCatalog
             .mockResolvedValueOnce([])
             .mockResolvedValueOnce([remotePackage]);
+        const downloadedRemotePackage = {
+            ...remotePackage,
+            provider: 'gitee',
+            repository: 'wdadsd/scratch-product-extensions',
+            resolvedDownloadUrl: 'https://gitee.com/api/v5/repos/wdadsd/scratch-product-extensions/contents/' +
+                'dist/aimecanum-0.3.0.sbext?ref=main',
+            resolvedSourceType: 'gitee-contents'
+        };
         downloadRemoteLibraryPackage.mockResolvedValue({
             data: new Uint8Array([1, 2, 3]).buffer,
-            remotePackage
+            remotePackage: downloadedRemotePackage
         });
         readCustomExtensionPackageBuffer.mockResolvedValue(remoteManifest);
         loadedExtensionIds.clear();
@@ -179,6 +187,10 @@ describe('ProductExtensionLibrary user extensions', () => {
         expect(window.confirm).toHaveBeenCalled();
         expect(getLatestCachedRemotePackage(loadCachedRemotePackages(), 'aimecanum')).toMatchObject({
             version: '0.3.0',
+            provider: 'gitee',
+            repository: 'wdadsd/scratch-product-extensions',
+            resolvedDownloadUrl: downloadedRemotePackage.resolvedDownloadUrl,
+            resolvedSourceType: 'gitee-contents',
             manifest: {version: '0.3.0'}
         });
         expect(screen.getByText('0.3.0')).toBeTruthy();

@@ -31,6 +31,8 @@ const normalizeCachedRemotePackage = cachedPackage => {
         tag: String(cachedPackage.tag || ''),
         asset: String(cachedPackage.asset || ''),
         downloadUrl: String(cachedPackage.downloadUrl || ''),
+        resolvedDownloadUrl: String(cachedPackage.resolvedDownloadUrl || ''),
+        resolvedSourceType: String(cachedPackage.resolvedSourceType || ''),
         sha256,
         cachedAt: String(cachedPackage.cachedAt || ''),
         manifest

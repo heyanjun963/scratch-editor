@@ -632,13 +632,16 @@ const ProductExtensionLibraryComponent = ({
     const installRemoteUpdate = remotePackage => {
         setUpdatingPackageId(remotePackage.packageId);
         return downloadRemoteLibraryPackage(remotePackage)
-            .then(({data}) => readCustomExtensionPackageBuffer(data, remotePackage.asset))
-            .then(manifest => {
+            .then(({data, remotePackage: downloadedRemotePackage}) =>
+                readCustomExtensionPackageBuffer(data, remotePackage.asset)
+                    .then(manifest => ({manifest, downloadedRemotePackage})))
+            .then(({manifest, downloadedRemotePackage}) => {
                 if (manifest.id !== remotePackage.packageId || manifest.version !== remotePackage.version) {
                     throw new Error('拓展包内的产品 ID 或版本与 catalog 不一致');
                 }
                 const cachedPackage = {
-                    ...remotePackage,
+                    // 下载客户端已经解析出实际成功的 Gitee/GitHub 来源，缓存该来源便于离线追溯。
+                    ...(downloadedRemotePackage || remotePackage),
                     cachedAt: new Date().toISOString(),
                     manifest
                 };

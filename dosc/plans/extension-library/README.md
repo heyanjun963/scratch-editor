@@ -23,7 +23,9 @@
 | [17 产品配置总仓库与同步命令执行记录](./17-product-extension-repository-sync-progress.md) | 记录独立多产品配置仓库、源配置与 SBEXT 同步命令、catalog 增量更新、稳定 SHA256 和人工 Release 步骤 |
 | [18 GitHub 产品拓展自动更新执行记录](./18-github-remote-update-progress.md) | 记录公开 catalog、版本比较、SBEXT 下载、SHA256、离线缓存、CORS 双地址和浏览器更新验证 |
 | [19 产品积木发版流程与动态产品目录策略](./19-product-extension-release-and-catalog-strategy.md) | 整理当前产品积木发版、GitHub Release、客户端验收和回滚步骤，并确定云端新增产品与软件发版的职责边界 |
+| [20 Gitee 产品积木托管调研与接入方案](./20-gitee-product-extension-hosting-research.md) | 调研 Gitee Contents/Release API、浏览器跨域、双源回退和公开产品总仓库的发布方式，给出后续适配步骤 |
+| [21 Gitee 产品拓展自动更新执行记录](./21-gitee-remote-update-implementation-progress.md) | 记录 Gitee 真实 Release/API 验证、Contents Base64 解码、GitHub 回退、来源缓存和人工验收步骤 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。AI机甲麦轮车已使用标准源包维护，并可生成重新导入的 `.sbext`。本地包现已归入独立“用户拓展”分类，支持保留包的加载/卸载和彻底删除。GitHub 公开 catalog、版本比较、SBEXT 下载、SHA256 和离线缓存链路已经打通；下一步先补齐远端新增产品的动态合并和兼容检查，再推进项目版本锁定与真机产品验证。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。AI机甲麦轮车已使用标准源包维护，并可生成重新导入的 `.sbext`。本地包现已归入独立“用户拓展”分类，支持保留包的加载/卸载和彻底删除。桌面端现已支持 Gitee Contents 主源、GitHub Raw 备用源、SHA256 校验和离线缓存，并完成真实 Gitee Release/API 验证。下一步补齐远端新增产品动态合并、最低软件版本兼容检查和项目版本锁定。

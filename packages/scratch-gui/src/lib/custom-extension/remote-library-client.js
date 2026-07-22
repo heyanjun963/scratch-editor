@@ -1,9 +1,139 @@
 const DEFAULT_REMOTE_CATALOG_URL =
     'https://raw.githubusercontent.com/heyanjun963/scratch-product-extensions/main/catalog.json';
+const DEFAULT_GITEE_REPOSITORY = 'wdadsd/scratch-product-extensions';
+const DEFAULT_REMOTE_CATALOG_SOURCES = Object.freeze([{
+    type: 'gitee-contents',
+    provider: 'gitee',
+    repository: DEFAULT_GITEE_REPOSITORY,
+    ref: 'main',
+    path: 'catalog.json',
+    packagePathPrefix: 'dist'
+}, {
+    type: 'direct',
+    provider: 'github',
+    repository: 'heyanjun963/scratch-product-extensions',
+    url: DEFAULT_REMOTE_CATALOG_URL
+}]);
 
 const VERSION_PATTERN = /^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/i;
 const MAX_REMOTE_PACKAGE_SIZE = 10 * 1024 * 1024;
+const MAX_REMOTE_CATALOG_SIZE = 1024 * 1024;
+const GITEE_API_ROOT = 'https://gitee.com/api/v5';
+
+// 外部目录和包直链只允许 HTTPS，避免更新流程降级到明文传输。
+const validateHttpsUrl = (value, label) => {
+    let url;
+    try {
+        url = new URL(value);
+    } catch {
+        throw new Error(`${label}不合法`);
+    }
+    if (url.protocol !== 'https:') throw new Error(`${label}必须使用 HTTPS`);
+    return url.toString();
+};
+
+// Gitee Contents 路径逐段编码，保留斜杠目录结构，避免产品名或分支名破坏 API URL。
+const getGiteeContentsUrl = source => {
+    const repositoryParts = String(source.repository || '').split('/');
+    if (repositoryParts.length !== 2 || repositoryParts.some(part => !part || /\s/.test(part))) {
+        throw new Error('Gitee 仓库地址必须为 owner/repository');
+    }
+    const pathParts = String(source.path || '').split('/');
+    if (pathParts.some(part => !part || part === '.' || part === '..')) {
+        throw new Error('Gitee Contents 路径不合法');
+    }
+    const ref = String(source.ref || 'main').trim();
+    if (!ref) throw new Error('Gitee Contents 分支不能为空');
+    const repository = repositoryParts.map(encodeURIComponent).join('/');
+    const contentPath = pathParts.map(encodeURIComponent).join('/');
+    return `${GITEE_API_ROOT}/repos/${repository}/contents/${contentPath}?ref=${encodeURIComponent(ref)}`;
+};
+
+// 把 catalog 声明或默认配置统一为两种受支持的来源结构。
+const normalizeRemoteSource = source => {
+    if (!source || typeof source !== 'object') throw new Error('远程拓展来源不合法');
+    if (source.type === 'gitee-contents') {
+        const normalized = {
+            type: source.type,
+            provider: String(source.provider || 'gitee'),
+            repository: String(source.repository || ''),
+            ref: String(source.ref || 'main'),
+            path: String(source.path || ''),
+            packagePathPrefix: String(source.packagePathPrefix || 'dist')
+        };
+        getGiteeContentsUrl(normalized);
+        return normalized;
+    }
+    if (source.type === 'direct') {
+        return {
+            type: source.type,
+            provider: String(source.provider || 'direct'),
+            repository: String(source.repository || ''),
+            url: validateHttpsUrl(source.url, '远程拓展地址')
+        };
+    }
+    throw new Error(`不支持的远程拓展来源类型: ${source.type || '(empty)'}`);
+};
+
+// 日志只输出来源类型和公开地址，不包含响应内容或其他运行态数据。
+const describeRemoteSource = source => source.type === 'gitee-contents' ?
+    `${source.provider}:${source.repository}/${source.path}` :
+    `${source.provider}:${source.url}`;
+
+// Contents 的 Base64 文本按原始字节解码，SBEXT 不经过字符串编码转换。
+const decodeBase64 = content => {
+    let binary;
+    try {
+        binary = globalThis.atob(String(content || '').replace(/\s/g, ''));
+    } catch {
+        throw new Error('Gitee Contents Base64 内容不合法');
+    }
+    const data = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index++) data[index] = binary.charCodeAt(index);
+    return data.buffer;
+};
+
+// Gitee API 返回 JSON 包装的 Base64 文件，解码后再交给 catalog 或 SBEXT 的既有校验层。
+const loadGiteeContentsData = async (source, fetchImpl, maxDecodedSize) => {
+    const url = getGiteeContentsUrl(source);
+    const response = await fetchImpl(url, {cache: 'no-store'});
+    if (!response.ok) throw new Error(`Gitee Contents 请求失败: HTTP ${response.status}`);
+    const payload = await response.json();
+    if (!payload || payload.type !== 'file' || payload.encoding !== 'base64' || typeof payload.content !== 'string') {
+        throw new Error('Gitee Contents 响应格式不受支持');
+    }
+    const reportedSize = Number(payload.size);
+    const maxEncodedSize = Math.ceil(maxDecodedSize / 3) * 4 + 4096;
+    if (!Number.isSafeInteger(reportedSize) || reportedSize < 0) {
+        throw new Error('Gitee Contents 文件大小不合法');
+    }
+    if (reportedSize > maxDecodedSize || payload.content.length > maxEncodedSize) {
+        throw new Error(`远程文件大小超过 ${maxDecodedSize / 1024 / 1024} MiB 限制`);
+    }
+    const data = decodeBase64(payload.content);
+    if (data.byteLength > maxDecodedSize) {
+        throw new Error(`远程文件大小超过 ${maxDecodedSize / 1024 / 1024} MiB 限制`);
+    }
+    return {data, url};
+};
+
+// GitHub Raw 等二进制直链沿用下载前后两次体积检查。
+const loadDirectPackageData = async (source, fetchImpl) => {
+    const response = await fetchImpl(source.url, {cache: 'no-store'});
+    if (!response.ok) throw new Error(`拓展包下载失败: HTTP ${response.status}`);
+    const contentLength = response.headers && response.headers.get ?
+        Number(response.headers.get('content-length')) :
+        0;
+    if (contentLength > MAX_REMOTE_PACKAGE_SIZE) {
+        throw new Error(`拓展包大小超过 ${MAX_REMOTE_PACKAGE_SIZE / 1024 / 1024} MiB 限制`);
+    }
+    const data = await response.arrayBuffer();
+    if (data.byteLength > MAX_REMOTE_PACKAGE_SIZE) {
+        throw new Error(`拓展包大小超过 ${MAX_REMOTE_PACKAGE_SIZE / 1024 / 1024} MiB 限制`);
+    }
+    return {data, url: source.url};
+};
 
 // 产品包版本使用严格语义化版本，避免远程 tag 中的普通字符串产生错误升级判断。
 const parseVersion = version => {
@@ -46,24 +176,33 @@ const compareVersions = (leftVersion, rightVersion) => {
     return comparePrerelease(left.prerelease, right.prerelease);
 };
 
+// 兼容旧 downloadUrl，并把新 catalog 中的结构化来源归一化为有序列表。
+const getRemotePackageSources = remotePackage => {
+    const sources = Array.isArray(remotePackage.sources) ? remotePackage.sources.slice() : [];
+    if (remotePackage.downloadUrl && !sources.some(source => source.type === 'direct' &&
+        source.url === remotePackage.downloadUrl)) {
+        sources.push({
+            type: 'direct',
+            provider: remotePackage.provider || 'direct',
+            repository: remotePackage.repository || '',
+            url: remotePackage.downloadUrl
+        });
+    }
+    return sources.map(normalizeRemoteSource);
+};
+
+// catalog 属于外部输入，在下载前统一校验产品标识、版本、文件名、来源和哈希。
 const validateRemotePackage = remotePackage => {
     const packageId = String(remotePackage && remotePackage.packageId || '');
     if (!/^[a-z][a-z0-9_-]*$/.test(packageId)) {
         throw new Error(`远程产品 packageId 不合法: ${packageId || '(empty)'}`);
     }
     parseVersion(remotePackage.version);
-    if (!remotePackage.asset || !/\.sbext$/i.test(remotePackage.asset)) {
-        throw new Error(`远程产品缺少 SBEXT asset: ${packageId}`);
+    if (!/^[0-9A-Za-z][0-9A-Za-z._-]*\.sbext$/i.test(String(remotePackage.asset || ''))) {
+        throw new Error(`远程产品缺少或存在不合法的 SBEXT asset: ${packageId}`);
     }
-    let downloadUrl;
-    try {
-        downloadUrl = new URL(remotePackage.downloadUrl);
-    } catch {
-        throw new Error(`远程产品下载地址不合法: ${packageId}`);
-    }
-    if (downloadUrl.protocol !== 'https:') {
-        throw new Error(`远程产品下载地址必须使用 HTTPS: ${packageId}`);
-    }
+    const sources = getRemotePackageSources(remotePackage);
+    if (!sources.length) throw new Error(`远程产品缺少下载来源: ${packageId}`);
     if (!SHA256_PATTERN.test(String(remotePackage.sha256 || ''))) {
         throw new Error(`远程产品 SHA256 不合法: ${packageId}`);
     }
@@ -71,25 +210,71 @@ const validateRemotePackage = remotePackage => {
         ...remotePackage,
         packageId,
         version: String(remotePackage.version),
-        sha256: String(remotePackage.sha256).toLowerCase()
+        sha256: String(remotePackage.sha256).toLowerCase(),
+        sources
     };
 };
 
-// 只接收 published 条目；draft 包不会进入普通用户的版本检查结果。
-const loadRemoteLibraryCatalog = async ({
-    catalogUrl = DEFAULT_REMOTE_CATALOG_URL,
-    fetchImpl = globalThis.fetch
-} = {}) => {
-    if (typeof fetchImpl !== 'function') throw new Error('当前环境不支持网络请求');
-    const response = await fetchImpl(catalogUrl, {cache: 'no-store'});
-    if (!response.ok) throw new Error(`远程拓展目录请求失败: HTTP ${response.status}`);
-    const catalog = await response.json();
-    if (!catalog || catalog.formatVersion !== 1 || !Array.isArray(catalog.packages)) {
-        throw new Error('远程拓展目录格式不受支持');
+// 从 Gitee 读取 catalog 时，同仓库 dist 文件作为第一包源，原 downloadUrl 保留为备用。
+const addCatalogSourceToPackage = (remotePackage, catalogSource) => {
+    if (catalogSource.type !== 'gitee-contents') return remotePackage;
+    const pathPrefix = catalogSource.packagePathPrefix.replace(/^\/+|\/+$/g, '');
+    return {
+        ...remotePackage,
+        sources: [{
+            type: 'gitee-contents',
+            provider: catalogSource.provider,
+            repository: catalogSource.repository,
+            ref: catalogSource.ref,
+            path: `${pathPrefix}/${remotePackage.asset}`
+        }, ...(Array.isArray(remotePackage.sources) ? remotePackage.sources : [])]
+    };
+};
+
+// 不同来源最终都转换为普通 catalog 对象，后续发布状态和字段校验保持一致。
+const loadCatalogFromSource = async (source, fetchImpl) => {
+    if (source.type === 'gitee-contents') {
+        const {data} = await loadGiteeContentsData(source, fetchImpl, MAX_REMOTE_CATALOG_SIZE);
+        try {
+            return JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(data));
+        } catch {
+            throw new Error('Gitee 远程拓展目录 JSON 不合法');
+        }
     }
-    return catalog.packages
-        .filter(remotePackage => remotePackage.status === 'published')
-        .map(validateRemotePackage);
+    const response = await fetchImpl(source.url, {cache: 'no-store'});
+    if (!response.ok) throw new Error(`远程拓展目录请求失败: HTTP ${response.status}`);
+    return response.json();
+};
+
+// 只接收 published 条目；draft 包不会进入普通用户的版本检查结果。
+const loadRemoteLibraryCatalog = async (options = {}) => {
+    const fetchImpl = options.fetchImpl || globalThis.fetch;
+    if (typeof fetchImpl !== 'function') throw new Error('当前环境不支持网络请求');
+    const catalogSources = options.catalogSources || (options.catalogUrl ? [{
+        type: 'direct',
+        provider: 'direct',
+        url: options.catalogUrl
+    }] : DEFAULT_REMOTE_CATALOG_SOURCES);
+    const failures = [];
+    for (let index = 0; index < catalogSources.length; index++) {
+        const source = normalizeRemoteSource(catalogSources[index]);
+        try {
+            const catalog = await loadCatalogFromSource(source, fetchImpl);
+            if (!catalog || catalog.formatVersion !== 1 || !Array.isArray(catalog.packages)) {
+                throw new Error('远程拓展目录格式不受支持');
+            }
+            return catalog.packages
+                .filter(remotePackage => remotePackage.status === 'published')
+                .map(remotePackage => validateRemotePackage(addCatalogSourceToPackage(remotePackage, source)));
+        } catch (error) {
+            failures.push(`${describeRemoteSource(source)}: ${error.message}`);
+            if (index < catalogSources.length - 1) {
+                console.warn(`[remote-library-client] loadRemoteLibraryCatalog 来源失败，尝试备用源: ${
+                    describeRemoteSource(source)}`, error);
+            }
+        }
+    }
+    throw new Error(`远程拓展目录所有来源均失败: ${failures.join('; ')}`);
 };
 
 const calculateSha256 = async data => {
@@ -101,37 +286,48 @@ const calculateSha256 = async data => {
         .join('');
 };
 
-// Release 资产只有在字节哈希匹配 catalog 后才交给 package-reader 解析。
+// 远程包只有在字节哈希匹配 catalog 后才交给 package-reader 解析。
 const downloadRemoteLibraryPackage = async (remotePackage, {
     fetchImpl = globalThis.fetch,
     sha256Impl = calculateSha256
 } = {}) => {
     const normalizedPackage = validateRemotePackage(remotePackage);
     if (typeof fetchImpl !== 'function') throw new Error('当前环境不支持网络请求');
-    const response = await fetchImpl(normalizedPackage.downloadUrl, {cache: 'no-store'});
-    if (!response.ok) throw new Error(`拓展包下载失败: HTTP ${response.status}`);
-    const contentLength = response.headers && response.headers.get ?
-        Number(response.headers.get('content-length')) :
-        0;
-    if (contentLength > MAX_REMOTE_PACKAGE_SIZE) {
-        throw new Error(`拓展包大小超过 ${MAX_REMOTE_PACKAGE_SIZE / 1024 / 1024} MiB 限制`);
+    const failures = [];
+    for (let index = 0; index < normalizedPackage.sources.length; index++) {
+        const source = normalizedPackage.sources[index];
+        try {
+            const {data, url} = source.type === 'gitee-contents' ?
+                await loadGiteeContentsData(source, fetchImpl, MAX_REMOTE_PACKAGE_SIZE) :
+                await loadDirectPackageData(source, fetchImpl);
+            const actualSha256 = await sha256Impl(data);
+            if (actualSha256.toLowerCase() !== normalizedPackage.sha256) {
+                throw new Error(`拓展包 SHA256 校验失败: ${normalizedPackage.packageId}`);
+            }
+            return {
+                data,
+                remotePackage: {
+                    ...normalizedPackage,
+                    provider: source.provider,
+                    repository: source.repository,
+                    resolvedDownloadUrl: url,
+                    resolvedSourceType: source.type
+                }
+            };
+        } catch (error) {
+            failures.push(`${describeRemoteSource(source)}: ${error.message}`);
+            if (index < normalizedPackage.sources.length - 1) {
+                console.warn(`[remote-library-client] downloadRemoteLibraryPackage 来源失败，尝试备用源: ${
+                    describeRemoteSource(source)}`, error);
+            }
+        }
     }
-    const data = await response.arrayBuffer();
-    if (data.byteLength > MAX_REMOTE_PACKAGE_SIZE) {
-        throw new Error(`拓展包大小超过 ${MAX_REMOTE_PACKAGE_SIZE / 1024 / 1024} MiB 限制`);
-    }
-    const actualSha256 = await sha256Impl(data);
-    if (actualSha256.toLowerCase() !== normalizedPackage.sha256) {
-        throw new Error(`拓展包 SHA256 校验失败: ${normalizedPackage.packageId}`);
-    }
-    return {
-        data,
-        remotePackage: normalizedPackage
-    };
+    throw new Error(`拓展包所有下载来源均失败: ${normalizedPackage.packageId}; ${failures.join('; ')}`);
 };
 
 export {
     DEFAULT_REMOTE_CATALOG_URL,
+    DEFAULT_REMOTE_CATALOG_SOURCES,
     MAX_REMOTE_PACKAGE_SIZE,
     compareVersions,
     downloadRemoteLibraryPackage,
