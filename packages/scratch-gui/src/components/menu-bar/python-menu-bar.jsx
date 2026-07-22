@@ -74,6 +74,7 @@ const messages = defineMessages({
     },
 });
 
+// 获取 preload 暴露的串口 IPC；普通浏览器环境没有该能力时返回 null。
 const getDesktopSerialApi = () => {
     if (typeof window === 'undefined') return null;
     return window.scratchDesktopSerial || null;
@@ -85,8 +86,10 @@ const getWebSerialApi = () => {
     return navigator.serial || null;
 };
 
+// 统一生成串口在下拉框和控制台日志中使用的可读名称。
 const portLabel = port => port.label || port.portName || port.displayName || port.path || '';
 
+// 候选列表刷新后优先保留用户原选择，否则选择第一项作为默认值。
 const pickPreferredPort = (ports, selectedPath) => {
     if (selectedPath) {
         const selected = ports.find(port => port.path === selectedPath);
@@ -95,6 +98,7 @@ const pickPreferredPort = (ports, selectedPath) => {
     return ports[0] || null;
 };
 
+// 使用 ANSI 红色包装串口错误，使其在 xterm 中与普通硬件日志区分。
 const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 
 // Python 模式专用头部菜单：只保留设置、文件和串口相关操作。
@@ -148,6 +152,7 @@ const PythonMenuBar = ({
         onWriteConsoleLine
     ]);
 
+    // 保持串口选择 ref 为最新值，异步候选回调不会读取到旧的 React props。
     useEffect(() => {
         serialPortPathRef.current = serialPortPath;
     }, [serialPortPath]);
@@ -235,10 +240,12 @@ const PythonMenuBar = ({
             await selectedPort.open({baudRate: serialBaudRate});
             serialPortRef.current = selectedPort;
             const outputMonitor = startSerialOutputMonitor(selectedPort, {
+                // reader 异常统一转成控制台红色错误信息。
                 onError: error => {
                     const message = error && error.message ? error.message : String(error);
                     writeSerialError(messages.serialFailed, {message});
                 },
+                // 普通硬件输出追加到 Redux 轻量历史，再由 Python 控制台增量显示。
                 onOutput: output => onWriteConsoleLine(output)
             });
             serialOutputMonitorRef.current = outputMonitor;
@@ -542,6 +549,7 @@ PythonMenuBar.defaultProps = {
     serialPorts: []
 };
 
+// 从 Redux 读取串口选择、忙碌状态和当前生成的 Python 代码。
 const mapStateToProps = state => ({
     pythonCode: state.scratchGui.pythonCoding.code,
     serialBaudRate: state.scratchGui.pythonCoding.serialBaudRate,
@@ -551,6 +559,7 @@ const mapStateToProps = state => ({
     serialPorts: state.scratchGui.pythonCoding.serialPorts
 });
 
+// 把菜单操作转换成 Python 编码模式的 Redux 状态更新。
 const mapDispatchToProps = dispatch => ({
     onSetSerialBaudRate: baudRate => dispatch(setSerialBaudRate(baudRate)),
     onSetSerialBusy: busy => dispatch(setSerialBusy(busy)),

@@ -11,11 +11,13 @@ const MIN_CONSOLE_HEIGHT = 120;
 const MIN_EDITOR_HEIGHT = 160;
 const KEYBOARD_RESIZE_STEP = 16;
 
+// 把控制台高度限制在控制台最小高度与代码区最小高度共同允许的范围内。
 const clampConsoleHeight = (panelRect, requestedHeight) => Math.min(
     Math.max(requestedHeight, MIN_CONSOLE_HEIGHT),
     Math.max(MIN_CONSOLE_HEIGHT, panelRect.height - MIN_EDITOR_HEIGHT)
 );
 
+// 展示 Python 代码、运行状态和可调节高度的 xterm 控制台。
 const PythonCodingPanel = ({
     code,
     desktopApiAvailable,
@@ -35,12 +37,14 @@ const PythonCodingPanel = ({
     const removeDragListenersRef = useRef(null);
     const [consoleHeight, setConsoleHeight] = useState(null);
 
+    // 根据鼠标在面板中的纵向位置换算控制台高度，并应用上下限。
     const resizeConsoleAt = useCallback(clientY => {
         if (!panelRef.current) return;
         const panelRect = panelRef.current.getBoundingClientRect();
         setConsoleHeight(clampConsoleHeight(panelRect, panelRect.bottom - clientY));
     }, []);
 
+    // 结束拖拽并移除 document 级监听，防止切换页面后残留事件。
     const stopDragging = useCallback(() => {
         if (removeDragListenersRef.current) {
             removeDragListenersRef.current();
@@ -48,6 +52,7 @@ const PythonCodingPanel = ({
         }
     }, []);
 
+    // 开始拖拽后在 document 上跟踪鼠标，确保指针移出分隔条仍能连续调整。
     const handleResizeMouseDown = useCallback(event => {
         event.preventDefault();
         stopDragging();
@@ -65,6 +70,7 @@ const PythonCodingPanel = ({
         stopDragging
     ]);
 
+    // 分隔条获得焦点时支持方向键按固定步长调整控制台高度。
     const handleResizeKeyDown = useCallback(event => {
         if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
         if (!panelRef.current) return;
@@ -75,6 +81,7 @@ const PythonCodingPanel = ({
         setConsoleHeight(clampConsoleHeight(panelRect, currentHeight + delta));
     }, [consoleHeight]);
 
+    // 组件卸载时终止可能仍在进行的拖拽，清理 document 监听。
     useEffect(() => stopDragging, [stopDragging]);
 
     const consolePaneStyle = consoleHeight === null ? undefined : {

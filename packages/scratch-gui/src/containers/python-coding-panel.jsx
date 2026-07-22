@@ -75,6 +75,7 @@ const getDesktopTabId = () => {
     return params.get('desktopTabId');
 };
 
+// 使用 ANSI 红色包装本地 Python 错误输出。
 const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 
 // Redux 历史达到上限后会从头部裁行，这里只提取裁剪后新增的尾部文本，避免重复写入 xterm。
@@ -128,6 +129,7 @@ const PythonCodingPanel = props => {
         }
     }, []);
 
+    // 向 xterm 写入一条完整消息并换行，供状态提示和 Redux 轻量历史使用。
     const writeTerminalLine = useCallback(text => {
         if (terminalRef.current) {
             terminalRef.current.writeln(text);
@@ -363,6 +365,7 @@ PythonCodingPanel.propTypes = {
     scriptPath: PropTypes.string
 };
 
+// 从 Redux 读取生成代码、轻量控制台历史和本地 Python 运行状态。
 const mapStateToProps = state => ({
     code: state.scratchGui.pythonCoding.code,
     consoleText: state.scratchGui.pythonCoding.consoleText,
@@ -372,6 +375,7 @@ const mapStateToProps = state => ({
     scriptPath: state.scratchGui.pythonCoding.scriptPath
 });
 
+// 把控制台与运行结果操作转换成 Redux 状态更新。
 const mapDispatchToProps = dispatch => ({
     onClearConsole: () => dispatch(clearPythonConsole()),
     onSetError: error => dispatch(setPythonError(error)),

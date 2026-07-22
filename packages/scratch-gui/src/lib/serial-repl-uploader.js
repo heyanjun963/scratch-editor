@@ -4,10 +4,14 @@ const CONTROL_D = new Uint8Array([0x04]);
 const OK_RESPONSE = 'OK';
 const DEFAULT_CHUNK_SIZE = 256;
 
+// 提供上传状态切换所需的异步短延时。
 const sleep = delay => new Promise(resolve => setTimeout(resolve, delay));
+// 把 JavaScript 字符串编码为串口发送的 UTF-8 字节。
 const encode = text => new TextEncoder().encode(text);
+// 把设备返回的 UTF-8 字节解码为可读文本。
 const decode = bytes => new TextDecoder().decode(bytes);
 
+// 把任意文件字节转换成安全的 Python bytes 字面量，避免中文和控制字符破坏命令。
 const bytesToPythonLiteral = bytes => {
     let result = "b'";
     bytes.forEach(byte => {
@@ -30,12 +34,15 @@ const bytesToPythonLiteral = bytes => {
     return `${result}'`;
 };
 
+// 转义目标文件名，生成可直接放入 Python 命令的字符串字面量。
 const pythonStringLiteral = value => `'${String(value)
     .replace(/\\/g, '\\\\')
     .replace(/'/g, "\\'")}'`;
 
+// readUntil 返回值包含结束控制字节，业务读取 stdout/stderr 时去掉该末尾标记。
 const withoutLastByte = bytes => bytes.slice(0, Math.max(bytes.byteLength - 1, 0));
 
+// 在 Raw REPL 中执行一条命令，依次校验 OK、stdout、stderr 和下一次命令提示符。
 const rawExec = async (protocol, command, timeout = 10000) => {
     await protocol.write(encode(command));
     await protocol.write(CONTROL_D);
@@ -52,6 +59,7 @@ const rawExec = async (protocol, command, timeout = 10000) => {
     return decode(stdout);
 };
 
+// 清理设备可能遗留的 REPL 状态并进入可接收上传命令的 Raw REPL。
 const enterRawRepl = async protocol => {
     // 上一次失败可能遗留在 Raw REPL，先退出；部分固件不稳定返回 >>>，因此不把它作为前置条件。
     await protocol.discardInput(20);
@@ -71,6 +79,7 @@ const enterRawRepl = async protocol => {
     }
 };
 
+// 通过 Raw REPL 分块写入目标文件，并以设备端文件大小作为成功返回前的校验条件。
 const uploadMicroPythonFile = async (session, code, {
     chunkSize = DEFAULT_CHUNK_SIZE,
     fileName = 'main.py',
@@ -83,6 +92,7 @@ const uploadMicroPythonFile = async (session, code, {
     if (!fileData.byteLength) throw new Error('没有可上传的 Python 代码');
     const fileLiteral = pythonStringLiteral(fileName);
 
+    // 上传期间独占普通日志 reader，避免协议响应被控制台提前消费。
     const result = await session.runProtocol(async protocol => {
         let rawReplEntered = false;
         try {
@@ -123,6 +133,7 @@ const uploadMicroPythonFile = async (session, code, {
     return result;
 };
 
+// 把设备切回友好 REPL 后执行软复位，使 boot.py/main.py 重新运行并输出启动日志。
 const restartMicroPython = async (session, {delayMs = 100} = {}) => {
     if (!session || typeof session.write !== 'function') return;
     await session.write(encode('\r\x02'));

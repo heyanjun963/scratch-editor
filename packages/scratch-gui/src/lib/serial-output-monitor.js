@@ -1,6 +1,7 @@
 // 串口输出监视器负责把 Web Serial 字节流拼成文本行，并批量交给 Python 控制台。
 const DEFAULT_FLUSH_DELAY = 20;
 
+// 合并连续到达的串口字节块，供协议读取器按统一缓冲区消费。
 const concatBytes = (left, right) => {
     const result = new Uint8Array(left.byteLength + right.byteLength);
     result.set(left, 0);
@@ -8,6 +9,7 @@ const concatBytes = (left, right) => {
     return result;
 };
 
+// 在字节缓冲区中查找协议结束标记，支持标记跨串口数据块出现。
 const findBytes = (buffer, search) => {
     for (let offset = 0; offset <= buffer.byteLength - search.byteLength; offset++) {
         let matches = true;
@@ -22,6 +24,7 @@ const findBytes = (buffer, search) => {
     return -1;
 };
 
+// 启动唯一串口 reader，并在普通日志模式与独占协议模式之间分发收到的字节。
 const startSerialOutputMonitor = (port, {
     flushDelay = DEFAULT_FLUSH_DELAY,
     onError = () => {},
@@ -45,6 +48,7 @@ const startSerialOutputMonitor = (port, {
     let protocolWaiters = [];
     let streamFailure = null;
 
+    // 把已完成的多行日志合并后交给界面，减少高频串口输出触发的渲染次数。
     const flushLines = () => {
         if (flushTimer) {
             clearTimeout(flushTimer);
@@ -56,23 +60,27 @@ const startSerialOutputMonitor = (port, {
         onOutput(output);
     };
 
+    // 延迟一个很短的窗口批量刷新日志，同一窗口内只创建一个定时器。
     const scheduleFlush = () => {
         if (flushTimer) return;
         flushTimer = setTimeout(flushLines, flushDelay);
     };
 
+    // 串口流失败时立即拒绝所有正在等待协议数据的操作。
     const rejectProtocolWaiters = error => {
         const waiters = protocolWaiters;
         protocolWaiters = [];
         waiters.forEach(waiter => waiter.reject(error));
     };
 
+    // 新字节到达后唤醒协议读取操作，由读取操作重新检查缓冲区是否满足条件。
     const notifyProtocolWaiters = () => {
         const waiters = protocolWaiters;
         protocolWaiters = [];
         waiters.forEach(waiter => waiter.resolve());
     };
 
+    // 等待下一批协议字节，并在超时或串口流失败时返回明确错误。
     const waitForProtocolData = (timeout, description) => new Promise((resolve, reject) => {
         if (streamFailure) {
             reject(streamFailure);
@@ -96,6 +104,7 @@ const startSerialOutputMonitor = (port, {
         protocolWaiters.push(waiter);
     });
 
+    // 把字符串、ArrayBuffer 和 TypedArray 统一转换成 Uint8Array。
     const toBytes = value => {
         if (ArrayBuffer.isView(value)) {
             return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
@@ -104,12 +113,14 @@ const startSerialOutputMonitor = (port, {
         return new TextEncoder().encode(String(value));
     };
 
+    // 从协议缓冲区头部取出指定字节，并保留尚未消费的后续响应。
     const consumeProtocolBytes = byteCount => {
         const result = protocolBuffer.slice(0, byteCount);
         protocolBuffer = protocolBuffer.slice(byteCount);
         return result;
     };
 
+    // 等待并读取固定数量的协议字节，例如 Raw REPL 的两字节 OK 响应。
     const readProtocolBytes = async (byteCount, timeout = 5000) => {
         while (protocolBuffer.byteLength < byteCount) {
             await waitForProtocolData(timeout, `${byteCount}字节`);
@@ -117,6 +128,7 @@ const startSerialOutputMonitor = (port, {
         return consumeProtocolBytes(byteCount);
     };
 
+    // 持续读取到指定结束标记，返回内容包含结束标记本身。
     const readProtocolUntil = async (ending, timeout = 5000) => {
         const endingBytes = toBytes(ending);
         while (true) {
@@ -128,6 +140,7 @@ const startSerialOutputMonitor = (port, {
         }
     };
 
+    // 获取短生命周期 writer 写入串口，并保证每次写入后释放 writer lock。
     const write = async data => {
         if (!port.writable || typeof port.writable.getWriter !== 'function') {
             throw new Error('串口没有可写入的数据流');
@@ -140,8 +153,10 @@ const startSerialOutputMonitor = (port, {
         }
     };
 
+    // 为设备状态切换提供可等待的短延时，避免连续控制字符被固件漏处理。
     const sleep = delay => new Promise(resolve => setTimeout(resolve, delay));
 
+    // 进入上传协议前刷新普通日志的解码器、完整行和残留半行。
     const flushNormalOutput = () => {
         consumeText(decoder.decode());
         decoder = new TextDecoder();
@@ -166,6 +181,7 @@ const startSerialOutputMonitor = (port, {
         if (pendingLines.length) scheduleFlush();
     };
 
+    // 持续占用唯一 reader 读取设备数据；结束时统一释放 reader lock 和残留日志。
     const done = (async () => {
         try {
             activeReader = port.readable.getReader();
@@ -214,6 +230,7 @@ const startSerialOutputMonitor = (port, {
             protocolMode = true;
             try {
                 return await callback({
+                    // 丢弃状态切换期间的旧响应，确保下一步只匹配新命令返回的数据。
                     discardInput: async (delay = 0) => {
                         protocolBuffer = new Uint8Array(0);
                         if (delay > 0) await sleep(delay);
@@ -230,6 +247,7 @@ const startSerialOutputMonitor = (port, {
                 decoder = new TextDecoder();
             }
         },
+        // 主动断开时先取消读取并等待 reader 完整退出，调用方随后才能安全关闭 port。
         stop: async () => {
             stopped = true;
             if (activeReader) {
