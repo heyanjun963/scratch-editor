@@ -1,6 +1,9 @@
 import aimecanumBlocks from '../builtin-product-packages/aimecanum/blocks.json';
 import aimecanumGenerator from '../builtin-product-packages/aimecanum/generator/python.json';
 import aimecanumManifest from '../builtin-product-packages/aimecanum/manifest.json';
+import aidoggyBlocks from '../builtin-product-packages/aidoggy/blocks.json';
+import aidoggyGenerator from '../builtin-product-packages/aidoggy/generator/python.json';
+import aidoggyManifest from '../builtin-product-packages/aidoggy/manifest.json';
 import minihexaBlocks from '../builtin-product-packages/minihexa/blocks.json';
 import minihexaGenerator from '../builtin-product-packages/minihexa/generator/python.json';
 import minihexaManifest from '../builtin-product-packages/minihexa/manifest.json';
@@ -22,9 +25,18 @@ const minihexa = createPackageManifest({
     packageFileName: 'minihexa.sbext'
 });
 
+// AiDoggy 默认包从旧 VM 与旧 Python 生成器提取，供离线内置和后续远程更新共同使用。
+const aidoggy = createPackageManifest({
+    rawManifest: aidoggyManifest,
+    rawBlocks: aidoggyBlocks,
+    rawGenerator: aidoggyGenerator,
+    packageFileName: 'aidoggy.sbext'
+});
+
 const builtinProductManifests = {
     aimecanum,
-    minihexa
+    minihexa,
+    aidoggy
 };
 
 export {

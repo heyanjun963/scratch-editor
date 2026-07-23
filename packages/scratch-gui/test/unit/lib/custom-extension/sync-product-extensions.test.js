@@ -16,6 +16,10 @@ describe('product extension repository sync', () => {
         editorRoot,
         'packages/scratch-gui/src/lib/custom-extension/builtin-product-packages/minihexa/manifest.json'
     ), 'utf8'));
+    const aiDoggyManifest = JSON.parse(fs.readFileSync(path.join(
+        editorRoot,
+        'packages/scratch-gui/src/lib/custom-extension/builtin-product-packages/aidoggy/manifest.json'
+    ), 'utf8'));
     let targetDirectory;
 
     beforeEach(() => {
@@ -53,7 +57,9 @@ describe('product extension repository sync', () => {
 
         expect(fs.existsSync(path.join(targetDirectory, 'products', productManifest.id, 'blocks.json'))).toBe(true);
         expect(fs.existsSync(path.join(targetDirectory, 'products', miniHexaManifest.id, 'blocks.json'))).toBe(true);
+        expect(fs.existsSync(path.join(targetDirectory, 'products', aiDoggyManifest.id))).toBe(false);
         expect(catalog.packages.find(entry => entry.packageId === 'remote-only-product')).toBeTruthy();
+        expect(catalog.packages.find(entry => entry.packageId === aiDoggyManifest.id)).toBeUndefined();
         expect(catalog.packages.find(entry => entry.packageId === miniHexaManifest.id)).toMatchObject({
             version: miniHexaManifest.version,
             tag: `${miniHexaManifest.id}-v${miniHexaManifest.version}`,

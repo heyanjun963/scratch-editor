@@ -1,0 +1,138 @@
+{
+  "formatVersion": 2,
+  "id": "aidoggy",
+  "name": "AiDoggy",
+  "version": "0.1.0",
+  "publish": false,
+  "description": "AiDoggy 四足机器狗积木拓展包。",
+  "color1": "#4682b4",
+  "color2": "#4682b4",
+  "color3": "#4682b4",
+  "target": "python",
+  "source": "python",
+  "entry": {
+    "blocks": "blocks.json",
+    "python": "generator/python.json"
+  },
+  "runtime": {
+    "pythonLibraries": []
+  },
+  "menus": {
+    "action_name": {
+      "items": [
+        {"text": "坐下", "value": "sit_preset"},
+        {"text": "站立", "value": "stand_preset"},
+        {"text": "趴下", "value": "lieDown_preset"},
+        {"text": "下蹲", "value": "squat_preset"},
+        {"text": "伸展", "value": "stretch_preset"},
+        {"text": "握手", "value": "handshake_preset"},
+        {"text": "挥手", "value": "waveHand_preset"},
+        {"text": "抬腿", "value": "pee_preset"},
+        {"text": "摇摆", "value": "sway_preset"},
+        {"text": "波浪运动", "value": "waveMotion_preset"},
+        {"text": "三轴姿态演示", "value": "3axis_preset"},
+        {"text": "俯仰轴动作", "value": "action_pitch_preset"},
+        {"text": "横滚轴动作", "value": "action_roll_preset"},
+        {"text": "偏航轴动作", "value": "action_yaw_preset"}
+      ]
+    },
+    "blocking": {
+      "items": [
+        {"text": "等待运行完毕", "value": "True"},
+        {"text": "不等待", "value": "False"}
+      ]
+    },
+    "oriention_turn": {
+      "items": [
+        {"text": "原地左转", "value": "1"},
+        {"text": "原地右转", "value": "-1"}
+      ]
+    },
+    "orientation": {
+      "items": [
+        {"text": "↑", "value": "0"},
+        {"text": "↓", "value": "180"},
+        {"text": "←", "value": "90"},
+        {"text": "→", "value": "-90"},
+        {"text": "↖", "value": "45"},
+        {"text": "↗", "value": "-45"},
+        {"text": "↙", "value": "75"},
+        {"text": "↘", "value": "-75"}
+      ]
+    },
+    "gait": {
+      "items": [
+        {"text": "对角小跑", "value": "0"},
+        {"text": "爬行", "value": "1"},
+        {"text": "跳跃", "value": "2"},
+        {"text": "侧向", "value": "3"},
+        {"text": "混合", "value": "4"}
+      ]
+    },
+    "tones": {
+      "items": [
+        {"text": "C2", "value": "65"},
+        {"text": "D2", "value": "73"},
+        {"text": "E2", "value": "82"},
+        {"text": "F2", "value": "87"},
+        {"text": "G2", "value": "98"},
+        {"text": "A2", "value": "110"},
+        {"text": "B2", "value": "123"},
+        {"text": "C3", "value": "131"},
+        {"text": "D3", "value": "147"},
+        {"text": "E3", "value": "165"},
+        {"text": "F3", "value": "175"},
+        {"text": "G3", "value": "196"},
+        {"text": "A3", "value": "220"},
+        {"text": "B3", "value": "247"},
+        {"text": "C4", "value": "262"},
+        {"text": "D4", "value": "294"},
+        {"text": "E4", "value": "330"},
+        {"text": "F4", "value": "349"},
+        {"text": "G4", "value": "392"},
+        {"text": "A4", "value": "440"},
+        {"text": "B4", "value": "494"},
+        {"text": "C5", "value": "523"},
+        {"text": "D5", "value": "587"},
+        {"text": "E5", "value": "659"},
+        {"text": "F5", "value": "698"},
+        {"text": "G5", "value": "784"},
+        {"text": "A5", "value": "880"},
+        {"text": "B5", "value": "988"},
+        {"text": "C6", "value": "1047"},
+        {"text": "D6", "value": "1175"},
+        {"text": "E6", "value": "1319"},
+        {"text": "F6", "value": "1397"},
+        {"text": "G6", "value": "1568"},
+        {"text": "A6", "value": "1760"},
+        {"text": "B6", "value": "1976"},
+        {"text": "C7", "value": "2093"},
+        {"text": "D7", "value": "2349"},
+        {"text": "E7", "value": "2637"},
+        {"text": "F7", "value": "2794"},
+        {"text": "G7", "value": "3136"},
+        {"text": "A7", "value": "3520"},
+        {"text": "B7", "value": "3951"},
+        {"text": "C8", "value": "4186"},
+        {"text": "D8", "value": "4699"}
+      ]
+    },
+    "rhythms": {
+      "items": [
+        {"text": "二分之一", "value": "500"},
+        {"text": "四分之一", "value": "250"},
+        {"text": "八分之一", "value": "125"},
+        {"text": "一拍", "value": "1000"},
+        {"text": "两拍", "value": "2000"},
+        {"text": "长音", "value": "5000"},
+        {"text": "连续", "value": "0"}
+      ]
+    },
+    "on_off": {
+      "items": [
+        {"text": "开启", "value": "True"},
+        {"text": "关闭", "value": "False"}
+      ]
+    }
+  }
+}

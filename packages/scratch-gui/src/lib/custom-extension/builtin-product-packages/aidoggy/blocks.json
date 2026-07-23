@@ -1,0 +1,189 @@
+{
+  "categories": [
+    {
+      "id": "entry",
+      "name": "",
+      "hideLabel": true,
+      "blocks": ["start_thread", "start_run_thread"]
+    },
+    {
+      "id": "board_resource",
+      "name": "板载资源",
+      "hideLabel": false,
+      "blocks": [
+        "buzzer_tone_set",
+        "buzzer_tone_set_arg",
+        "get_battery_level",
+        "set_low_battery_alarm"
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出打印",
+      "hideLabel": false,
+      "blocks": ["print_str", "print_number"]
+    },
+    {
+      "id": "motion",
+      "name": "运动控制",
+      "hideLabel": false,
+      "blocks": ["set_pose", "set_move", "set_move_xyz", "set_turn", "set_gait", "set_stop"]
+    },
+    {
+      "id": "action_group",
+      "name": "动作组控制",
+      "hideLabel": false,
+      "blocks": ["run_action", "run_action_name", "stop_action"]
+    }
+  ],
+  "blocks": [
+    {
+      "opcode": "start_thread",
+      "blockType": "hat",
+      "text": "主程序",
+      "arguments": {}
+    },
+    {
+      "opcode": "start_run_thread",
+      "blockType": "hat",
+      "text": "当启动时",
+      "arguments": {}
+    },
+    {
+      "opcode": "buzzer_tone_set",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 间隔 [VALUE] 毫秒，鸣响 [VALUE2] 次",
+      "arguments": {
+        "TONES": {"type": "string", "defaultValue": "65", "menu": "tones", "literal": true},
+        "RHYTHMS": {"type": "string", "defaultValue": "500", "menu": "rhythms", "literal": true},
+        "VALUE": {"type": "number", "defaultValue": 100},
+        "VALUE2": {"type": "number", "defaultValue": 1}
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_arg",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 间隔 [VALUE] 毫秒，鸣响 [VALUE2] 次",
+      "arguments": {
+        "TONES": {"type": "number", "defaultValue": 65},
+        "RHYTHMS": {"type": "number", "defaultValue": 500},
+        "VALUE": {"type": "number", "defaultValue": 100},
+        "VALUE2": {"type": "number", "defaultValue": 1}
+      }
+    },
+    {
+      "opcode": "get_battery_level",
+      "blockType": "reporter",
+      "text": "电池电压(mV)",
+      "arguments": {}
+    },
+    {
+      "opcode": "set_low_battery_alarm",
+      "blockType": "command",
+      "text": "[VALUE] 低电压报警",
+      "arguments": {
+        "VALUE": {"type": "string", "defaultValue": "True", "menu": "on_off", "literal": true}
+      }
+    },
+    {
+      "opcode": "print_str",
+      "blockType": "command",
+      "text": "输出打印字符 [STR]",
+      "arguments": {
+        "STR": {"type": "string", "defaultValue": "Hello"}
+      }
+    },
+    {
+      "opcode": "print_number",
+      "blockType": "command",
+      "text": "输出打印数字 [NUM]",
+      "arguments": {
+        "NUM": {"type": "number", "defaultValue": 60}
+      }
+    },
+    {
+      "opcode": "set_pose",
+      "blockType": "command",
+      "text": "设置以 [VALUE6] 毫秒的时间调整姿态，俯仰角(Pitch) [VALUE1] 度，横滚角(Roll) [VALUE2] 度，机身高度 [VALUE3] 毫米，X轴偏移 [VALUE4] 毫米，Y轴偏移 [VALUE5] 毫米",
+      "arguments": {
+        "VALUE1": {"type": "number", "defaultValue": 0},
+        "VALUE2": {"type": "number", "defaultValue": 0},
+        "VALUE3": {"type": "number", "defaultValue": 0},
+        "VALUE4": {"type": "number", "defaultValue": 0},
+        "VALUE5": {"type": "number", "defaultValue": 0},
+        "VALUE6": {"type": "number", "defaultValue": 1000}
+      }
+    },
+    {
+      "opcode": "set_move",
+      "blockType": "command",
+      "text": "设置以 [VALUE5] 毫米/秒的速度行走，行走方向 [VALUE1]，行走距离 [VALUE2] 毫米，步长 [VALUE3] 毫米，抬腿高度 [VALUE4] 毫米",
+      "arguments": {
+        "VALUE1": {"type": "string", "defaultValue": "0", "menu": "orientation", "literal": true},
+        "VALUE2": {"type": "number", "defaultValue": 200},
+        "VALUE3": {"type": "number", "defaultValue": 40},
+        "VALUE4": {"type": "number", "defaultValue": 30},
+        "VALUE5": {"type": "number", "defaultValue": 80}
+      }
+    },
+    {
+      "opcode": "set_move_xyz",
+      "blockType": "command",
+      "text": "设置X方向速度 [VALUE1] 毫米/秒，Y方向速度 [VALUE2] 毫米/秒，角速度 [VALUE3] 度/秒，步长 [VALUE4] 毫米，抬腿高度 [VALUE5] 毫米",
+      "arguments": {
+        "VALUE1": {"type": "number", "defaultValue": 0},
+        "VALUE2": {"type": "number", "defaultValue": 0},
+        "VALUE3": {"type": "number", "defaultValue": 0},
+        "VALUE4": {"type": "number", "defaultValue": 40},
+        "VALUE5": {"type": "number", "defaultValue": 30}
+      }
+    },
+    {
+      "opcode": "set_turn",
+      "blockType": "command",
+      "text": "设置以 [VALUE1] 度/秒的速度 [VALUE2]",
+      "arguments": {
+        "VALUE1": {"type": "number", "defaultValue": 0},
+        "VALUE2": {"type": "string", "defaultValue": "1", "menu": "oriention_turn", "literal": true}
+      }
+    },
+    {
+      "opcode": "set_gait",
+      "blockType": "command",
+      "text": "设置步态类型 [VALUE1]",
+      "arguments": {
+        "VALUE1": {"type": "string", "defaultValue": "0", "menu": "gait", "literal": true}
+      }
+    },
+    {
+      "opcode": "set_stop",
+      "blockType": "command",
+      "text": "停止运动",
+      "arguments": {}
+    },
+    {
+      "opcode": "run_action",
+      "blockType": "command",
+      "text": "设置运行动作组名称 [ACTION] [BLOCK]",
+      "arguments": {
+        "ACTION": {"type": "string", "defaultValue": "sit_preset"},
+        "BLOCK": {"type": "number", "defaultValue": "True", "menu": "blocking", "literal": true}
+      }
+    },
+    {
+      "opcode": "run_action_name",
+      "blockType": "command",
+      "text": "设置运行动作组 [ACTION] [BLOCK]",
+      "arguments": {
+        "ACTION": {"type": "string", "defaultValue": "sit_preset", "menu": "action_name", "literal": true},
+        "BLOCK": {"type": "number", "defaultValue": "True", "menu": "blocking", "literal": true}
+      }
+    },
+    {
+      "opcode": "stop_action",
+      "blockType": "command",
+      "text": "停止运行动作组",
+      "arguments": {}
+    }
+  ]
+}

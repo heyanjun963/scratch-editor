@@ -55,9 +55,9 @@ const productExtensionCatalog = [
                 id: 'aidoggy',
                 name: 'AiDoggy',
                 sourceExtension: 'aidoggy',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
+                version: '0.1.0',
+                latestVersion: '0.1.0',
+                status: 'available'
             }
         ]
     },
