@@ -102,6 +102,24 @@ describe('ProductExtensionLibrary user extensions', () => {
         expect(screen.getByText('My Device')).toBeTruthy();
     });
 
+    test('renders only products from the legacy main controller catalog', async () => {
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+
+        [
+            'AI机甲双驱车',
+            'AI机甲麦轮车',
+            'AI机甲四足机器人',
+            'AI机甲四足竞赛版',
+            'AI机甲六足机器人',
+            'miniHexa',
+            'AiDoggy'
+        ].forEach(name => expect(screen.getByText(name)).toBeTruthy());
+        ['MechDog', 'TonyBot', 'Qbot', 'AIBlocks 控制板', 'CoreX 控制器']
+            .forEach(name => expect(screen.queryByText(name)).toBeNull());
+        expect(screen.getByText('miniHexa').closest('article').getAttribute('title')).toBe('miniHexa');
+    });
+
     test('renders the product version as an inert label', async () => {
         loadRemoteLibraryCatalog.mockResolvedValueOnce([{
             packageId: 'aimecanum',

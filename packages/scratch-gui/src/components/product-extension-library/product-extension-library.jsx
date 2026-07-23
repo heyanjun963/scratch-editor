@@ -309,12 +309,11 @@ const messages = defineMessages({
     }
 });
 
-const mainCategoryIds = ['robots', 'controllers'];
+const mainCategoryIds = ['robots'];
 const loadedExtensionIds = ['python-native', 'company-http'];
 const categoryFilters = {
     main: [
-        {id: 'robots', message: messages.boards},
-        {id: 'controllers', message: messages.kits}
+        {id: 'robots', message: messages.boards}
     ],
     module: [
         {id: 'input', message: messages.inputModule},

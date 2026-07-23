@@ -1,0 +1,481 @@
+{
+  "formatVersion": 2,
+  "id": "minihexa",
+  "name": "miniHexa",
+  "version": "0.1.1",
+  "description": "miniHexa 六足机器人积木拓展包。",
+  "color1": "#336699",
+  "color2": "#336699",
+  "color3": "#336699",
+  "target": "python",
+  "source": "python",
+  "entry": {
+    "blocks": "blocks.json",
+    "python": "generator/python.json"
+  },
+  "runtime": {
+    "pythonLibraries": []
+  },
+  "menus": {
+    "iicport": {
+      "items": [
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "4",
+          "value": "4"
+        },
+        {
+          "text": "5",
+          "value": "5"
+        },
+        {
+          "text": "9",
+          "value": "9"
+        }
+      ]
+    },
+    "asrmodes": {
+      "items": [
+        {
+          "text": "连续模式",
+          "value": "1"
+        },
+        {
+          "text": "语音模式",
+          "value": "2"
+        },
+        {
+          "text": "按键模式",
+          "value": "3"
+        }
+      ]
+    },
+    "blemode": {
+      "items": [
+        {
+          "text": "从机模式",
+          "value": "BLE.MODE_BLE_SLAVE"
+        },
+        {
+          "text": "主机模式",
+          "value": "BLE.MODE_BLE_MASTER"
+        }
+      ]
+    },
+    "balance": {
+      "items": [
+        {
+          "text": "启动",
+          "value": "True"
+        },
+        {
+          "text": "停止",
+          "value": "False"
+        }
+      ]
+    },
+    "baudrate": {
+      "items": [
+        {
+          "text": "9600",
+          "value": "9600"
+        },
+        {
+          "text": "115200",
+          "value": "115200"
+        }
+      ]
+    },
+    "tones": {
+      "items": [
+        {
+          "text": "C2",
+          "value": "65"
+        },
+        {
+          "text": "D2",
+          "value": "73"
+        },
+        {
+          "text": "E2",
+          "value": "82"
+        },
+        {
+          "text": "F2",
+          "value": "87"
+        },
+        {
+          "text": "G2",
+          "value": "98"
+        },
+        {
+          "text": "A2",
+          "value": "110"
+        },
+        {
+          "text": "B2",
+          "value": "123"
+        },
+        {
+          "text": "C3",
+          "value": "131"
+        },
+        {
+          "text": "D3",
+          "value": "147"
+        },
+        {
+          "text": "E3",
+          "value": "165"
+        },
+        {
+          "text": "F3",
+          "value": "175"
+        },
+        {
+          "text": "G3",
+          "value": "196"
+        },
+        {
+          "text": "A3",
+          "value": "220"
+        },
+        {
+          "text": "B3",
+          "value": "247"
+        },
+        {
+          "text": "C4",
+          "value": "262"
+        },
+        {
+          "text": "D4",
+          "value": "294"
+        },
+        {
+          "text": "E4",
+          "value": "330"
+        },
+        {
+          "text": "F4",
+          "value": "349"
+        },
+        {
+          "text": "G4",
+          "value": "392"
+        },
+        {
+          "text": "A4",
+          "value": "440"
+        },
+        {
+          "text": "B4",
+          "value": "494"
+        },
+        {
+          "text": "C5",
+          "value": "523"
+        },
+        {
+          "text": "D5",
+          "value": "587"
+        },
+        {
+          "text": "E5",
+          "value": "659"
+        },
+        {
+          "text": "F5",
+          "value": "698"
+        },
+        {
+          "text": "G5",
+          "value": "784"
+        },
+        {
+          "text": "A5",
+          "value": "880"
+        },
+        {
+          "text": "B5",
+          "value": "988"
+        },
+        {
+          "text": "C6",
+          "value": "1047"
+        },
+        {
+          "text": "D6",
+          "value": "1175"
+        },
+        {
+          "text": "E6",
+          "value": "1319"
+        },
+        {
+          "text": "F6",
+          "value": "1397"
+        },
+        {
+          "text": "G6",
+          "value": "1568"
+        },
+        {
+          "text": "A6",
+          "value": "1760"
+        },
+        {
+          "text": "B6",
+          "value": "1976"
+        },
+        {
+          "text": "C7",
+          "value": "2093"
+        },
+        {
+          "text": "D7",
+          "value": "2349"
+        },
+        {
+          "text": "E7",
+          "value": "2637"
+        },
+        {
+          "text": "F7",
+          "value": "2794"
+        },
+        {
+          "text": "G7",
+          "value": "3136"
+        },
+        {
+          "text": "A7",
+          "value": "3520"
+        },
+        {
+          "text": "B7",
+          "value": "3951"
+        },
+        {
+          "text": "C8",
+          "value": "4186"
+        },
+        {
+          "text": "D8",
+          "value": "4699"
+        }
+      ]
+    },
+    "rhythms": {
+      "items": [
+        {
+          "text": "二分之一",
+          "value": "500"
+        },
+        {
+          "text": "四分之一",
+          "value": "250"
+        },
+        {
+          "text": "八分之一",
+          "value": "125"
+        },
+        {
+          "text": "一拍",
+          "value": "1000"
+        },
+        {
+          "text": "两拍",
+          "value": "2000"
+        },
+        {
+          "text": "长音",
+          "value": "5000"
+        },
+        {
+          "text": "0",
+          "value": "0"
+        }
+      ]
+    },
+    "buzzer_mode": {
+      "items": [
+        {
+          "text": "后台播放",
+          "value": "False"
+        },
+        {
+          "text": "前台播放（阻塞）",
+          "value": "True"
+        }
+      ]
+    },
+    "gyro_select": {
+      "items": [
+        {
+          "text": "X轴角速度",
+          "value": "0"
+        },
+        {
+          "text": "Y轴角速度",
+          "value": "1"
+        },
+        {
+          "text": "Z轴角速度",
+          "value": "2"
+        }
+      ]
+    },
+    "imu_select": {
+      "items": [
+        {
+          "text": "横滚角",
+          "value": "0"
+        },
+        {
+          "text": "俯仰角",
+          "value": "1"
+        }
+      ]
+    },
+    "up_down_select": {
+      "items": [
+        {
+          "text": "向上",
+          "value": "1"
+        },
+        {
+          "text": "向下",
+          "value": "-1"
+        }
+      ]
+    },
+    "x_select": {
+      "items": [
+        {
+          "text": "向前",
+          "value": "1"
+        },
+        {
+          "text": "向后",
+          "value": "-1"
+        }
+      ]
+    },
+    "pitch_select": {
+      "items": [
+        {
+          "text": "前倾",
+          "value": "1"
+        },
+        {
+          "text": "后倾",
+          "value": "-1"
+        }
+      ]
+    },
+    "roll_select": {
+      "items": [
+        {
+          "text": "左倾",
+          "value": "1"
+        },
+        {
+          "text": "右倾",
+          "value": "-1"
+        }
+      ]
+    },
+    "roll_pitch_yaw": {
+      "items": [
+        {
+          "text": "横滚",
+          "value": "1"
+        },
+        {
+          "text": "俯仰",
+          "value": "2"
+        },
+        {
+          "text": "偏航",
+          "value": "3"
+        }
+      ]
+    },
+    "oriention_8": {
+      "items": [
+        {
+          "text": "↑",
+          "value": "0"
+        },
+        {
+          "text": "↓",
+          "value": "1"
+        },
+        {
+          "text": "←",
+          "value": "2"
+        },
+        {
+          "text": "→",
+          "value": "3"
+        },
+        {
+          "text": "↖",
+          "value": "4"
+        },
+        {
+          "text": "↗",
+          "value": "5"
+        },
+        {
+          "text": "↙",
+          "value": "6"
+        },
+        {
+          "text": "↘",
+          "value": "7"
+        }
+      ]
+    },
+    "oriention_9": {
+      "items": [
+        {
+          "text": "抬高",
+          "value": "1"
+        },
+        {
+          "text": "降低",
+          "value": "-1"
+        }
+      ]
+    },
+    "robot_turn": {
+      "items": [
+        {
+          "text": "顺时针旋转",
+          "value": "1"
+        },
+        {
+          "text": "逆时针旋转",
+          "value": "2"
+        }
+      ]
+    },
+    "onoff": {
+      "items": [
+        {
+          "text": "开启",
+          "value": "True"
+        },
+        {
+          "text": "关闭",
+          "value": "False"
+        }
+      ]
+    }
+  }
+}

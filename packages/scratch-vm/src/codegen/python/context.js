@@ -72,7 +72,7 @@ class PythonCodegenContext {
 
     // manifest 可写 random 或 import random，这里统一输出合法 import 行。
     getImportLines () {
-        return Array.from(this.imports).sort().map(name => (
+        return Array.from(this.imports).map(name => (
             /^(?:from|import)\s/.test(name) ? name : `import ${name}`
         ));
     }

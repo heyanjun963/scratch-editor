@@ -12,6 +12,10 @@ describe('product extension repository sync', () => {
         editorRoot,
         'packages/scratch-gui/src/lib/custom-extension/builtin-product-packages/aimecanum/manifest.json'
     ), 'utf8'));
+    const miniHexaManifest = JSON.parse(fs.readFileSync(path.join(
+        editorRoot,
+        'packages/scratch-gui/src/lib/custom-extension/builtin-product-packages/minihexa/manifest.json'
+    ), 'utf8'));
     let targetDirectory;
 
     beforeEach(() => {
@@ -48,7 +52,14 @@ describe('product extension repository sync', () => {
         const catalog = JSON.parse(firstCatalog);
 
         expect(fs.existsSync(path.join(targetDirectory, 'products', productManifest.id, 'blocks.json'))).toBe(true);
+        expect(fs.existsSync(path.join(targetDirectory, 'products', miniHexaManifest.id, 'blocks.json'))).toBe(true);
         expect(catalog.packages.find(entry => entry.packageId === 'remote-only-product')).toBeTruthy();
+        expect(catalog.packages.find(entry => entry.packageId === miniHexaManifest.id)).toMatchObject({
+            version: miniHexaManifest.version,
+            tag: `${miniHexaManifest.id}-v${miniHexaManifest.version}`,
+            asset: `${miniHexaManifest.id}-${miniHexaManifest.version}.sbext`,
+            status: 'draft'
+        });
         expect(catalog.packages.find(entry => entry.packageId === productManifest.id)).toMatchObject({
             version: productManifest.version,
             tag: `${productManifest.id}-v${productManifest.version}`,

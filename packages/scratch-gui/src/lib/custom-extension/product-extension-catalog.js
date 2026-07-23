@@ -47,92 +47,14 @@ const productExtensionCatalog = [
                 id: 'minihexa',
                 name: 'miniHexa',
                 sourceExtension: 'minihexa',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
+                version: '0.1.1',
+                latestVersion: '0.1.1',
+                status: 'available'
             },
             {
                 id: 'aidoggy',
                 name: 'AiDoggy',
                 sourceExtension: 'aidoggy',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'mechdog',
-                name: 'MechDog',
-                sourceExtension: 'mechdog',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'tonybot',
-                name: 'TonyBot',
-                sourceExtension: 'tonybot',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'qbot',
-                name: 'Qbot',
-                sourceExtension: 'qbot',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            }
-        ]
-    },
-    {
-        id: 'controllers',
-        label: '控制器',
-        children: [
-            {
-                id: 'aiblocksboard',
-                name: 'AIBlocks 控制板',
-                sourceExtension: 'aiblocksboard',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'corex',
-                name: 'CoreX 控制器',
-                sourceExtension: 'corex',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'microbit_python',
-                name: 'micro:bit Python',
-                sourceExtension: 'microbit_python',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'largec',
-                name: 'LargeC 控制器',
-                sourceExtension: 'largec',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'midc',
-                name: 'MidC 控制器',
-                sourceExtension: 'midc',
-                version: '0.0.0',
-                latestVersion: '1.0.0',
-                status: 'planned'
-            },
-            {
-                id: 'smallc',
-                name: 'SmallC 控制器',
-                sourceExtension: 'smallc',
                 version: '0.0.0',
                 latestVersion: '1.0.0',
                 status: 'planned'

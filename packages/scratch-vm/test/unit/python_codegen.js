@@ -233,8 +233,8 @@ test('empty custom setup hat keeps preamble imports', t => {
 
     t.equal(code, [
         'import Hiwonder',
-        'import Hiwonder_DEV',
         'import time',
+        'import Hiwonder_DEV',
         ''
     ].join('\n'));
     t.end();
@@ -266,5 +266,45 @@ test('custom setup hats do not consume main entry names', t => {
     t.match(code, /Hiwonder\.startMain\(start_main\)/);
     t.notMatch(code, /def start_main1\(\):/);
     t.notMatch(code, /def start_run\(\):/);
+    t.end();
+});
+
+test('custom template selector chooses a case from a literal menu argument', t => {
+    const main = new TestBlock('company_start');
+    const move = new TestBlock('company_move', {
+        DIRECTION: 'left',
+        SPEED: 20
+    });
+    main.next = move;
+
+    const templates = {
+        company_start: {
+            blockType: 'hat',
+            section: 'main',
+            template: ''
+        },
+        company_move: {
+            blockType: 'command',
+            arguments: {
+                DIRECTION: {defaultValue: 'right', literal: true},
+                SPEED: {defaultValue: 10}
+            },
+            template: 'robot.move({SPEED})',
+            templateSelector: {
+                argument: 'DIRECTION',
+                cases: {
+                    left: 'robot.move(-{SPEED})',
+                    right: 'robot.move({SPEED})'
+                }
+            }
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([main]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.match(code, /robot\.move\(-20\)/);
+    t.notMatch(code, /robot\.move\(20\)/);
     t.end();
 });

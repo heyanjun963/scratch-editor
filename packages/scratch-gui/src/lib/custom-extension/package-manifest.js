@@ -48,6 +48,7 @@ const getBlockPythonCodegen = (rawBlock, generatorInfo, commonImports) => {
 
     return {
         template,
+        templateSelector: generatorPython.templateSelector || inlinePython.templateSelector || null,
         imports: uniqueStrings([
             ...commonImports,
             ...(Array.isArray(inlinePython.imports) ? inlinePython.imports : []),

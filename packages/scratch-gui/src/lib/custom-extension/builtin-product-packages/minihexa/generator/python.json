@@ -1,0 +1,268 @@
+{
+  "blocks": {
+    "start_thread": {
+      "template": "",
+      "imports": [
+        "import Hiwonder",
+        "import time",
+        "import Hiwonder_DEV"
+      ],
+      "variables": [
+        "minihexa = Hiwonder.Robot()"
+      ],
+      "launcher": "Hiwonder.startMain({MAIN})",
+      "section": "main"
+    },
+    "start_run_thread": {
+      "template": "",
+      "imports": [
+        "import Hiwonder",
+        "import time",
+        "import Hiwonder_DEV"
+      ],
+      "variables": [
+        "minihexa = Hiwonder.Robot()"
+      ],
+      "section": "setup"
+    },
+    "buzzer_tone_set": {
+      "template": "beep.playTone({TONES},{RHYTHMS},{MODE})",
+      "variables": [
+        "beep = Hiwonder.Buzzer()"
+      ]
+    },
+    "buzzer_tone_set_arg": {
+      "template": "beep.playTone({TONES},{RHYTHMS},{MODE})",
+      "variables": [
+        "beep = Hiwonder.Buzzer()"
+      ]
+    },
+    "buzzer_tone_set_volume": {
+      "template": "beep.setVolume({VALUE})",
+      "variables": [
+        "beep = Hiwonder.Buzzer()"
+      ]
+    },
+    "get_battery_level": {
+      "template": "Hiwonder.Battery_power()",
+      "imports": [
+        "import Hiwonder"
+      ]
+    },
+    "get_volume": {
+      "template": "sound.read()",
+      "imports": [
+        "import Hiwonder"
+      ],
+      "variables": [
+        "sound = Hiwonder.Sound()"
+      ]
+    },
+    "disable_lowPower_alarm": {
+      "template": "Hiwonder.disableLowPowerAlarm()",
+      "variables": [
+        "beep = Hiwonder.Buzzer()"
+      ]
+    },
+    "print_str": {
+      "template": "print({STR})\ntime.sleep(0.5)",
+      "imports": [
+        "import time"
+      ]
+    },
+    "print_number": {
+      "template": "print({NUM})\ntime.sleep(0.5)",
+      "imports": [
+        "import time"
+      ]
+    },
+    "set_body_reset": {
+      "template": "minihexa.reset()"
+    },
+    "set_body_angle": {
+      "template": "minihexa.set_body_angle([0,0,0],{DURATION})",
+      "templateSelector": {
+        "argument": "ANGLE",
+        "cases": {
+          "1": "minihexa.set_body_angle([{VALUE},0,0],{DURATION})",
+          "2": "minihexa.set_body_angle([0,{VALUE},0],{DURATION})",
+          "3": "minihexa.set_body_angle([0,0,{VALUE}],{DURATION})"
+        }
+      }
+    },
+    "set_body_pose": {
+      "template": "minihexa.set_body_pose([0,0,0],{DURATION})",
+      "templateSelector": {
+        "argument": "ORIENTION",
+        "cases": {
+          "0": "minihexa.set_body_pose([0,{VALUE},0],{DURATION})",
+          "1": "minihexa.set_body_pose([0,-{VALUE},0],{DURATION})",
+          "2": "minihexa.set_body_pose([-{VALUE},0,0],{DURATION})",
+          "3": "minihexa.set_body_pose([{VALUE},0,0],{DURATION})",
+          "4": "minihexa.set_body_pose([-{VALUE},{VALUE},0],{DURATION})",
+          "5": "minihexa.set_body_pose([{VALUE},{VALUE},0],{DURATION})",
+          "6": "minihexa.set_body_pose([-{VALUE},-{VALUE},0],{DURATION})",
+          "7": "minihexa.set_body_pose([{VALUE},-{VALUE},0],{DURATION})"
+        }
+      }
+    },
+    "set_body_pose_height": {
+      "template": "minihexa.set_body_pose([0,0,{VALUE}*{ORIENTION}],{DURATION})"
+    },
+    "set_go": {
+      "template": "minihexa.go([0,0,0],-1,{DURATION})",
+      "templateSelector": {
+        "argument": "MOVE",
+        "cases": {
+          "0": "minihexa.go([0,{SPEED},0],-1,{DURATION})",
+          "1": "minihexa.go([0,-{SPEED},0],-1,{DURATION})",
+          "2": "minihexa.go([-{SPEED},0,0],-1,{DURATION})",
+          "3": "minihexa.go([{SPEED},0,0],-1,{DURATION})",
+          "4": "minihexa.go([-{SPEED},{SPEED},0],-1,{DURATION})",
+          "5": "minihexa.go([{SPEED},{SPEED},0],-1,{DURATION})",
+          "6": "minihexa.go([-{SPEED},-{SPEED},0],-1,{DURATION})",
+          "7": "minihexa.go([{SPEED},-{SPEED},0],-1,{DURATION})"
+        }
+      }
+    },
+    "set_go_step": {
+      "template": "minihexa.go([0,0,0],{STEP},{DURATION})",
+      "templateSelector": {
+        "argument": "MOVE",
+        "cases": {
+          "0": "minihexa.go([0,{SPEED},0],{STEP},{DURATION})",
+          "1": "minihexa.go([0,-{SPEED},0],{STEP},{DURATION})",
+          "2": "minihexa.go([-{SPEED},0,0],{STEP},{DURATION})",
+          "3": "minihexa.go([{SPEED},0,0],{STEP},{DURATION})",
+          "4": "minihexa.go([-{SPEED},{SPEED},0],{STEP},{DURATION})",
+          "5": "minihexa.go([{SPEED},{SPEED},0],{STEP},{DURATION})",
+          "6": "minihexa.go([-{SPEED},-{SPEED},0],{STEP},{DURATION})",
+          "7": "minihexa.go([{SPEED},-{SPEED},0],{STEP},{DURATION})"
+        }
+      }
+    },
+    "set_move_xyz": {
+      "template": "minihexa.go([{VALUE1},{VALUE2},{VALUE3}],-1,{DURATION})"
+    },
+    "set_move_xyz_step": {
+      "template": "minihexa.go([{VALUE1},{VALUE2},{VALUE3}],{STEP},{DURATION})"
+    },
+    "set_turn": {
+      "template": "minihexa.go([0,0,0],-1,{DURATION})",
+      "templateSelector": {
+        "argument": "MOVE",
+        "cases": {
+          "1": "minihexa.go([0,0,-{SPEED}],-1,{DURATION})",
+          "2": "minihexa.go([0,0,{SPEED}],-1,{DURATION})"
+        }
+      }
+    },
+    "set_turn_step": {
+      "template": "minihexa.go([0,0,0],{STEP},{DURATION})",
+      "templateSelector": {
+        "argument": "MOVE",
+        "cases": {
+          "1": "minihexa.go([0,0,-{SPEED}],{STEP},{DURATION})",
+          "2": "minihexa.go([0,0,{SPEED}],{STEP},{DURATION})"
+        }
+      }
+    },
+    "set_go_stop": {
+      "template": "minihexa.go([0,0,0],0)"
+    },
+    "set_leg_lift": {
+      "template": "minihexa.set_leg_lift({VALUE})"
+    },
+    "set_self_balance": {
+      "template": "minihexa.homeostasis({CONTROL})"
+    },
+    "set_servo": {
+      "template": "minihexa.multi_servo_control([({NUM},{POS})],{DURATION})"
+    },
+    "action_run": {
+      "template": "minihexa.action_run({NUM},{LOOP})"
+    },
+    "action_stop": {
+      "template": "minihexa.action_stop()"
+    },
+    "when_minihexa_key_click_thread": {
+      "template": "",
+      "imports": [
+        "import Hiwonder",
+        "import time",
+        "import Hiwonder_IIC"
+      ],
+      "variables": [
+        "minihexa = Hiwonder.Robot()",
+        "button1 = Hiwonder.Button()"
+      ],
+      "entryTemplate": "def on_button1_clicked():",
+      "entryFooter": "button1.Clicked(on_button1_clicked)",
+      "section": "main"
+    },
+    "when_minihexa_key_longclick_thread": {
+      "template": "",
+      "imports": [
+        "import Hiwonder",
+        "import time",
+        "import Hiwonder_IIC"
+      ],
+      "variables": [
+        "minihexa = Hiwonder.Robot()",
+        "button1 = Hiwonder.Button()"
+      ],
+      "entryTemplate": "def on_button1_longpressed():",
+      "entryFooter": "button1.Longpressed(on_button1_longpressed)",
+      "section": "main"
+    },
+    "key_is_pressed": {
+      "template": "button1.read()",
+      "imports": [
+        "import Hiwonder",
+        "import time"
+      ],
+      "variables": [
+        "button1 = Hiwonder.Button()"
+      ]
+    },
+    "imu_read_gyro_data": {
+      "template": "imu.read_gyro_data()[{SELECT}]",
+      "variables": [
+        "imu = Hiwonder.IMU()"
+      ]
+    },
+    "imu_read_angle": {
+      "template": "imu.read_angle()[{SELECT}]",
+      "variables": [
+        "imu = Hiwonder.IMU()"
+      ]
+    },
+    "serial_set_baudrate": {
+      "template": "",
+      "variables": [
+        "uart = Hiwonder.UART({DATA})"
+      ]
+    },
+    "serial_write": {
+      "template": "uart.send_data({DATA})"
+    },
+    "serial_has_recv_data": {
+      "template": "uart.has_data()"
+    },
+    "serial_recv_contains": {
+      "template": "uart.contains_data({DATA})"
+    },
+    "serial_recv_buff": {
+      "template": "uart.read_buffer()"
+    },
+    "get_serial_cmd": {
+      "template": "uart.read_uart_cmd({DATA})[0]"
+    },
+    "get_serial_args": {
+      "template": "uart.parse_uart_cmd({DATA})[{NUM}]"
+    },
+    "clear_buffer": {
+      "template": "uart.clear_buffer()"
+    }
+  }
+}

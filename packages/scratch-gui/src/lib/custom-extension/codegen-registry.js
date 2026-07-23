@@ -12,6 +12,7 @@ const registerPythonCodegenManifest = manifest => {
             blockType: block.blockType,
             arguments: block.arguments,
             template: block.codegen.python.template,
+            templateSelector: block.codegen.python.templateSelector || null,
             imports: block.codegen.python.imports || [],
             runtimeFiles: block.codegen.python.runtimeFiles || [],
             variables: block.codegen.python.variables || [],

@@ -61,6 +61,8 @@ const getSourcePackages = () => fs.readdirSync(sourceRoot, {withFileTypes: true}
         }
         return {manifest, sourceDirectory};
     })
+    // 未完成的迁移包保留在编辑器源码中，但在显式开放发布前不能进入公开产品仓库。
+    .filter(sourcePackage => sourcePackage.manifest.publish !== false)
     .sort((left, right) => left.manifest.id.localeCompare(right.manifest.id));
 
 // 同步单个产品的声明式源文件，并生成带版本号且可直接发布的稳定 SBEXT 包。

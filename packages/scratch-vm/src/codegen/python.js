@@ -210,17 +210,40 @@ const addCustomImports = (templateInfo, imports) => {
     });
 };
 
+// 固定菜单值兼容外层 dropdown 和扩展菜单 shadow，两种结构都返回菜单的原始 value。
+const getLiteralArgumentValue = (templateInfo, block, inputName, fallback) => {
+    const argument = templateInfo.arguments && templateInfo.arguments[inputName];
+    const inputBlock = getInputBlock(block, inputName);
+    if (!inputBlock) return getFieldValue(block, [inputName], fallback);
+    return getFieldValue(
+        inputBlock,
+        [argument && argument.menu, inputName, 'VALUE', 'TEXT', 'NUM'].filter(Boolean),
+        fallback
+    );
+};
+
 // 把 manifest 模板里的 {ARG} 替换为积木当前输入对应的 Python 代码。
 const applyTemplateText = (template, templateInfo, block, imports) => (
     String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, inputName) => {
         const argument = templateInfo.arguments && templateInfo.arguments[inputName];
         const fallback = getDefaultArgumentValue(templateInfo, inputName, '');
-        if (argument && argument.literal && !getInputBlock(block, inputName)) {
-            return getFieldValue(block, [inputName], fallback);
+        if (argument && argument.literal) {
+            return getLiteralArgumentValue(templateInfo, block, inputName, fallback);
         }
         return valueToPython(block, inputName, fallback, imports);
     })
 );
+
+// 选择器按菜单字段值挑选模板；未命中时回退到基础 template，保证旧包仍按原规则生成。
+const selectCustomTemplate = (templateInfo, block) => {
+    const selector = templateInfo.templateSelector;
+    if (!selector || !selector.argument || !selector.cases) return templateInfo.template;
+    const fallback = getDefaultArgumentValue(templateInfo, selector.argument, '');
+    const value = String(getLiteralArgumentValue(templateInfo, block, selector.argument, fallback));
+    return Object.prototype.hasOwnProperty.call(selector.cases, value) ?
+        selector.cases[value] :
+        templateInfo.template;
+};
 
 // 自定义积木可以在生成本行代码时顺带声明 import、全局变量、setup 和 launcher。
 const addCustomGenerationMetadata = (templateInfo, block, imports) => {
@@ -241,7 +264,7 @@ const addCustomGenerationMetadata = (templateInfo, block, imports) => {
 // 普通自定义积木最终落到一段 template 文本。
 const applyCustomTemplate = (templateInfo, block, imports) => {
     addCustomGenerationMetadata(templateInfo, block, imports);
-    return applyTemplateText(templateInfo.template, templateInfo, block, imports);
+    return applyTemplateText(selectCustomTemplate(templateInfo, block), templateInfo, block, imports);
 };
 
 // 自定义帽子积木可以覆盖入口函数签名，例如按键事件需要生成 on_buttonA_clicked。
@@ -446,12 +469,12 @@ const generateStack = (topBlock, imports, options = {}) => {
         if (templateInfo) {
             addCustomGenerationMetadata(templateInfo, topBlock, imports);
         }
-        const globalNamesBeforeBody = new Set(codegenContext.getGlobalNames());
         const body = stack.slice(1).flatMap(block => generateStatementLines(block, imports, 1));
         const usesEntryTemplate = Boolean(templateInfo && templateInfo.entryTemplate);
-        // 事件回调只声明函数体内新增使用的硬件对象，避免把事件源本身也写进 global。
+        const bodyCode = body.join('\n');
+        // 对齐旧生成器：只为函数体实际引用的硬件对象声明 global。
         const globalNames = codegenContext.getGlobalNames()
-            .filter(name => !usesEntryTemplate || !globalNamesBeforeBody.has(name));
+            .filter(name => new RegExp(`\\b${name}\\b`).test(bodyCode));
         const globalLines = globalNames.map(name => `${indent(1)}global ${name}`);
         const entryName = options.entryName || 'start_main';
         const headerLines = renderEntryHeader(templateInfo, topBlock, imports, entryName);
@@ -521,12 +544,18 @@ const generatePythonCode = (workspace, options = {}) => {
     ];
     const generatedEntryBlocks = entryBlocks.filter(usesGeneratedEntryName);
     const entryIndexByBlock = new Map(generatedEntryBlocks.map((block, index) => [block, index]));
+    // 先按工作区顺序生成并收集依赖，再按 functions/setup/entry 顺序组织最终代码。
+    const generatedSections = new Map(topBlocks
+        .filter(block => orderedBlocks.includes(block))
+        .map(block => {
+            const entryIndex = entryIndexByBlock.get(block);
+            const entryName = typeof entryIndex === 'number' ?
+                codegenContext.getEntryName(entryIndex) :
+                undefined;
+            return [block, generateStack(block, imports, {entryName})];
+        }));
     const sections = orderedBlocks.map(block => {
-        const entryIndex = entryIndexByBlock.get(block);
-        const entryName = typeof entryIndex === 'number' ?
-            codegenContext.getEntryName(entryIndex) :
-            undefined;
-        return generateStack(block, imports, {entryName});
+        return generatedSections.get(block) || [];
     }).filter(section => section.length);
 
     if (sections.length === 0 && !codegenContext.hasPreamble()) {

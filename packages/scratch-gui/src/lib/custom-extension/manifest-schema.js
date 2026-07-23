@@ -1,5 +1,6 @@
 const ID_PATTERN = /^[a-z0-9]+$/;
-const OPCODE_PATTERN = /^[a-z][a-z0-9_]*$/;
+// Scratch 扩展允许使用驼峰 opcode；保留原值才能兼容旧工程中的积木标识。
+const OPCODE_PATTERN = /^[a-z][A-Za-z0-9_]*$/;
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 const blockTypeMap = {
@@ -54,7 +55,21 @@ const extractTemplateArgs = template => {
 
 const validateArgumentReferences = (block, argumentNames) => {
     const textArgs = extractTextArgs(block.text);
-    const templateArgs = extractTemplateArgs(block.codegen.python.template);
+    const templateSelector = block.codegen.python.templateSelector;
+    const selectedTemplateArgs = templateSelector ?
+        Object.values(templateSelector.cases).flatMap(template => Array.from(extractTemplateArgs(template))) :
+        [];
+    const templateArgs = new Set([
+        ...extractTemplateArgs(block.codegen.python.template),
+        ...selectedTemplateArgs
+    ]);
+
+    if (templateSelector && !argumentNames.includes(templateSelector.argument)) {
+        throw new Error(`积木 ${block.opcode} 的 templateSelector 引用了未定义参数 ${templateSelector.argument}`);
+    }
+    if (templateSelector && !block.arguments[templateSelector.argument].literal) {
+        throw new Error(`积木 ${block.opcode} 的 templateSelector 参数 ${templateSelector.argument} 必须是固定字段`);
+    }
 
     [...textArgs, ...templateArgs].forEach(name => {
         if (!argumentNames.includes(name)) {
@@ -104,6 +119,22 @@ const normalizeMenus = rawMenus => {
     }, {});
 };
 
+// 菜单选择器让纯 JSON 配置按固定字段值选择模板，用于迁移旧生成器中的 switch 分支。
+const normalizeTemplateSelector = (opcode, rawSelector) => {
+    if (!rawSelector) return null;
+    assertObject(rawSelector, `积木 ${opcode} 的 templateSelector 必须是对象`);
+    const argument = String(rawSelector.argument || '').trim();
+    assertObject(rawSelector.cases, `积木 ${opcode} 的 templateSelector.cases 必须是对象`);
+    const cases = Object.keys(rawSelector.cases).reduce((result, value) => {
+        result[String(value)] = String(rawSelector.cases[value]);
+        return result;
+    }, {});
+    if (!argument || Object.keys(cases).length === 0) {
+        throw new Error(`积木 ${opcode} 的 templateSelector 必须声明 argument 和 cases`);
+    }
+    return {argument, cases};
+};
+
 // Python 生成配置允许声明 import、变量初始化、入口模板和回调 footer。
 const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
     assertObject(rawPythonCodegen, `积木 ${opcode} 缺少 codegen.python 配置`);
@@ -112,6 +143,7 @@ const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
     }
     return {
         template: String(rawPythonCodegen.template),
+        templateSelector: normalizeTemplateSelector(opcode, rawPythonCodegen.templateSelector),
         imports: Array.isArray(rawPythonCodegen.imports) ?
             rawPythonCodegen.imports.map(String) :
             [],
@@ -137,7 +169,7 @@ const normalizeBlock = (rawBlock, seenOpcodes) => {
 
     const opcode = String(rawBlock.opcode || '').trim();
     if (!OPCODE_PATTERN.test(opcode)) {
-        throw new Error(`opcode ${opcode || '(空)'} 必须以小写字母开头，只能包含小写字母、数字和下划线`);
+        throw new Error(`opcode ${opcode || '(空)'} 必须以小写字母开头，只能包含字母、数字和下划线`);
     }
     if (seenOpcodes.has(opcode)) {
         throw new Error(`opcode ${opcode} 重复`);
@@ -291,6 +323,7 @@ const serializeCustomExtensionManifest = manifest => {
             codegen: {
                 python: {
                     template: block.codegen.python.template,
+                    templateSelector: block.codegen.python.templateSelector || undefined,
                     imports: block.codegen.python.imports || [],
                     runtimeFiles: block.codegen.python.runtimeFiles || [],
                     variables: block.codegen.python.variables || [],
