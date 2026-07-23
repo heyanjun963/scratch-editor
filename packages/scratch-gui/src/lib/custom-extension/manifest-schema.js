@@ -219,6 +219,15 @@ const normalizeCategories = rawCategories => {
     }).filter(category => category.id || category.name);
 };
 
+// Python 依赖仅作为包元数据保存，实际安装必须由后续受控流程处理。
+const normalizePythonDependencies = rawDependencies => {
+    if (!rawDependencies || typeof rawDependencies !== 'object' || Array.isArray(rawDependencies)) return {};
+    return Object.keys(rawDependencies).reduce((dependencies, name) => {
+        dependencies[String(name)] = String(rawDependencies[name]);
+        return dependencies;
+    }, {});
+};
+
 // v1/v2 共用字段统一在这里处理，避免目录包和单 JSON 包出现字段差异。
 const normalizeCommonManifestFields = rawManifest => {
     const id = String(rawManifest.id || '').trim();
@@ -263,6 +272,9 @@ const normalizeCustomExtensionManifestV2 = rawManifest => ({
         pythonLibraries: rawManifest.runtime && Array.isArray(rawManifest.runtime.pythonLibraries) ?
             rawManifest.runtime.pythonLibraries.map(String) :
             [],
+        pythonDependencies: normalizePythonDependencies(
+            rawManifest.runtime && rawManifest.runtime.pythonDependencies
+        ),
         files: rawManifest.runtime && Array.isArray(rawManifest.runtime.files) ?
             rawManifest.runtime.files.map(file => ({
                 path: String(file.path || ''),

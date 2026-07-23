@@ -1,0 +1,7 @@
+{
+  "pythonfixture.printText|block": "打印 [TEXT] 重复 [COUNT] 次",
+  "pythonfixture.readStatus|block": "读取测试状态 [MODE]",
+  "pythonfixture.isReady|block": "测试状态 [MODE] 已就绪？",
+  "pythonfixture.MODE.fast|menu": "快速",
+  "pythonfixture.MODE.stable|menu": "稳定"
+}

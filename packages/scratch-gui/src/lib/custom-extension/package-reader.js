@@ -1,12 +1,13 @@
 import JSZip from 'jszip';
 
 import {normalizeCustomExtensionManifest} from './manifest-schema';
+import {adaptMindPlusPythonPackage} from './mindplus-package-adapter';
 import {createPackageManifest} from './package-manifest';
 
 const JSON_EXTENSIONS = ['.json'];
-const ZIP_EXTENSIONS = ['.zip', '.sbext'];
+const ZIP_EXTENSIONS = ['.zip', '.sbext', '.mpext'];
 
-// package-reader 负责把用户选择的 .json/.zip/.sbext 统一读成规范化 manifest。
+// package-reader 负责把用户选择的 .json/.zip/.sbext/.mpext 统一读成规范化 manifest。
 const getFileExtension = fileName => {
     const dotIndex = String(fileName || '').lastIndexOf('.');
     return dotIndex >= 0 ? String(fileName).slice(dotIndex).toLowerCase() : '';
@@ -59,6 +60,46 @@ const readZipJson = async (lookup, candidates, label) => {
     }
 };
 
+const readOptionalZipJson = async (lookup, candidates) => {
+    const file = getZipFile(lookup, candidates);
+    if (!file) return {};
+    try {
+        return JSON.parse(await file.async('string'));
+    } catch (error) {
+        throw new Error(`${file.name} is not valid JSON: ${error.message}`);
+    }
+};
+
+// 多语言文件按低优先级到高优先级合并，让中文缺失的键继续回退英文。
+const readMergedOptionalZipJson = async (lookup, candidates) => {
+    const localeFiles = await Promise.all(
+        candidates.map(candidate => readOptionalZipJson(lookup, [candidate]))
+    );
+    return Object.assign({}, ...localeFiles);
+};
+
+const readZipText = async (lookup, candidates, label) => {
+    const file = getZipFile(lookup, candidates);
+    if (!file) {
+        throw new Error(`Extension package is missing ${label}: ${candidates.filter(Boolean).join(' or ')}`);
+    }
+    return file.async('string');
+};
+
+// 外部包路径必须保持在 ZIP 根目录内，不能通过 ../ 跳出 asset 目录。
+const normalizePackagePath = value => {
+    const path = String(value || '').replace(/\\/g, '/');
+    const parts = path.split('/').filter(part => part && part !== '.');
+    if (path.startsWith('/') || parts.includes('..')) {
+        throw new Error(`Mind+ 包包含不安全路径: ${value}`);
+    }
+    return parts.join('/');
+};
+
+const joinPackagePath = (directory, relativePath) => normalizePackagePath(
+    `${normalizePackagePath(directory)}/${normalizePackagePath(relativePath)}`
+);
+
 // runtime 文件不是所有包都必须携带，存在则内联到 manifest 方便桌面端保存。
 const readOptionalRuntimeFiles = async (lookup, paths) => {
     const uniquePaths = Array.from(new Set(paths.filter(Boolean).map(path => String(path).replace(/\\/g, '/'))));
@@ -76,13 +117,21 @@ const readOptionalRuntimeFiles = async (lookup, paths) => {
 };
 
 // 目录包合并入口：manifest/config + blocks + generator + runtime files -> v2 manifest。
-const mergePackageManifest = async (zipLookup, rawManifest, rawBlocks, rawGenerator, packageFileName) => {
+const mergePackageManifest = async (
+    zipLookup,
+    rawManifest,
+    rawBlocks,
+    rawGenerator,
+    packageFileName,
+    packageStructure
+) => {
     // 先合并一次得到完整运行库路径，再读取包内文件并写回最终 manifest。
     const packageManifest = createPackageManifest({
         rawManifest,
         rawBlocks,
         rawGenerator,
-        packageFileName
+        packageFileName,
+        packageStructure
     });
     const runtimeFiles = await readOptionalRuntimeFiles(zipLookup, packageManifest.runtime.pythonLibraries);
 
@@ -91,8 +140,56 @@ const mergePackageManifest = async (zipLookup, rawManifest, rawBlocks, rawGenera
         rawBlocks,
         rawGenerator,
         runtimeFiles,
-        packageFileName
+        packageFileName,
+        packageStructure
     });
+};
+
+// Mind+ Python 包先静态转换为现有三段配置，再复用统一的 manifest 合并和运行库读取流程。
+const readMindPlusPackageData = async (lookup, rawConfig, packageFileName) => {
+    const assets = rawConfig.asset || {};
+    const pythonAsset = assets.python;
+    if (!pythonAsset || typeof pythonAsset !== 'object') {
+        throw new Error('Mind+ 包当前只支持 asset.python');
+    }
+    const assetDirectory = normalizePackagePath(pythonAsset.dir || 'python');
+    const mainPath = joinPackagePath(assetDirectory, pythonAsset.main || 'main.ts');
+    const mainSource = await readZipText(lookup, [mainPath], 'asset.python.main');
+    const rawMenus = await readOptionalZipJson(lookup, [
+        joinPackagePath(assetDirectory, '_menus/index.json')
+    ]);
+    const rawLocales = await readMergedOptionalZipJson(lookup, [
+        joinPackagePath(assetDirectory, '_locales/en.json'),
+        joinPackagePath(assetDirectory, '_locales/zh.json'),
+        joinPackagePath(assetDirectory, '_locales/zh-cn.json')
+    ]);
+    const declaredRuntimePaths = Array.isArray(pythonAsset.files) ? pythonAsset.files
+        .filter(path => String(path).toLowerCase().endsWith('.py'))
+        .map(path => joinPackagePath(assetDirectory, path)) : [];
+    const libraryPrefix = `${assetDirectory.toLowerCase()}/libraries/`;
+    const discoveredRuntimePaths = Array.from(lookup.values())
+        .map(file => normalizePackagePath(file.name))
+        .filter(path => path.toLowerCase().startsWith(libraryPrefix) && path.toLowerCase().endsWith('.py'));
+    const runtimePythonLibraries = Array.from(new Set([
+        ...declaredRuntimePaths,
+        ...discoveredRuntimePaths
+    ]));
+    const adapted = adaptMindPlusPythonPackage({
+        rawConfig,
+        mainSource,
+        rawMenus,
+        rawLocales,
+        runtimePythonLibraries
+    });
+
+    return mergePackageManifest(
+        lookup,
+        adapted.rawManifest,
+        adapted.rawBlocks,
+        adapted.rawGenerator,
+        packageFileName,
+        'mindplus-python-package-v1'
+    );
 };
 
 // 读取内存中的目录包数据，供浏览器文件、内置产物和后续远程下载共同复用。
@@ -100,6 +197,9 @@ const readZipPackageData = async (data, packageFileName) => {
     const zip = await JSZip.loadAsync(data);
     const lookup = createZipLookup(zip);
     const rawManifest = await readZipJson(lookup, ['manifest.json', 'config.json'], 'config.json/manifest.json');
+    if (rawManifest.asset) {
+        return readMindPlusPackageData(lookup, rawManifest, packageFileName);
+    }
     const entry = rawManifest.entry || {};
     const blocksPath = entry.blocks || 'blocks.json';
     const generatorPath = entry.python || entry.generator || 'generator/python.json';
@@ -124,7 +224,7 @@ const readZipPackage = async file => readZipPackageData(await readFileAsArrayBuf
 const readCustomExtensionPackageBuffer = (data, packageFileName) => {
     const extension = getFileExtension(packageFileName);
     if (!ZIP_EXTENSIONS.includes(extension)) {
-        return Promise.reject(new Error('Only .zip or .sbext binary extension library files are supported'));
+        return Promise.reject(new Error('Only .zip, .sbext or .mpext binary extension library files are supported'));
     }
     return readZipPackageData(data, packageFileName);
 };
@@ -147,7 +247,7 @@ const readCustomExtensionPackage = file => {
     if (ZIP_EXTENSIONS.includes(extension)) {
         return readZipPackage(file);
     }
-    return Promise.reject(new Error('Only .json, .zip or .sbext extension library files are supported'));
+    return Promise.reject(new Error('Only .json, .zip, .sbext or .mpext extension library files are supported'));
 };
 
 export {

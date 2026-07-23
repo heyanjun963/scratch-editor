@@ -111,6 +111,9 @@ export default eslintConfigScratch.defineConfig(
     globalIgnores([
         'build/**/*',
         'dist/**/*',
-        'node_modules/**/*'
+        'node_modules/**/*',
+        // Mind+ fixture 中的 main.ts 使用外部 DSL，只作为兼容解析器输入，不属于本项目 TypeScript。
+        'test/fixtures/custom-extension/mindplus/*-fixture/**/*',
+        'test/fixtures/custom-extension/mindplus/dist/**/*'
     ])
 );

@@ -213,7 +213,7 @@ const messages = defineMessages({
         id: 'gui.productExtensionLibrary.uploadNotice'
     },
     localImportNotice: {
-        defaultMessage: '本地导入会复用现有 .json/.zip/.sbext 拓展包解析器。',
+        defaultMessage: '本地导入支持 .json、.zip、.sbext 和 Mind+ Python .mpext 拓展包。',
         description: 'Notice shown for reserved local import entry',
         id: 'gui.productExtensionLibrary.localImportNotice'
     },
@@ -708,7 +708,7 @@ const ProductExtensionLibraryComponent = ({
             });
     };
 
-    // 读取本地 .json/.zip/.sbext，解析失败时提示用户具体错误。
+    // 读取本地 .json/.zip/.sbext/.mpext，解析失败时提示用户具体错误。
     const handleImportFile = event => {
         const file = event.target.files && event.target.files[0];
         if (!file) return;
@@ -925,7 +925,7 @@ const ProductExtensionLibraryComponent = ({
                 )}
                 <div className={styles.toolbarActions}>
                     <input
-                        accept=".json,.zip,.sbext"
+                        accept=".json,.zip,.sbext,.mpext"
                         ref={fileInputRef}
                         style={{display: 'none'}}
                         type="file"

@@ -92,8 +92,10 @@ describe('ProductExtensionLibrary user extensions', () => {
     });
 
     test('keeps local packages out of module extensions', async () => {
-        render(<ProductExtensionLibraryComponent {...props} />);
+        const {container} = render(<ProductExtensionLibraryComponent {...props} />);
         await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+
+        expect(container.querySelector('input[type="file"]').getAttribute('accept')).toContain('.mpext');
 
         fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
         expect(screen.queryByText('My Device')).toBeNull();

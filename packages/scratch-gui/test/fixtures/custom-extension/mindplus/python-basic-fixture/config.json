@@ -1,0 +1,33 @@
+{
+  "name": {
+    "zh-cn": "Python兼容测试",
+    "en": "Python compatibility fixture"
+  },
+  "description": {
+    "zh-cn": "验证 Mind+ Python 用户库的基础积木、依赖和本地库结构。",
+    "en": "Validates basic blocks, dependencies and local libraries in a Mind+ Python package."
+  },
+  "author": "Scratch Editor Test",
+  "email": "test@example.com",
+  "license": "MIT",
+  "isBoard": false,
+  "id": "pythonfixture",
+  "platform": ["win", "mac", "web", "linux"],
+  "version": "0.1.0",
+  "asset": {
+    "python": {
+      "dir": "python/",
+      "version": "0.1.0",
+      "main": "main.ts",
+      "dependencies": {
+        "typing-extensions": "4.12.2"
+      },
+      "files": [
+        "_images/icon.svg",
+        "_locales/zh-cn.json",
+        "_menus/index.json",
+        "libraries/fixture_helper.py"
+      ]
+    }
+  }
+}

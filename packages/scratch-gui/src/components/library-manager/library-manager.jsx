@@ -254,7 +254,7 @@ const LibraryManagerComponent = ({
                         </div>
                     )}
                     <input
-                        accept=".json,.sbext,.zip,application/json"
+                        accept=".json,.sbext,.zip,.mpext,application/json"
                         className={styles.hiddenInput}
                         ref={fileInputRef}
                         type="file"

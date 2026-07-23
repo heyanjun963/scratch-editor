@@ -81,7 +81,8 @@ const createPackageManifest = ({
     rawBlocks,
     rawGenerator,
     runtimeFiles = [],
-    packageFileName
+    packageFileName,
+    packageStructure = 'company-scratch-extension-package-v2'
 }) => {
     const blockCollection = normalizeBlockCollection(rawBlocks);
     const generatorCollection = normalizeGeneratorCollection(rawGenerator);
@@ -126,7 +127,7 @@ const createPackageManifest = ({
         },
         package: {
             fileName: packageFileName,
-            structure: 'company-scratch-extension-package-v2'
+            structure: packageStructure
         },
         blocks
     });

@@ -1,0 +1,7 @@
+{
+  "MODE": {
+    "menu": [["快速", "fast"], ["稳定", "stable"]],
+    "default_readStatus_MODE": "fast",
+    "default_isReady_MODE": "stable"
+  }
+}
