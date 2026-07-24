@@ -363,6 +363,23 @@ const styles = `
     font-size: 11pt;
   }
 
+  .blocklyHatStackToggle {
+    cursor: pointer;
+    opacity: .88;
+  }
+
+  .blocklyHatStackToggle:hover {
+    opacity: 1;
+  }
+
+  .blocklyInsertionMarker .blocklyHatStackToggle {
+    display: none;
+  }
+
+  .blocklyHatStackCollapsedDots {
+    pointer-events: none;
+  }
+
   .blocklyNonEditableText>text {
     pointer-events: none;
   }

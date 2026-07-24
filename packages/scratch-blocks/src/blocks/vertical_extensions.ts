@@ -26,10 +26,12 @@
 import * as Blockly from 'blockly/core'
 import * as Constants from '../constants'
 import { FlyoutCheckboxIcon } from '../flyout_checkbox_icon'
+import { HatStackCollapseController } from '../hat_stack_collapse'
 import { ScratchProcedures } from '../procedures'
 
 interface ScratchBlockSvg extends Blockly.BlockSvg {
   hatStylePersisted?: boolean
+  hatStackCollapseController?: HatStackCollapseController
 }
 
 /**
@@ -87,8 +89,22 @@ const makeHatExtension = function (hatType: string) {
       blockSvg.setStyle = function (blockStyleName: string) {
         origSetStyle(blockStyleName)
         blockSvg.hat = hatType
+        blockSvg.hatStackCollapseController?.refreshIndicator()
       }
       blockSvg.hatStylePersisted = true
+    }
+
+    // 只在主工作区的普通帽子积木上增加整条脚本折叠按钮，工具箱和过程定义保持原样。
+    if (
+      hatType === 'cap' &&
+      this.workspace.rendered &&
+      !this.workspace.isFlyout &&
+      !blockSvg.hatStackCollapseController
+    ) {
+      const controller = new HatStackCollapseController(blockSvg)
+      const input = this.inputList[this.inputList.length - 1] ?? this.appendDummyInput()
+      input.appendField(controller.getField())
+      blockSvg.hatStackCollapseController = controller
     }
   }
 }
