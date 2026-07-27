@@ -135,11 +135,11 @@ describe('ProductExtensionLibrary user extensions', () => {
         loadedExtensionIds.clear();
         render(<ProductExtensionLibraryComponent {...props} />);
 
-        await waitFor(() => expect(screen.getByText('0.2.1')).toBeTruthy());
-        expect(screen.queryByText('0.2.2')).toBeNull();
+        await waitFor(() => expect(screen.getByText('0.2.3')).toBeTruthy());
+        expect(screen.queryByText('0.2.4')).toBeNull();
         expect(screen.queryByRole('combobox')).toBeNull();
 
-        fireEvent.click(screen.getByText('0.2.1'));
+        fireEvent.click(screen.getByText('0.2.3'));
         expect(vm.extensionManager.registerExtensionObject).not.toHaveBeenCalled();
         expect(props.onRequestClose).not.toHaveBeenCalled();
     });

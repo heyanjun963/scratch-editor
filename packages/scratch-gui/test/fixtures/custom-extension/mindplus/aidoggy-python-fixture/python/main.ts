@@ -121,8 +121,7 @@ namespace aidoggy {
     //% VALUE2.shadow="dropdown" VALUE2.options="oriention_turn"
     export function set_turn(parameter: any, block: any) {
         const speed = parameter.VALUE1.code;
-        const direction = parameter.VALUE2.code;
-        Generator.addCode(`aidoggy.omni_move(0,0,(${speed})*(${direction}),0,0)`);
+        Generator.addCode(`aidoggy.omni_move(0,0,${speed},0,0)`);
     }
 
     //% block="set gait [VALUE1]" blockType="command"

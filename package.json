@@ -43,6 +43,7 @@
     "prepare": "husky install",
     "refresh-gh-workflow": "ts-node scripts/update-gha-workflows.ts",
     "start": "npm --workspace @scratch/scratch-gui start",
+    "sync:builtin-product-snapshots": "node --import tsx scripts/sync-builtin-product-snapshots.mjs",
     "sync:product-extensions": "node scripts/sync-product-extensions.mjs",
     "test": "npm test --workspaces",
     "update-legal": "scripts/update-legal.sh",

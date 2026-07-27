@@ -241,6 +241,7 @@ const normalizeCommonManifestFields = rawManifest => {
         version: String(rawManifest.version || '1.0.0'),
         description: rawManifest.description ? String(rawManifest.description) : '',
         icon: rawManifest.icon ? String(rawManifest.icon) : null,
+        blockIcon: rawManifest.blockIcon ? String(rawManifest.blockIcon) : null,
         color1: normalizeColor(rawManifest.color1, '#4C97FF'),
         color2: normalizeColor(rawManifest.color2, '#3373CC'),
         color3: normalizeColor(rawManifest.color3, '#285CA3'),
@@ -350,6 +351,7 @@ const serializeCustomExtensionManifest = manifest => {
     };
 
     if (manifest.icon) serialized.icon = manifest.icon;
+    if (manifest.blockIcon) serialized.blockIcon = manifest.blockIcon;
     if (manifest.package) serialized.package = manifest.package;
     return serialized;
 };

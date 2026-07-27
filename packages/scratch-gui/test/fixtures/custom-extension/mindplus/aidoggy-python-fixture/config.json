@@ -1,14 +1,13 @@
 {
   "name": {
-    "zh-cn": "AiDoggy兼容测试",
-    "en": "AiDoggy compatibility fixture"
+    "zh-cn": "AiDoggy",
+    "en": "AiDoggy"
   },
   "description": {
-    "zh-cn": "使用 AiDoggy 现有积木验证 Mind+ Python 用户库格式。",
-    "en": "Validates the Mind+ Python package format with the existing AiDoggy blocks."
+    "zh-cn": "适用于 AiDoggy 四足机器狗的 Python 积木拓展包。",
+    "en": "Python block extension package for the AiDoggy quadruped robot."
   },
-  "author": "Scratch Editor Test",
-  "email": "test@example.com",
+  "author": "Hiwonder",
   "license": "MIT",
   "isBoard": false,
   "id": "aidoggy",
@@ -41,6 +40,25 @@
       },
       "start_run_thread": {
         "section": "setup"
+      },
+      "set_turn": {
+        "templateSelector": {
+          "argument": "VALUE2",
+          "cases": {
+            "1": "aidoggy.omni_move(0,0,{VALUE1},0,0)",
+            "-1": "aidoggy.omni_move(0,0,-{VALUE1},0,0)"
+          }
+        }
+      },
+      "run_action": {
+        "arguments": {
+          "BLOCK": {"type": "number", "defaultValue": "True"}
+        }
+      },
+      "run_action_name": {
+        "arguments": {
+          "BLOCK": {"type": "number", "defaultValue": "True"}
+        }
       }
     }
   },

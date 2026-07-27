@@ -1,0 +1,962 @@
+{
+  "formatVersion": 2,
+  "id": "aidoggy",
+  "name": "AiDoggy",
+  "version": "0.1.0",
+  "description": "适用于 AiDoggy 四足机器狗的 Python 积木拓展包。",
+  "color1": "#4682b4",
+  "color2": "#4682b4",
+  "color3": "#4682b4",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "entry",
+      "name": "entry",
+      "hideLabel": true,
+      "blocks": [
+        "start_thread",
+        "start_run_thread"
+      ]
+    },
+    {
+      "id": "board_resource",
+      "name": "板载资源",
+      "hideLabel": false,
+      "blocks": [
+        "buzzer_tone_set",
+        "buzzer_tone_set_arg",
+        "get_battery_level",
+        "set_low_battery_alarm"
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出打印",
+      "hideLabel": false,
+      "blocks": [
+        "print_str",
+        "print_number"
+      ]
+    },
+    {
+      "id": "motion",
+      "name": "运动控制",
+      "hideLabel": false,
+      "blocks": [
+        "set_pose",
+        "set_move",
+        "set_move_xyz",
+        "set_turn",
+        "set_gait",
+        "set_stop"
+      ]
+    },
+    {
+      "id": "action_group",
+      "name": "动作组控制",
+      "hideLabel": false,
+      "blocks": [
+        "run_action",
+        "run_action_name",
+        "stop_action"
+      ]
+    }
+  ],
+  "menus": {
+    "action_name": {
+      "items": [
+        {
+          "text": "坐下",
+          "value": "sit_preset"
+        },
+        {
+          "text": "站立",
+          "value": "stand_preset"
+        },
+        {
+          "text": "趴下",
+          "value": "lieDown_preset"
+        },
+        {
+          "text": "下蹲",
+          "value": "squat_preset"
+        },
+        {
+          "text": "伸展",
+          "value": "stretch_preset"
+        },
+        {
+          "text": "握手",
+          "value": "handshake_preset"
+        },
+        {
+          "text": "挥手",
+          "value": "waveHand_preset"
+        },
+        {
+          "text": "抬腿",
+          "value": "pee_preset"
+        },
+        {
+          "text": "摇摆",
+          "value": "sway_preset"
+        },
+        {
+          "text": "波浪运动",
+          "value": "waveMotion_preset"
+        },
+        {
+          "text": "三轴姿态演示",
+          "value": "3axis_preset"
+        },
+        {
+          "text": "俯仰轴动作",
+          "value": "action_pitch_preset"
+        },
+        {
+          "text": "横滚轴动作",
+          "value": "action_roll_preset"
+        },
+        {
+          "text": "偏航轴动作",
+          "value": "action_yaw_preset"
+        }
+      ]
+    },
+    "blocking": {
+      "items": [
+        {
+          "text": "等待运行完毕",
+          "value": "True"
+        },
+        {
+          "text": "不等待",
+          "value": "False"
+        }
+      ]
+    },
+    "oriention_turn": {
+      "items": [
+        {
+          "text": "原地左转",
+          "value": "1"
+        },
+        {
+          "text": "原地右转",
+          "value": "-1"
+        }
+      ]
+    },
+    "orientation": {
+      "items": [
+        {
+          "text": "↑",
+          "value": "0"
+        },
+        {
+          "text": "↓",
+          "value": "180"
+        },
+        {
+          "text": "←",
+          "value": "90"
+        },
+        {
+          "text": "→",
+          "value": "-90"
+        },
+        {
+          "text": "↖",
+          "value": "45"
+        },
+        {
+          "text": "↗",
+          "value": "-45"
+        },
+        {
+          "text": "↙",
+          "value": "75"
+        },
+        {
+          "text": "↘",
+          "value": "-75"
+        }
+      ]
+    },
+    "gait": {
+      "items": [
+        {
+          "text": "对角小跑",
+          "value": "0"
+        },
+        {
+          "text": "爬行",
+          "value": "1"
+        },
+        {
+          "text": "跳跃",
+          "value": "2"
+        },
+        {
+          "text": "侧向",
+          "value": "3"
+        },
+        {
+          "text": "混合",
+          "value": "4"
+        }
+      ]
+    },
+    "tones": {
+      "items": [
+        {
+          "text": "C2",
+          "value": "65"
+        },
+        {
+          "text": "D2",
+          "value": "73"
+        },
+        {
+          "text": "E2",
+          "value": "82"
+        },
+        {
+          "text": "F2",
+          "value": "87"
+        },
+        {
+          "text": "G2",
+          "value": "98"
+        },
+        {
+          "text": "A2",
+          "value": "110"
+        },
+        {
+          "text": "B2",
+          "value": "123"
+        },
+        {
+          "text": "C3",
+          "value": "131"
+        },
+        {
+          "text": "D3",
+          "value": "147"
+        },
+        {
+          "text": "E3",
+          "value": "165"
+        },
+        {
+          "text": "F3",
+          "value": "175"
+        },
+        {
+          "text": "G3",
+          "value": "196"
+        },
+        {
+          "text": "A3",
+          "value": "220"
+        },
+        {
+          "text": "B3",
+          "value": "247"
+        },
+        {
+          "text": "C4",
+          "value": "262"
+        },
+        {
+          "text": "D4",
+          "value": "294"
+        },
+        {
+          "text": "E4",
+          "value": "330"
+        },
+        {
+          "text": "F4",
+          "value": "349"
+        },
+        {
+          "text": "G4",
+          "value": "392"
+        },
+        {
+          "text": "A4",
+          "value": "440"
+        },
+        {
+          "text": "B4",
+          "value": "494"
+        },
+        {
+          "text": "C5",
+          "value": "523"
+        },
+        {
+          "text": "D5",
+          "value": "587"
+        },
+        {
+          "text": "E5",
+          "value": "659"
+        },
+        {
+          "text": "F5",
+          "value": "698"
+        },
+        {
+          "text": "G5",
+          "value": "784"
+        },
+        {
+          "text": "A5",
+          "value": "880"
+        },
+        {
+          "text": "B5",
+          "value": "988"
+        },
+        {
+          "text": "C6",
+          "value": "1047"
+        },
+        {
+          "text": "D6",
+          "value": "1175"
+        },
+        {
+          "text": "E6",
+          "value": "1319"
+        },
+        {
+          "text": "F6",
+          "value": "1397"
+        },
+        {
+          "text": "G6",
+          "value": "1568"
+        },
+        {
+          "text": "A6",
+          "value": "1760"
+        },
+        {
+          "text": "B6",
+          "value": "1976"
+        },
+        {
+          "text": "C7",
+          "value": "2093"
+        },
+        {
+          "text": "D7",
+          "value": "2349"
+        },
+        {
+          "text": "E7",
+          "value": "2637"
+        },
+        {
+          "text": "F7",
+          "value": "2794"
+        },
+        {
+          "text": "G7",
+          "value": "3136"
+        },
+        {
+          "text": "A7",
+          "value": "3520"
+        },
+        {
+          "text": "B7",
+          "value": "3951"
+        },
+        {
+          "text": "C8",
+          "value": "4186"
+        },
+        {
+          "text": "D8",
+          "value": "4699"
+        }
+      ]
+    },
+    "rhythms": {
+      "items": [
+        {
+          "text": "二分之一",
+          "value": "500"
+        },
+        {
+          "text": "四分之一",
+          "value": "250"
+        },
+        {
+          "text": "八分之一",
+          "value": "125"
+        },
+        {
+          "text": "一拍",
+          "value": "1000"
+        },
+        {
+          "text": "两拍",
+          "value": "2000"
+        },
+        {
+          "text": "长音",
+          "value": "5000"
+        },
+        {
+          "text": "连续",
+          "value": "0"
+        }
+      ]
+    },
+    "on_off": {
+      "items": [
+        {
+          "text": "开启",
+          "value": "True"
+        },
+        {
+          "text": "关闭",
+          "value": "False"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "start_thread",
+      "blockType": "hat",
+      "text": "主程序",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "aidoggy = Hiwonder.AIDoggy()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "Hiwonder.startMain({MAIN})",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "start_run_thread",
+      "blockType": "hat",
+      "text": "当启动时",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "aidoggy = Hiwonder.AIDoggy()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": "setup"
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 间隔 [VALUE] 毫秒，鸣响 [VALUE2] 次",
+      "arguments": {
+        "TONES": {
+          "type": "string",
+          "defaultValue": "65",
+          "menu": "tones",
+          "literal": true
+        },
+        "RHYTHMS": {
+          "type": "string",
+          "defaultValue": "500",
+          "menu": "rhythms",
+          "literal": true
+        },
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 100
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.set_buzzer({TONES},{RHYTHMS},{VALUE},{VALUE2})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_arg",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 间隔 [VALUE] 毫秒，鸣响 [VALUE2] 次",
+      "arguments": {
+        "TONES": {
+          "type": "number",
+          "defaultValue": 65
+        },
+        "RHYTHMS": {
+          "type": "number",
+          "defaultValue": 500
+        },
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 100
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.set_buzzer({TONES},{RHYTHMS},{VALUE},{VALUE2})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_battery_level",
+      "blockType": "reporter",
+      "text": "电池电压(mV)",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "rsys.read_battery_voltage()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "rsys = Hiwonder.Robot_System()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_low_battery_alarm",
+      "blockType": "command",
+      "text": "[VALUE] 低电压报警",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "True",
+          "menu": "on_off",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rsys.set_low_voltage_alarm_enable({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "rsys = Hiwonder.Robot_System()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "print_str",
+      "blockType": "command",
+      "text": "输出打印字符 [STR]",
+      "arguments": {
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hello"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print({STR})\ntime.sleep(0.05)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "print_number",
+      "blockType": "command",
+      "text": "输出打印数字 [NUM]",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print({NUM})\ntime.sleep(0.05)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_pose",
+      "blockType": "command",
+      "text": "设置以 [VALUE6] 毫秒的时间调整姿态，俯仰角(Pitch) [VALUE1] 度，横滚角(Roll) [VALUE2] 度，机身高度 [VALUE3] 毫米，X轴偏移 [VALUE4] 毫米，Y轴偏移 [VALUE5] 毫米",
+      "arguments": {
+        "VALUE6": {
+          "type": "number",
+          "defaultValue": 1000
+        },
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE4": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE5": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.set_pose({VALUE1},{VALUE2},{VALUE3},{VALUE4},{VALUE5},{VALUE6})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_move",
+      "blockType": "command",
+      "text": "设置以 [VALUE5] 毫米/秒的速度行走，行走方向 [VALUE1]，行走距离 [VALUE2] 毫米，步长 [VALUE3] 毫米，抬腿高度 [VALUE4] 毫米",
+      "arguments": {
+        "VALUE5": {
+          "type": "number",
+          "defaultValue": 80
+        },
+        "VALUE1": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "orientation",
+          "literal": true
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 200
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 40
+        },
+        "VALUE4": {
+          "type": "number",
+          "defaultValue": 30
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.move({VALUE1},{VALUE2},{VALUE3},{VALUE4},{VALUE5})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_move_xyz",
+      "blockType": "command",
+      "text": "设置X方向速度 [VALUE1] 毫米/秒，Y方向速度 [VALUE2] 毫米/秒，角速度 [VALUE3] 度/秒，步长 [VALUE4] 毫米，抬腿高度 [VALUE5] 毫米",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE4": {
+          "type": "number",
+          "defaultValue": 40
+        },
+        "VALUE5": {
+          "type": "number",
+          "defaultValue": 30
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.omni_move({VALUE1},{VALUE2},{VALUE3},{VALUE4},{VALUE5})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_turn",
+      "blockType": "command",
+      "text": "设置以 [VALUE1] 度/秒的速度 [VALUE2]",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "oriention_turn",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.omni_move(0,0,{VALUE1},0,0)",
+          "templateSelector": {
+            "argument": "VALUE2",
+            "cases": {
+              "1": "aidoggy.omni_move(0,0,{VALUE1},0,0)",
+              "-1": "aidoggy.omni_move(0,0,-{VALUE1},0,0)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_gait",
+      "blockType": "command",
+      "text": "设置步态类型 [VALUE1]",
+      "arguments": {
+        "VALUE1": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "gait",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.set_gait({VALUE1})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_stop",
+      "blockType": "command",
+      "text": "停止运动",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "aidoggy.stop()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "run_action",
+      "blockType": "command",
+      "text": "设置运行动作组名称 [ACTION] [BLOCK]",
+      "arguments": {
+        "ACTION": {
+          "type": "string",
+          "defaultValue": "sit_preset"
+        },
+        "BLOCK": {
+          "type": "number",
+          "defaultValue": "True",
+          "menu": "blocking",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.run_action_group({ACTION},{BLOCK})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "run_action_name",
+      "blockType": "command",
+      "text": "设置运行动作组 [ACTION] [BLOCK]",
+      "arguments": {
+        "ACTION": {
+          "type": "string",
+          "defaultValue": "sit_preset",
+          "menu": "action_name",
+          "literal": true
+        },
+        "BLOCK": {
+          "type": "number",
+          "defaultValue": "True",
+          "menu": "blocking",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "aidoggy.run_action_group('{ACTION}',{BLOCK})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "stop_action",
+      "blockType": "command",
+      "text": "停止运行动作组",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "aidoggy.action_stop()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "icon": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2250%22%20height%3D%2240%22%20viewBox%3D%220%200%2050%2040%22%3E%0A%20%20%3Crect%20x%3D%224%22%20y%3D%229%22%20width%3D%2242%22%20height%3D%2223%22%20rx%3D%224%22%20fill%3D%22%234682B4%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2216%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23FFFFFF%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2234%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23FFFFFF%22%2F%3E%0A%3C%2Fsvg%3E%0A",
+  "package": {
+    "fileName": "aidoggy-0.1.0.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

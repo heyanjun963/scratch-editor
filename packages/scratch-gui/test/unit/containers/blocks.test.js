@@ -1,4 +1,5 @@
 import {Blocks} from '../../../src/containers/blocks.jsx';
+import {PYTHON_EDITOR_MODE} from '../../../src/reducers/mode';
 
 describe('Blocks container onWorkspaceUpdate', () => {
     let instance;
@@ -7,6 +8,7 @@ describe('Blocks container onWorkspaceUpdate', () => {
         // Minimal mock instance — just enough for onWorkspaceUpdate to run
         instance = {
             getToolboxXML: jest.fn().mockReturnValue(null),
+            onPythonWorkspaceChange: jest.fn(),
             onWorkspaceMetricsChange: jest.fn(),
             toolboxUpdateChangeListener: jest.fn(),
             props: {
@@ -61,5 +63,34 @@ describe('Blocks container onWorkspaceUpdate', () => {
 
         expect(instance.ScratchBlocks.Events.disable).toHaveBeenCalled();
         expect(instance.ScratchBlocks.Events.enable).toHaveBeenCalled();
+    });
+});
+
+describe('Blocks container ensurePythonExtensions', () => {
+    test('does not automatically load the Python native toolbox category', () => {
+        const extensionManager = {
+            isExtensionLoaded: jest.fn().mockReturnValue(false),
+            loadExtensionURL: jest.fn().mockResolvedValue()
+        };
+        const instance = {
+            loadingPythonNativeExtension: false,
+            props: {
+                editorMode: PYTHON_EDITOR_MODE,
+                customExtensionLibraries: [],
+                vm: {extensionManager}
+            },
+            refreshToolboxXML: jest.fn()
+        };
+
+        Blocks.prototype.ensurePythonExtensions.call(instance);
+
+        expect(extensionManager.loadExtensionURL.mock.calls.map(([extensionId]) => extensionId)).toEqual([
+            'pythonControl',
+            'pythonOperators',
+            'pythonText',
+            'pythonVariables',
+            'pythonList',
+            'pythonFunction'
+        ]);
     });
 });

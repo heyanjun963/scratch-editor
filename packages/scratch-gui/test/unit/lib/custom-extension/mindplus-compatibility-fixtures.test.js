@@ -72,27 +72,16 @@ describe('Mind+ compatibility fixtures', () => {
     });
 
     test('keeps the AiDoggy Mind+ fixture aligned with the current product package', () => {
-        const sourceDirectory = path.join(fixtureRoot, 'aidoggy-python-fixture');
-        const productDirectory = path.join(guiRoot, 'src/lib/custom-extension/builtin-product-packages/aidoggy');
-        const config = JSON.parse(fs.readFileSync(path.join(sourceDirectory, 'config.json'), 'utf8'));
-        const main = fs.readFileSync(path.join(sourceDirectory, 'python/main.ts'), 'utf8');
-        const menu = JSON.parse(fs.readFileSync(path.join(sourceDirectory, 'python/_menus/index.json'), 'utf8'));
-        const locale = JSON.parse(fs.readFileSync(path.join(sourceDirectory, 'python/_locales/zh-cn.json'), 'utf8'));
-        const productBlocks = JSON.parse(fs.readFileSync(path.join(productDirectory, 'blocks.json'), 'utf8'));
-        const productManifest = JSON.parse(fs.readFileSync(path.join(productDirectory, 'manifest.json'), 'utf8'));
-        const fixtureOpcodes = Array.from(main.matchAll(/export function ([A-Za-z0-9_]+)\(/g), match => match[1]);
+        const fixturePackage = fs.readFileSync(path.join(
+            fixtureRoot,
+            'dist/aidoggy-python-fixture-0.1.0.mpext'
+        ));
+        const snapshotPackage = fs.readFileSync(path.join(
+            guiRoot,
+            'src/lib/custom-extension/builtin-product-snapshots/packages/aidoggy-0.1.0.mpext'
+        ));
 
-        expect(config).toMatchObject({id: 'aidoggy', version: productManifest.version});
-        expect(fixtureOpcodes).toEqual(productBlocks.blocks.map(block => block.opcode));
-        expect(Object.keys(menu)).toEqual(Object.keys(productManifest.menus));
-        Object.entries(productManifest.menus).forEach(([name, productMenu]) => {
-            expect(menu[name].menu).toEqual(productMenu.items.map(item => [item.text, item.value]));
-        });
-        productBlocks.blocks.forEach(block => {
-            expect(locale[`aidoggy.${block.opcode}|block`]).toBe(block.text);
-        });
-        expect(main).toContain('Generator.addImport("import Hiwonder")');
-        expect(main.match(/Generator\.addCode/g)).toHaveLength(15);
+        expect(fixturePackage).toEqual(snapshotPackage);
     });
 
     test('covers Python dependencies, local libraries and basic generator input', () => {

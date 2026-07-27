@@ -26,11 +26,12 @@ const EXPECTED_AIDOGGY_OPCODES = [
     'stop_action'
 ];
 
-const createMindPlusPackage = async ({config, main, menus, locales = {}}) => {
+const createMindPlusPackage = async ({config, main, menus, locales = {}, icon}) => {
     const zip = new JSZip();
     zip.file('config.json', JSON.stringify(config));
     if (main) zip.file('python/main.ts', main);
     if (menus) zip.file('python/_menus/index.json', JSON.stringify(menus));
+    if (icon) zip.file('python/_images/icon.svg', icon);
     Object.entries(locales).forEach(([locale, messages]) => {
         zip.file(`python/_locales/${locale}.json`, JSON.stringify(messages));
     });
@@ -85,7 +86,7 @@ describe('Mind+ package reader', () => {
 
         expect(manifest).toMatchObject({
             id: 'aidoggy',
-            name: 'AiDoggy兼容测试',
+            name: 'AiDoggy',
             version: '0.1.0',
             source: 'mindplus',
             package: {
@@ -113,9 +114,18 @@ describe('Mind+ package reader', () => {
             variables: ['beep = Hiwonder.Buzzer()']
         });
         expect(blocksByOpcode.set_turn.codegen.python.template).toBe(
-            'aidoggy.omni_move(0,0,({VALUE1})*({VALUE2}),0,0)'
+            'aidoggy.omni_move(0,0,{VALUE1},0,0)'
         );
+        expect(blocksByOpcode.set_turn.codegen.python.templateSelector).toEqual({
+            argument: 'VALUE2',
+            cases: {
+                '1': 'aidoggy.omni_move(0,0,{VALUE1},0,0)',
+                '-1': 'aidoggy.omni_move(0,0,-{VALUE1},0,0)'
+            }
+        });
         expect(blocksByOpcode.get_battery_level.text).toBe('电池电压(mV)');
+        expect(blocksByOpcode.run_action.arguments.BLOCK.type).toBe('number');
+        expect(blocksByOpcode.run_action_name.arguments.BLOCK.type).toBe('number');
         expect(manifest.menus.orientation.items.map(item => item.value)).toEqual([
             '0', '180', '90', '-90', '45', '-45', '75', '-75'
         ]);
@@ -126,7 +136,7 @@ describe('Mind+ package reader', () => {
             getPythonCodegenTemplate: getManifestTemplate(manifest)
         });
         expect(code).toContain('aidoggy = Hiwonder.AIDoggy()');
-        expect(code).toContain('aidoggy.omni_move(0,0,(12)*(-1),0,0)');
+        expect(code).toContain('aidoggy.omni_move(0,0,-12,0,0)');
         expect(code).toContain('Hiwonder.startMain(start_main)');
     });
 
@@ -169,6 +179,19 @@ describe('Mind+ package reader', () => {
             config: {
                 id: 'localefixture',
                 name: {en: 'Locale fixture'},
+                scratchEditor: {
+                    blocks: {
+                        read: {
+                            templateSelector: {
+                                argument: 'MODE',
+                                cases: {
+                                    fast: 'read_fast()',
+                                    stable: 'read_stable()'
+                                }
+                            }
+                        }
+                    }
+                },
                 asset: {
                     python: {
                         dir: 'python/',
@@ -189,7 +212,7 @@ describe('Mind+ package reader', () => {
                 '}'
             ].join('\n'),
             menus: {
-                MODE: {menu: [['Fast', 'fast']]}
+                MODE: {menu: [['Fast', 'fast'], ['Stable', 'stable']]}
             },
             locales: {
                 en: {
@@ -199,14 +222,82 @@ describe('Mind+ package reader', () => {
                 'zh-cn': {
                     'localefixture.read|block': '读取模式 [MODE]'
                 }
-            }
+            },
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>'
         });
 
         const manifest = await readCustomExtensionPackageBuffer(packageData, 'locale.mpext');
 
         expect(manifest.version).toBe('2.3.4');
+        expect(manifest.icon).toMatch(/^data:image\/svg\+xml;utf8,/);
         expect(manifest.blocks[0].text).toBe('读取模式 [MODE]');
-        expect(manifest.menus.MODE.items).toEqual([{text: 'Fast fallback', value: 'fast'}]);
+        expect(manifest.blocks[0].codegen.python.templateSelector).toEqual({
+            argument: 'MODE',
+            cases: {
+                fast: 'read_fast()',
+                stable: 'read_stable()'
+            }
+        });
+        expect(manifest.menus.MODE.items).toEqual([
+            {text: 'Fast fallback', value: 'fast'},
+            {text: 'Stable', value: 'stable'}
+        ]);
+    });
+
+    test('preserves Scratch-specific colors and line6 arguments declared by a Mind+ product', async () => {
+        const packageData = await createMindPlusPackage({
+            config: {
+                id: 'linefixture',
+                name: {en: 'Line fixture'},
+                version: '1.0.0',
+                scratchEditor: {
+                    color1: '#1874cd',
+                    color2: '#145fa8',
+                    color3: '#104b85',
+                    blocks: {
+                        read: {
+                            arguments: {
+                                LINE: {
+                                    type: 'line6',
+                                    defaultValue: '00'
+                                }
+                            }
+                        }
+                    }
+                },
+                asset: {
+                    python: {
+                        dir: 'python/',
+                        main: 'main.ts'
+                    }
+                }
+            },
+            main: [
+                '//% color="#1874cd"',
+                'namespace linefixture {',
+                '    //% block="read [LINE]" blockType="boolean"',
+                '    //% LINE.shadow="string" LINE.defl="00"',
+                '    export function read(parameter: any, block: any) {',
+                '        const line = parameter.LINE.code;',
+                '        Generator.addCode(`read_line(${line})`);',
+                '    }',
+                '}'
+            ].join('\n')
+        });
+
+        const manifest = await readCustomExtensionPackageBuffer(packageData, 'linefixture.mpext');
+
+        expect(manifest).toMatchObject({
+            color1: '#1874cd',
+            color2: '#145fa8',
+            color3: '#104b85'
+        });
+        expect(manifest.blocks[0].arguments.LINE).toMatchObject({
+            type: 'line6',
+            scratchType: 'line6',
+            defaultValue: '00',
+            literal: false
+        });
     });
 
     test('rejects Arduino C assets with an explicit target error', async () => {

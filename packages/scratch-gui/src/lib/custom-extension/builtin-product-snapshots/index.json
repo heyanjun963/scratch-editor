@@ -1,0 +1,23 @@
+{
+  "formatVersion": 1,
+  "packages": [
+    {
+      "packageId": "aidoggy",
+      "version": "0.1.0",
+      "asset": "aidoggy-0.1.0.mpext",
+      "sha256": "987b83dc86aabe9262c1f9d9311537741d29be52c4cd259d1af2558627cfc754"
+    },
+    {
+      "packageId": "aimecanum",
+      "version": "0.2.3",
+      "asset": "aimecanum-0.2.3.mpext",
+      "sha256": "30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95"
+    },
+    {
+      "packageId": "minihexa",
+      "version": "0.1.1",
+      "asset": "minihexa-0.1.1.mpext",
+      "sha256": "7bbf1554e7dd67b7aa00d9e92b408f0ca7e2fb5cd2911c9597f71ca87d882478"
+    }
+  ]
+}

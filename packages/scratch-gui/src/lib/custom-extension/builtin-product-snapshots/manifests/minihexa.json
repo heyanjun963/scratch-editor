@@ -1,0 +1,1725 @@
+{
+  "formatVersion": 2,
+  "id": "minihexa",
+  "name": "miniHexa",
+  "version": "0.1.1",
+  "description": "适用于 miniHexa 六足机器人的 Python 积木拓展包。",
+  "color1": "#336699",
+  "color2": "#336699",
+  "color3": "#336699",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "entry",
+      "name": "entry",
+      "hideLabel": true,
+      "blocks": [
+        "start_thread",
+        "start_run_thread"
+      ]
+    },
+    {
+      "id": "board_resource",
+      "name": "板载资源",
+      "hideLabel": false,
+      "blocks": [
+        "buzzer_tone_set",
+        "buzzer_tone_set_arg",
+        "buzzer_tone_set_volume",
+        "get_battery_level",
+        "get_volume",
+        "disable_lowPower_alarm"
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出打印",
+      "hideLabel": false,
+      "blocks": [
+        "print_str",
+        "print_number"
+      ]
+    },
+    {
+      "id": "kinematics",
+      "name": "运动控制",
+      "hideLabel": false,
+      "blocks": [
+        "set_body_reset",
+        "set_body_angle",
+        "set_body_pose",
+        "set_body_pose_height",
+        "set_go",
+        "set_go_step",
+        "set_move_xyz",
+        "set_move_xyz_step",
+        "set_turn",
+        "set_turn_step",
+        "set_go_stop",
+        "set_leg_lift",
+        "set_self_balance"
+      ]
+    },
+    {
+      "id": "servo_control",
+      "name": "舵机控制",
+      "hideLabel": false,
+      "blocks": [
+        "set_servo"
+      ]
+    },
+    {
+      "id": "action_group",
+      "name": "动作组",
+      "hideLabel": false,
+      "blocks": [
+        "action_run",
+        "action_stop"
+      ]
+    },
+    {
+      "id": "keys",
+      "name": "按键",
+      "hideLabel": false,
+      "blocks": [
+        "when_minihexa_key_click_thread",
+        "when_minihexa_key_longclick_thread",
+        "key_is_pressed"
+      ]
+    },
+    {
+      "id": "imu_sensor",
+      "name": "IMU传感器",
+      "hideLabel": false,
+      "blocks": [
+        "imu_read_gyro_data",
+        "imu_read_angle"
+      ]
+    },
+    {
+      "id": "serial_communication",
+      "name": "串口通信",
+      "hideLabel": false,
+      "blocks": [
+        "serial_set_baudrate",
+        "serial_write",
+        "serial_has_recv_data",
+        "serial_recv_contains",
+        "serial_recv_buff",
+        "get_serial_cmd",
+        "get_serial_args",
+        "clear_buffer"
+      ]
+    }
+  ],
+  "menus": {
+    "iicport": {
+      "items": [
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "4",
+          "value": "4"
+        },
+        {
+          "text": "5",
+          "value": "5"
+        },
+        {
+          "text": "9",
+          "value": "9"
+        }
+      ]
+    },
+    "asrmodes": {
+      "items": [
+        {
+          "text": "连续模式",
+          "value": "1"
+        },
+        {
+          "text": "语音模式",
+          "value": "2"
+        },
+        {
+          "text": "按键模式",
+          "value": "3"
+        }
+      ]
+    },
+    "blemode": {
+      "items": [
+        {
+          "text": "从机模式",
+          "value": "BLE.MODE_BLE_SLAVE"
+        },
+        {
+          "text": "主机模式",
+          "value": "BLE.MODE_BLE_MASTER"
+        }
+      ]
+    },
+    "balance": {
+      "items": [
+        {
+          "text": "启动",
+          "value": "True"
+        },
+        {
+          "text": "停止",
+          "value": "False"
+        }
+      ]
+    },
+    "baudrate": {
+      "items": [
+        {
+          "text": "9600",
+          "value": "9600"
+        },
+        {
+          "text": "115200",
+          "value": "115200"
+        }
+      ]
+    },
+    "tones": {
+      "items": [
+        {
+          "text": "C2",
+          "value": "65"
+        },
+        {
+          "text": "D2",
+          "value": "73"
+        },
+        {
+          "text": "E2",
+          "value": "82"
+        },
+        {
+          "text": "F2",
+          "value": "87"
+        },
+        {
+          "text": "G2",
+          "value": "98"
+        },
+        {
+          "text": "A2",
+          "value": "110"
+        },
+        {
+          "text": "B2",
+          "value": "123"
+        },
+        {
+          "text": "C3",
+          "value": "131"
+        },
+        {
+          "text": "D3",
+          "value": "147"
+        },
+        {
+          "text": "E3",
+          "value": "165"
+        },
+        {
+          "text": "F3",
+          "value": "175"
+        },
+        {
+          "text": "G3",
+          "value": "196"
+        },
+        {
+          "text": "A3",
+          "value": "220"
+        },
+        {
+          "text": "B3",
+          "value": "247"
+        },
+        {
+          "text": "C4",
+          "value": "262"
+        },
+        {
+          "text": "D4",
+          "value": "294"
+        },
+        {
+          "text": "E4",
+          "value": "330"
+        },
+        {
+          "text": "F4",
+          "value": "349"
+        },
+        {
+          "text": "G4",
+          "value": "392"
+        },
+        {
+          "text": "A4",
+          "value": "440"
+        },
+        {
+          "text": "B4",
+          "value": "494"
+        },
+        {
+          "text": "C5",
+          "value": "523"
+        },
+        {
+          "text": "D5",
+          "value": "587"
+        },
+        {
+          "text": "E5",
+          "value": "659"
+        },
+        {
+          "text": "F5",
+          "value": "698"
+        },
+        {
+          "text": "G5",
+          "value": "784"
+        },
+        {
+          "text": "A5",
+          "value": "880"
+        },
+        {
+          "text": "B5",
+          "value": "988"
+        },
+        {
+          "text": "C6",
+          "value": "1047"
+        },
+        {
+          "text": "D6",
+          "value": "1175"
+        },
+        {
+          "text": "E6",
+          "value": "1319"
+        },
+        {
+          "text": "F6",
+          "value": "1397"
+        },
+        {
+          "text": "G6",
+          "value": "1568"
+        },
+        {
+          "text": "A6",
+          "value": "1760"
+        },
+        {
+          "text": "B6",
+          "value": "1976"
+        },
+        {
+          "text": "C7",
+          "value": "2093"
+        },
+        {
+          "text": "D7",
+          "value": "2349"
+        },
+        {
+          "text": "E7",
+          "value": "2637"
+        },
+        {
+          "text": "F7",
+          "value": "2794"
+        },
+        {
+          "text": "G7",
+          "value": "3136"
+        },
+        {
+          "text": "A7",
+          "value": "3520"
+        },
+        {
+          "text": "B7",
+          "value": "3951"
+        },
+        {
+          "text": "C8",
+          "value": "4186"
+        },
+        {
+          "text": "D8",
+          "value": "4699"
+        }
+      ]
+    },
+    "rhythms": {
+      "items": [
+        {
+          "text": "二分之一",
+          "value": "500"
+        },
+        {
+          "text": "四分之一",
+          "value": "250"
+        },
+        {
+          "text": "八分之一",
+          "value": "125"
+        },
+        {
+          "text": "一拍",
+          "value": "1000"
+        },
+        {
+          "text": "两拍",
+          "value": "2000"
+        },
+        {
+          "text": "长音",
+          "value": "5000"
+        },
+        {
+          "text": "0",
+          "value": "0"
+        }
+      ]
+    },
+    "buzzer_mode": {
+      "items": [
+        {
+          "text": "后台播放",
+          "value": "False"
+        },
+        {
+          "text": "前台播放（阻塞）",
+          "value": "True"
+        }
+      ]
+    },
+    "gyro_select": {
+      "items": [
+        {
+          "text": "X轴角速度",
+          "value": "0"
+        },
+        {
+          "text": "Y轴角速度",
+          "value": "1"
+        },
+        {
+          "text": "Z轴角速度",
+          "value": "2"
+        }
+      ]
+    },
+    "imu_select": {
+      "items": [
+        {
+          "text": "横滚角",
+          "value": "0"
+        },
+        {
+          "text": "俯仰角",
+          "value": "1"
+        }
+      ]
+    },
+    "up_down_select": {
+      "items": [
+        {
+          "text": "向上",
+          "value": "1"
+        },
+        {
+          "text": "向下",
+          "value": "-1"
+        }
+      ]
+    },
+    "x_select": {
+      "items": [
+        {
+          "text": "向前",
+          "value": "1"
+        },
+        {
+          "text": "向后",
+          "value": "-1"
+        }
+      ]
+    },
+    "pitch_select": {
+      "items": [
+        {
+          "text": "前倾",
+          "value": "1"
+        },
+        {
+          "text": "后倾",
+          "value": "-1"
+        }
+      ]
+    },
+    "roll_select": {
+      "items": [
+        {
+          "text": "左倾",
+          "value": "1"
+        },
+        {
+          "text": "右倾",
+          "value": "-1"
+        }
+      ]
+    },
+    "roll_pitch_yaw": {
+      "items": [
+        {
+          "text": "横滚",
+          "value": "1"
+        },
+        {
+          "text": "俯仰",
+          "value": "2"
+        },
+        {
+          "text": "偏航",
+          "value": "3"
+        }
+      ]
+    },
+    "oriention_8": {
+      "items": [
+        {
+          "text": "↑",
+          "value": "0"
+        },
+        {
+          "text": "↓",
+          "value": "1"
+        },
+        {
+          "text": "←",
+          "value": "2"
+        },
+        {
+          "text": "→",
+          "value": "3"
+        },
+        {
+          "text": "↖",
+          "value": "4"
+        },
+        {
+          "text": "↗",
+          "value": "5"
+        },
+        {
+          "text": "↙",
+          "value": "6"
+        },
+        {
+          "text": "↘",
+          "value": "7"
+        }
+      ]
+    },
+    "oriention_9": {
+      "items": [
+        {
+          "text": "抬高",
+          "value": "1"
+        },
+        {
+          "text": "降低",
+          "value": "-1"
+        }
+      ]
+    },
+    "robot_turn": {
+      "items": [
+        {
+          "text": "顺时针旋转",
+          "value": "1"
+        },
+        {
+          "text": "逆时针旋转",
+          "value": "2"
+        }
+      ]
+    },
+    "onoff": {
+      "items": [
+        {
+          "text": "开启",
+          "value": "True"
+        },
+        {
+          "text": "关闭",
+          "value": "False"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "start_thread",
+      "blockType": "hat",
+      "text": "主程序",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "minihexa = Hiwonder.Robot()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "Hiwonder.startMain({MAIN})",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "start_run_thread",
+      "blockType": "hat",
+      "text": "当启动时",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "minihexa = Hiwonder.Robot()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": "setup"
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 模式为 [MODE]",
+      "arguments": {
+        "TONES": {
+          "type": "string",
+          "defaultValue": "65",
+          "menu": "tones",
+          "literal": true
+        },
+        "RHYTHMS": {
+          "type": "string",
+          "defaultValue": "500",
+          "menu": "rhythms",
+          "literal": true
+        },
+        "MODE": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "buzzer_mode",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.playTone({TONES},{RHYTHMS},{MODE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_arg",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 模式为 [MODE]",
+      "arguments": {
+        "TONES": {
+          "type": "number",
+          "defaultValue": 65
+        },
+        "RHYTHMS": {
+          "type": "number",
+          "defaultValue": 500
+        },
+        "MODE": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "buzzer_mode",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.playTone({TONES},{RHYTHMS},{MODE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_volume",
+      "blockType": "command",
+      "text": "设置蜂鸣器音量为 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 100
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.setVolume({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_battery_level",
+      "blockType": "reporter",
+      "text": "电量值(mV)",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "Hiwonder.Battery_power()",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_volume",
+      "blockType": "reporter",
+      "text": "获取音量值",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "sound.read()",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "sound = Hiwonder.Sound()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "disable_lowPower_alarm",
+      "blockType": "command",
+      "text": "关闭低电量报警",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "Hiwonder.disableLowPowerAlarm()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "print_str",
+      "blockType": "command",
+      "text": "输出打印字符 [STR]",
+      "arguments": {
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hello"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print({STR})\ntime.sleep(0.5)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "print_number",
+      "blockType": "command",
+      "text": "输出打印数字 [NUM]",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print({NUM})\ntime.sleep(0.5)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_body_reset",
+      "blockType": "command",
+      "text": "设置机器人初始姿态",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "minihexa.reset()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_body_angle",
+      "blockType": "command",
+      "text": "设置身体 [ANGLE] 旋转角度(-20.0~20.0) [VALUE], 用时 [DURATION] ms",
+      "arguments": {
+        "ANGLE": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "roll_pitch_yaw",
+          "literal": true
+        },
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.set_body_angle([0,0,0],{DURATION})",
+          "templateSelector": {
+            "argument": "ANGLE",
+            "cases": {
+              "1": "minihexa.set_body_angle([{VALUE},0,0],{DURATION})",
+              "2": "minihexa.set_body_angle([0,{VALUE},0],{DURATION})",
+              "3": "minihexa.set_body_angle([0,0,{VALUE}],{DURATION})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_body_pose",
+      "blockType": "command",
+      "text": "设置身体中心向 [ORIENTION] 平移(-4.0~4.0) [VALUE] 厘米, 用时 [DURATION] ms",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oriention_8",
+          "literal": true
+        },
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.set_body_pose([0,0,0],{DURATION})",
+          "templateSelector": {
+            "argument": "ORIENTION",
+            "cases": {
+              "0": "minihexa.set_body_pose([0,{VALUE},0],{DURATION})",
+              "1": "minihexa.set_body_pose([0,-{VALUE},0],{DURATION})",
+              "2": "minihexa.set_body_pose([-{VALUE},0,0],{DURATION})",
+              "3": "minihexa.set_body_pose([{VALUE},0,0],{DURATION})",
+              "4": "minihexa.set_body_pose([-{VALUE},{VALUE},0],{DURATION})",
+              "5": "minihexa.set_body_pose([{VALUE},{VALUE},0],{DURATION})",
+              "6": "minihexa.set_body_pose([-{VALUE},-{VALUE},0],{DURATION})",
+              "7": "minihexa.set_body_pose([{VALUE},-{VALUE},0],{DURATION})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_body_pose_height",
+      "blockType": "command",
+      "text": "设置身体中心 [ORIENTION] [VALUE] (0.0~4.0) 厘米, 用时 [DURATION] ms",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "oriention_9",
+          "literal": true
+        },
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.set_body_pose([0,0,{VALUE}*{ORIENTION}],{DURATION})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_go",
+      "blockType": "command",
+      "text": "控制机器人以 [SPEED] 的速度向 [MOVE] 移动, 每一步用时 [DURATION] ms",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "MOVE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oriention_8",
+          "literal": true
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([0,0,0],-1,{DURATION})",
+          "templateSelector": {
+            "argument": "MOVE",
+            "cases": {
+              "0": "minihexa.go([0,{SPEED},0],-1,{DURATION})",
+              "1": "minihexa.go([0,-{SPEED},0],-1,{DURATION})",
+              "2": "minihexa.go([-{SPEED},0,0],-1,{DURATION})",
+              "3": "minihexa.go([{SPEED},0,0],-1,{DURATION})",
+              "4": "minihexa.go([-{SPEED},{SPEED},0],-1,{DURATION})",
+              "5": "minihexa.go([{SPEED},{SPEED},0],-1,{DURATION})",
+              "6": "minihexa.go([-{SPEED},-{SPEED},0],-1,{DURATION})",
+              "7": "minihexa.go([{SPEED},-{SPEED},0],-1,{DURATION})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_go_step",
+      "blockType": "command",
+      "text": "控制机器人以 [SPEED] 的速度向 [MOVE] 移动, 运行 [STEP] 步, 每一步用时 [DURATION] ms",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "MOVE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oriention_8",
+          "literal": true
+        },
+        "STEP": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([0,0,0],{STEP},{DURATION})",
+          "templateSelector": {
+            "argument": "MOVE",
+            "cases": {
+              "0": "minihexa.go([0,{SPEED},0],{STEP},{DURATION})",
+              "1": "minihexa.go([0,-{SPEED},0],{STEP},{DURATION})",
+              "2": "minihexa.go([-{SPEED},0,0],{STEP},{DURATION})",
+              "3": "minihexa.go([{SPEED},0,0],{STEP},{DURATION})",
+              "4": "minihexa.go([-{SPEED},{SPEED},0],{STEP},{DURATION})",
+              "5": "minihexa.go([{SPEED},{SPEED},0],{STEP},{DURATION})",
+              "6": "minihexa.go([-{SPEED},-{SPEED},0],{STEP},{DURATION})",
+              "7": "minihexa.go([{SPEED},-{SPEED},0],{STEP},{DURATION})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_move_xyz",
+      "blockType": "command",
+      "text": "控制机器人向 X: [VALUE1] Y: [VALUE2] Z: [VALUE3] 方向移动, 每一步用时 [DURATION] ms",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([{VALUE1},{VALUE2},{VALUE3}],-1,{DURATION})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_move_xyz_step",
+      "blockType": "command",
+      "text": "控制机器人向 X: [VALUE1] Y: [VALUE2] Z: [VALUE3] 方向移动 [STEP] 步, 每一步用时 [DURATION] ms",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "STEP": {
+          "type": "number",
+          "defaultValue": 5
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([{VALUE1},{VALUE2},{VALUE3}],{STEP},{DURATION})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_turn",
+      "blockType": "command",
+      "text": "控制机器人以 [SPEED] 的速度 [MOVE], 每一步用时 [DURATION] ms",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "MOVE": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "robot_turn",
+          "literal": true
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([0,0,0],-1,{DURATION})",
+          "templateSelector": {
+            "argument": "MOVE",
+            "cases": {
+              "1": "minihexa.go([0,0,-{SPEED}],-1,{DURATION})",
+              "2": "minihexa.go([0,0,{SPEED}],-1,{DURATION})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_turn_step",
+      "blockType": "command",
+      "text": "控制机器人以 [SPEED] 的速度 [MOVE] 运行 [STEP] 步, 每一步用时 [DURATION] ms",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "MOVE": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "robot_turn",
+          "literal": true
+        },
+        "STEP": {
+          "type": "number",
+          "defaultValue": 2
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([0,0,0],{STEP},{DURATION})",
+          "templateSelector": {
+            "argument": "MOVE",
+            "cases": {
+              "1": "minihexa.go([0,0,-{SPEED}],{STEP},{DURATION})",
+              "2": "minihexa.go([0,0,{SPEED}],{STEP},{DURATION})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_go_stop",
+      "blockType": "command",
+      "text": "控制机器人停止",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "minihexa.go([0,0,0],0)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_leg_lift",
+      "blockType": "command",
+      "text": "控制机器人抬腿高度等级(2~4) [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 3
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.set_leg_lift({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_self_balance",
+      "blockType": "command",
+      "text": "[CONTROL] 自平衡",
+      "arguments": {
+        "CONTROL": {
+          "type": "string",
+          "defaultValue": "True",
+          "menu": "onoff",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.homeostasis({CONTROL})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_servo",
+      "blockType": "command",
+      "text": "设置舵机 ID [NUM] 位置 [POS] 运行时间 [DURATION] 毫秒",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        },
+        "POS": {
+          "type": "number",
+          "defaultValue": 1500
+        },
+        "DURATION": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.multi_servo_control([({NUM},{POS})],{DURATION})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "action_run",
+      "blockType": "command",
+      "text": "miniHexa运行动作组 [NUM] ,重复次数 [LOOP]",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1"
+        },
+        "LOOP": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "minihexa.action_run({NUM},{LOOP})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "action_stop",
+      "blockType": "command",
+      "text": "停止运行动作组",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "minihexa.action_stop()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "when_minihexa_key_click_thread",
+      "blockType": "hat",
+      "text": "当按键短按时",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "minihexa = Hiwonder.Robot()",
+            "button1 = Hiwonder.Button()"
+          ],
+          "setups": [],
+          "entryTemplate": "def on_button1_clicked():",
+          "entryFooter": "button1.Clicked(on_button1_clicked)",
+          "launcher": "",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "when_minihexa_key_longclick_thread",
+      "blockType": "hat",
+      "text": "当按键长按时",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "minihexa = Hiwonder.Robot()",
+            "button1 = Hiwonder.Button()"
+          ],
+          "setups": [],
+          "entryTemplate": "def on_button1_longpressed():",
+          "entryFooter": "button1.Longpressed(on_button1_longpressed)",
+          "launcher": "",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "key_is_pressed",
+      "blockType": "boolean",
+      "text": "按键被按下",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "button1.read()",
+          "imports": [
+            "import Hiwonder",
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "button1 = Hiwonder.Button()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "imu_read_gyro_data",
+      "blockType": "reporter",
+      "text": "获取陀螺仪 [SELECT] 轴数值",
+      "arguments": {
+        "SELECT": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "gyro_select",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "imu.read_gyro_data()[{SELECT}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "imu = Hiwonder.IMU()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "imu_read_angle",
+      "blockType": "reporter",
+      "text": "获取 IMU [SELECT] 角度值",
+      "arguments": {
+        "SELECT": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "imu_select",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "imu.read_angle()[{SELECT}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "imu = Hiwonder.IMU()"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "serial_set_baudrate",
+      "blockType": "command",
+      "text": "设置串口波特率 [DATA]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "9600",
+          "menu": "baudrate",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "uart = Hiwonder.UART({DATA})"
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "serial_write",
+      "blockType": "command",
+      "text": "串口发送数据 [DATA]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "CMD"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "uart.send_data({DATA})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "serial_has_recv_data",
+      "blockType": "boolean",
+      "text": "串口已接收数据？",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "uart.has_data()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "serial_recv_contains",
+      "blockType": "boolean",
+      "text": "串口接收数据包含 [DATA]？",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "CMD"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "uart.contains_data({DATA})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "serial_recv_buff",
+      "blockType": "reporter",
+      "text": "串口接收缓冲区",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "uart.read_buffer()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_serial_cmd",
+      "blockType": "reporter",
+      "text": "解析串口数据 [DATA] 获取命令",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "0"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "uart.read_uart_cmd({DATA})[0]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_serial_args",
+      "blockType": "reporter",
+      "text": "解析串口数据 [DATA] 获取参数 [NUM]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "0"
+        },
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "uart.parse_uart_cmd({DATA})[{NUM}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "clear_buffer",
+      "blockType": "command",
+      "text": "清空串口缓冲区",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "uart.clear_buffer()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "package": {
+    "fileName": "minihexa-0.1.1.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

@@ -73,7 +73,7 @@ const manifestToExtensionBlocks = manifest => {
 const manifestToExtensionInfo = manifest => ({
     id: manifest.id,
     name: manifest.name,
-    blockIconURI: manifest.icon || undefined,
+    blockIconURI: manifest.blockIcon || undefined,
     menuIconURI: manifest.icon || undefined,
     color1: manifest.color1,
     color2: manifest.color2,

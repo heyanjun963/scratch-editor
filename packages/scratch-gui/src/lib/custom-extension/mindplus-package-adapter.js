@@ -130,7 +130,8 @@ const parseFunctionGeneration = (functionNode, opcode, override = {}) => {
         entryTemplate: override.entryTemplate ? String(override.entryTemplate) : '',
         entryFooter: override.entryFooter ? String(override.entryFooter) : '',
         launcher: override.launcher ? String(override.launcher) : '',
-        section: override.section ? String(override.section) : ''
+        section: override.section ? String(override.section) : '',
+        templateSelector: override.templateSelector || null
     };
     const codeParts = [];
 
@@ -219,7 +220,7 @@ const normalizeArgumentDefault = (type, value) => {
     return typeof value === 'undefined' ? '' : String(value);
 };
 
-const parseBlockArguments = (opcode, blockText, directives, rawMenus) => {
+const parseBlockArguments = (opcode, blockText, directives, rawMenus, rawOverrides = {}) => {
     const propertiesByArgument = directives.reduce((properties, attributes) => {
         Object.entries(attributes).forEach(([key, value]) => {
             const match = key.match(/^([A-Za-z][A-Za-z0-9_]*)\.(shadow|options|defl)$/);
@@ -242,9 +243,13 @@ const parseBlockArguments = (opcode, blockText, directives, rawMenus) => {
         const defaultValue = typeof properties.defl !== 'undefined' ?
             properties.defl :
             getMenuDefault(rawMenus, menu, opcode, name);
+        const override = rawOverrides[name] && typeof rawOverrides[name] === 'object' ? rawOverrides[name] : {};
+        const overriddenType = override.type ? String(override.type).toLowerCase() : type;
         argumentsByName[name] = {
-            type,
-            defaultValue: normalizeArgumentDefault(type, defaultValue),
+            type: overriddenType,
+            defaultValue: typeof override.defaultValue === 'undefined' ?
+                normalizeArgumentDefault(type, defaultValue) :
+                override.defaultValue,
             ...(menu ? {menu} : {}),
             ...(shadow === 'normal' || shadow === 'dropdown' ? {literal: true} : {})
         };
@@ -271,7 +276,8 @@ const adaptMindPlusPythonPackage = ({
     mainSource,
     rawMenus = {},
     rawLocales = {},
-    runtimePythonLibraries = []
+    runtimePythonLibraries = [],
+    icon = null
 }) => {
     const ast = parseMainAst(mainSource);
     const namespaces = ast.program.body.filter(node => node.type === 'TSModuleDeclaration');
@@ -318,8 +324,15 @@ const adaptMindPlusPythonPackage = ({
         const blockType = String(blockAttributes.blockType || 'command').toLowerCase();
         const defaultText = String(blockAttributes.block || opcode);
         const text = String(rawLocales[`${namespace}.${opcode}|block`] || defaultText);
-        const argumentsByName = parseBlockArguments(opcode, defaultText, directives, rawMenus);
         const blockOverride = overrides[opcode] || {};
+        // Mind+ 没有 line6 等 Scratch 专用参数类型，只允许配置层覆盖声明，后续仍由 manifest schema 校验。
+        const argumentsByName = parseBlockArguments(
+            opcode,
+            defaultText,
+            directives,
+            rawMenus,
+            blockOverride.arguments || {}
+        );
         if (blockType === 'hat' && !blockOverride.section) {
             throw new Error(`Mind+ 帽子积木 ${opcode} 必须通过 scratchEditor.blocks 声明 section`);
         }
@@ -337,8 +350,8 @@ const adaptMindPlusPythonPackage = ({
         throw new Error(`Mind+ namespace ${namespace} 未定义可导入积木`);
     }
 
-    const color = namespaceAttributes.color || '#4C97FF';
     const scratchEditor = rawConfig.scratchEditor || {};
+    const color = namespaceAttributes.color || '#4C97FF';
     const pythonAsset = rawConfig.asset && rawConfig.asset.python || {};
     return {
         rawManifest: {
@@ -347,9 +360,11 @@ const adaptMindPlusPythonPackage = ({
             name: getLocalizedValue(rawConfig.name, rawConfig.id),
             version: String(rawConfig.version || pythonAsset.version || '1.0.0'),
             description: getLocalizedValue(rawConfig.description, ''),
-            color1: color,
-            color2: color,
-            color3: color,
+            icon,
+            blockIcon: scratchEditor.blockIcon || null,
+            color1: scratchEditor.color1 || color,
+            color2: scratchEditor.color2 || color,
+            color3: scratchEditor.color3 || color,
             target: 'python',
             source: 'mindplus',
             menus,

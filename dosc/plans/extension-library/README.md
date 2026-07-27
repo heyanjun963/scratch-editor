@@ -28,7 +28,9 @@
 | [22 miniHexa 积木与 Python 迁移记录](./22-minihexa-block-migration-progress.md) | 记录从旧 VM 和旧 Python generator 提取 miniHexa 积木、菜单、入口及代码生成规则，并注册为内置产品的过程 |
 | [23 AiDoggy 积木与 Python 迁移记录](./23-aidoggy-block-python-migration-progress.md) | 记录从旧 VM 和旧 Python generator 提取 AiDoggy 的 17 个积木、运动菜单及最终代码生成规则 |
 | [24 Mind+ 用户库格式兼容方案](./24-mindplus-package-compatibility-research.md) | 对比 Mind+ 与现有 SBEXT 的目录、字段和生成器能力，定义安全兼容子集、测试包和实施顺序 |
+| [25 Mind+ 产品仓库迁移进度](./25-mindplus-product-repository-migration-progress.md) | 记录 AiDoggy、miniHexa 产品源码迁移、MPEXT 发布包、catalog 同步、自动验证和人工发版待办 |
+| [26 Mind+ 产品远程发布指南](./26-mindplus-product-release-guide.md) | 指导单人维护者升级版本、生成包、推送 GitHub/Gitee、创建 Release、开放 catalog 和验证离线缓存 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用，并已通过 AiDoggy、基础 Python fixture 自动化验证和本轮人工校对。后续所有产品统一使用 Mind+ Python 目录作为作者源格式，编辑器导入时转换为内部 manifest；产品仓库逐步改为发布 `.mpext`，Arduino C 继续延后处理。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用。AiDoggy、miniHexa 与 AI 机甲麦轮车均已迁移到独立产品仓库的 Mind+ Python 作者源，统一生成 `.mpext` 并完成旧行为等价性验证；编辑器内置加载也已切换为 MPEXT 生成快照，三个 catalog 条目均已开放为 `published`。Arduino C 继续延后处理。

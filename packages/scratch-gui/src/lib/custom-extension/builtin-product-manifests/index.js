@@ -1,42 +1,13 @@
-import aimecanumBlocks from '../builtin-product-packages/aimecanum/blocks.json';
-import aimecanumGenerator from '../builtin-product-packages/aimecanum/generator/python.json';
-import aimecanumManifest from '../builtin-product-packages/aimecanum/manifest.json';
-import aidoggyBlocks from '../builtin-product-packages/aidoggy/blocks.json';
-import aidoggyGenerator from '../builtin-product-packages/aidoggy/generator/python.json';
-import aidoggyManifest from '../builtin-product-packages/aidoggy/manifest.json';
-import minihexaBlocks from '../builtin-product-packages/minihexa/blocks.json';
-import minihexaGenerator from '../builtin-product-packages/minihexa/generator/python.json';
-import minihexaManifest from '../builtin-product-packages/minihexa/manifest.json';
-import {createPackageManifest} from '../package-manifest';
+import aidoggySnapshot from '../builtin-product-snapshots/manifests/aidoggy.json';
+import aimecanumSnapshot from '../builtin-product-snapshots/manifests/aimecanum.json';
+import minihexaSnapshot from '../builtin-product-snapshots/manifests/minihexa.json';
+import {normalizeCustomExtensionManifest} from '../manifest-schema';
 
-// 内置产品直接读取标准源包；打包产物和编辑器内置 manifest 始终来自同一份配置。
-const aimecanum = createPackageManifest({
-    rawManifest: aimecanumManifest,
-    rawBlocks: aimecanumBlocks,
-    rawGenerator: aimecanumGenerator,
-    packageFileName: 'aimecanum.sbext'
-});
-
-// miniHexa 内置默认包与远程发布包共用同一份积木和 Python 生成配置。
-const minihexa = createPackageManifest({
-    rawManifest: minihexaManifest,
-    rawBlocks: minihexaBlocks,
-    rawGenerator: minihexaGenerator,
-    packageFileName: 'minihexa.sbext'
-});
-
-// AiDoggy 默认包从旧 VM 与旧 Python 生成器提取，供离线内置和后续远程更新共同使用。
-const aidoggy = createPackageManifest({
-    rawManifest: aidoggyManifest,
-    rawBlocks: aidoggyBlocks,
-    rawGenerator: aidoggyGenerator,
-    packageFileName: 'aidoggy.sbext'
-});
-
+// 内置产品读取由已验证 MPEXT 生成的同步 manifest，离线启动不需要异步解压或访问远程仓库。
 const builtinProductManifests = {
-    aimecanum,
-    minihexa,
-    aidoggy
+    aidoggy: normalizeCustomExtensionManifest(aidoggySnapshot),
+    aimecanum: normalizeCustomExtensionManifest(aimecanumSnapshot),
+    minihexa: normalizeCustomExtensionManifest(minihexaSnapshot)
 };
 
 export {

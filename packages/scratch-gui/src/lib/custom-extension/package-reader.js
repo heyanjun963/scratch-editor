@@ -100,6 +100,19 @@ const joinPackagePath = (directory, relativePath) => normalizePackagePath(
     `${normalizePackagePath(directory)}/${normalizePackagePath(relativePath)}`
 );
 
+// 产品图标只从 Mind+ 约定目录读取，并转成浏览器可直接显示的数据 URI。
+const readOptionalPackageIcon = async (lookup, assetDirectory) => {
+    const svgFile = getZipFile(lookup, [joinPackagePath(assetDirectory, '_images/icon.svg')]);
+    if (svgFile) {
+        return `data:image/svg+xml;utf8,${encodeURIComponent(await svgFile.async('string'))}`;
+    }
+    const pngFile = getZipFile(lookup, [joinPackagePath(assetDirectory, '_images/icon.png')]);
+    if (pngFile) {
+        return `data:image/png;base64,${await pngFile.async('base64')}`;
+    }
+    return null;
+};
+
 // runtime 文件不是所有包都必须携带，存在则内联到 manifest 方便桌面端保存。
 const readOptionalRuntimeFiles = async (lookup, paths) => {
     const uniquePaths = Array.from(new Set(paths.filter(Boolean).map(path => String(path).replace(/\\/g, '/'))));
@@ -163,6 +176,7 @@ const readMindPlusPackageData = async (lookup, rawConfig, packageFileName) => {
         joinPackagePath(assetDirectory, '_locales/zh.json'),
         joinPackagePath(assetDirectory, '_locales/zh-cn.json')
     ]);
+    const icon = await readOptionalPackageIcon(lookup, assetDirectory);
     const declaredRuntimePaths = Array.isArray(pythonAsset.files) ? pythonAsset.files
         .filter(path => String(path).toLowerCase().endsWith('.py'))
         .map(path => joinPackagePath(assetDirectory, path)) : [];
@@ -179,7 +193,8 @@ const readMindPlusPackageData = async (lookup, rawConfig, packageFileName) => {
         mainSource,
         rawMenus,
         rawLocales,
-        runtimePythonLibraries
+        runtimePythonLibraries,
+        icon
     });
 
     return mergePackageManifest(

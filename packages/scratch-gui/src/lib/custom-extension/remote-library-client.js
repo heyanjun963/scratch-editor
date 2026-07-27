@@ -198,8 +198,8 @@ const validateRemotePackage = remotePackage => {
         throw new Error(`远程产品 packageId 不合法: ${packageId || '(empty)'}`);
     }
     parseVersion(remotePackage.version);
-    if (!/^[0-9A-Za-z][0-9A-Za-z._-]*\.sbext$/i.test(String(remotePackage.asset || ''))) {
-        throw new Error(`远程产品缺少或存在不合法的 SBEXT asset: ${packageId}`);
+    if (!/^[0-9A-Za-z][0-9A-Za-z._-]*\.(?:sbext|mpext)$/i.test(String(remotePackage.asset || ''))) {
+        throw new Error(`远程产品缺少或存在不合法的拓展包 asset: ${packageId}`);
     }
     const sources = getRemotePackageSources(remotePackage);
     if (!sources.length) throw new Error(`远程产品缺少下载来源: ${packageId}`);

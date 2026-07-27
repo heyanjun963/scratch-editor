@@ -262,12 +262,12 @@ Mind+ 没有当前产品包使用的子分类、`section` 和 `launcher`。fixtu
 
 解析器不会执行 `main.ts`。函数中出现普通调用、分支、循环或动态模板表达式会被拒绝，并报告 opcode 和行号。帽子积木必须通过 `scratchEditor.blocks` 明确声明 `section`。
 
-自动化验证已覆盖 Mind+ 解析、fixture 确定性打包、三个现有产品包及代码生成、持久化、远程缓存/客户端、同步脚本和拓展页面，共 13 个 Jest suite、55 项测试，全部通过。`node --check` 与 `git diff --check` 通过。ESLint 因当前 `node_modules` 缺少 `unrs-resolver` 可选原生绑定未能启动，本轮未通过重装依赖改变环境。
+自动化验证已覆盖 Mind+ 解析、fixture 确定性打包、内置快照、三个产品包及代码生成、持久化、远程缓存/客户端、同步脚本、拓展页面和默认工具箱，共 15 个 Jest suite、64 项测试，全部通过。三个产品均已生成确定性 `.mpext` 并通过旧行为深比较；AiDoggy 远程 `0.1.2` 已完成下载和 SHA256 校验。编辑器内置加载已切换为 MPEXT 生成快照，旧拆分 JSON 已删除。`node --check` 与 `git diff --check` 通过。ESLint 因当前 `node_modules` 缺少 `unrs-resolver` 可选原生绑定未能启动，本轮未通过重装依赖改变环境。
 
 ## 后续产品统一迁移计划
 
 1. 固化公司对 `scratchEditor.categories`、帽子积木 `section` 和 `launcher` 的扩展约定，并补充面向产品维护者的模板说明。
-2. 先把 AiDoggy 正式产品源迁移为 Mind+ Python 目录，确认同一份源码可被 Mind+ 和本编辑器使用。
-3. 再迁移 miniHexa 和 AI 机甲麦轮车，删除对应产品重复维护的 `blocks.json`、`generator/python.json` 源配置。
-4. 调整产品同步脚本和远程 catalog，使产品仓库发布 `.mpext`，版本、SHA256、离线缓存和检查更新流程保持不变。
+2. AiDoggy 正式产品源已迁移为 Mind+ Python 目录，产品包与编辑器 fixture 二进制一致。
+3. miniHexa 和 AI 机甲麦轮车均已迁移为 Mind+ Python 目录并完成统一打包与等价性验证。
+4. 产品同步脚本和远程 catalog 已支持 `.mpext`，版本、SHA256、离线缓存和检查更新流程保持不变。
 5. 每个产品迁移后分别执行积木外观、菜单参数、完整 Python 对照和真机测试，未通过人工校对前不进入公开 catalog。

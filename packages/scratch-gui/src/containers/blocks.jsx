@@ -66,9 +66,10 @@ const pythonExtensionIds = [
     'pythonText',
     'pythonVariables',
     'pythonList',
-    'pythonFunction',
-    'pythonNative'
+    'pythonFunction'
 ];
+
+// pythonNative 仅保留给旧工程解析，不再作为 Python 模式的默认工具箱分类加载。
 
 const builtinProductExtensionIds = Object.keys(builtinProductManifests);
 

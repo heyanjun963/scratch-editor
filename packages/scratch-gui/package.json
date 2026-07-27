@@ -55,7 +55,6 @@
     "clean": "rimraf build dist",
     "i18n:push": "tx-push-src scratch-editor interface translations/en.json",
     "i18n:src": "rimraf ./translations/messages/src && babel src > tmp.js && rimraf tmp.js && build-i18n-src ./translations/messages/src ./translations/",
-    "pack:extensions": "node scripts/pack-custom-extension.mjs src/lib/custom-extension/builtin-product-packages/aimecanum static/extensions/aimecanum.sbext",
     "prepare": "node scripts/prepare.mjs",
     "prepublishOnly": "echo \"Please publish through CI only.\" && exit 1",
     "start": "webpack serve",

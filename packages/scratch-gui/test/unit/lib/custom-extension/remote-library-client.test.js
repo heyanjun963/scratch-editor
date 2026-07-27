@@ -44,6 +44,26 @@ describe('remote product extension client', () => {
         ]);
     });
 
+    test('accepts Mind+ MPEXT assets while keeping SBEXT compatibility', async () => {
+        const mindPlusPackage = {
+            ...remotePackage,
+            asset: 'aidoggy-0.1.0.mpext',
+            downloadUrl: 'https://example.com/aidoggy-0.1.0.mpext'
+        };
+        const fetchImpl = jest.fn().mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({formatVersion: 1, packages: [mindPlusPackage, remotePackage]})
+        });
+
+        await expect(loadRemoteLibraryCatalog({
+            catalogUrl: 'https://example.com/catalog.json',
+            fetchImpl
+        })).resolves.toEqual([
+            expect.objectContaining({asset: 'aidoggy-0.1.0.mpext'}),
+            expect.objectContaining({asset: 'aimecanum-0.3.0.sbext'})
+        ]);
+    });
+
     test('loads a catalog from Gitee Contents and adds a Gitee package source', async () => {
         const catalog = JSON.stringify({
             formatVersion: 1,
@@ -116,7 +136,7 @@ describe('remote product extension client', () => {
         await expect(downloadRemoteLibraryPackage({
             ...remotePackage,
             asset: '../aimecanum-0.3.0.sbext'
-        })).rejects.toThrow('SBEXT asset');
+        })).rejects.toThrow('拓展包 asset');
     });
 
     test('returns verified release bytes', async () => {
