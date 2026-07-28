@@ -25,6 +25,7 @@ import generatePythonCode from '../lib/python-codegen';
 import {manifestToExtensionObject} from '../lib/custom-extension/manifest-to-extension';
 import {registerPythonCodegenManifest} from '../lib/custom-extension/codegen-registry';
 import {builtinProductManifests} from '../lib/custom-extension/builtin-product-manifests';
+import {productExtensionCatalog} from '../lib/custom-extension/product-extension-catalog';
 import {
     injectExtensionBlockIcons,
     injectExtensionCategoryMode,
@@ -72,6 +73,13 @@ const pythonExtensionIds = [
 // pythonNative 仅保留给旧工程解析，不再作为 Python 模式的默认工具箱分类加载。
 
 const builtinProductExtensionIds = Object.keys(builtinProductManifests);
+const catalogProductExtensionIds = productExtensionCatalog.flatMap(category => (
+    category.children.map(product => product.id)
+));
+const productExtensionIds = Array.from(new Set([
+    ...builtinProductExtensionIds,
+    ...catalogProductExtensionIds
+]));
 
 const disabledFlyoutBlocks = {
     pythonNative_currentTime: '当前时间积木暂未开放'
@@ -80,10 +88,10 @@ const disabledFlyoutBlocks = {
 const disabledFlyoutBlockClass = 'company-disabled-flyout-block';
 const disabledFlyoutBlockListenerKey = '__companyDisabledFlyoutListener';
 
-// Python 模式只展示 Python 基础分类、内置产品库和用户已导入的自定义拓展分类。
+// Python 模式展示基础分类、已加载的产品目录项和用户导入拓展，远程产品无需内置快照。
 const makePythonToolboxXML = (categoriesXML, customExtensionIds) => {
     const allowedExtensionIds = pythonExtensionIds.concat(
-        builtinProductExtensionIds,
+        productExtensionIds,
         String(customExtensionIds || '').split(',').filter(Boolean)
     );
     return [
@@ -121,6 +129,7 @@ class Blocks extends React.Component {
             'handleBlocksInfoUpdate',
             'ensurePythonExtensions',
             'refreshToolboxXML',
+            'selectPendingCategory',
             'onTargetsUpdate',
             'onPythonConsole',
             'onVisualReport',
@@ -143,6 +152,7 @@ class Blocks extends React.Component {
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.onPythonWorkspaceChange = debounce(this.onPythonWorkspaceChange, 100);
         this.toolboxUpdateQueue = [];
+        this.pendingCategoryId = null;
         this.loadingPythonNativeExtension = false;
     }
     componentDidMount () {
@@ -373,6 +383,7 @@ class Blocks extends React.Component {
         this.workspace.getToolbox().runAfterRerender(() => {
             this.applyFlyoutBlockAvailability();
         });
+        this.workspace.getToolbox().runAfterRerender(this.selectPendingCategory);
         this.workspace.getToolbox().forceRerender();
         this._renderedToolboxXML = this.props.toolboxXML;
         this.applyFlyoutBlockAvailability();
@@ -799,16 +810,23 @@ class Blocks extends React.Component {
                 this.refreshToolboxXML();
             });
     }
+    // 远程拓展注册事件可能早于 Blockly 工具箱重建，分类出现后再完成选择。
+    selectPendingCategory () {
+        if (!this.pendingCategoryId) return;
+        const toolbox = this.workspace.getToolbox();
+        const categoryItem = toolbox.getToolboxItemById(this.pendingCategoryId);
+        if (!categoryItem) return;
+        toolbox.setSelectedItem(categoryItem);
+        this.pendingCategoryId = null;
+    }
     handleCategorySelected (categoryId) {
         const extension = extensionData.find(ext => ext.extensionId === categoryId);
         if (extension && extension.launchPeripheralConnectionFlow) {
             this.handleConnectionModalStart(categoryId);
         }
 
-        this.withToolboxUpdates(() => {
-            const toolbox = this.workspace.getToolbox();
-            toolbox.setSelectedItem(toolbox.getToolboxItemById(categoryId));
-        });
+        this.pendingCategoryId = categoryId;
+        this.withToolboxUpdates(this.selectPendingCategory);
     }
     setBlocks (blocks) {
         this.blocks = blocks;

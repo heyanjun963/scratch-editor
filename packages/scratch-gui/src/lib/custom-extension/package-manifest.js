@@ -59,6 +59,10 @@ const getBlockPythonCodegen = (rawBlock, generatorInfo, commonImports) => {
             ...(Array.isArray(inlinePython.variables) ? inlinePython.variables : []),
             ...(Array.isArray(generatorPython.variables) ? generatorPython.variables : [])
         ]),
+        forcedVariables: [
+            ...(Array.isArray(inlinePython.forcedVariables) ? inlinePython.forcedVariables : []),
+            ...(Array.isArray(generatorPython.forcedVariables) ? generatorPython.forcedVariables : [])
+        ],
         setups: uniqueStrings([
             ...(Array.isArray(generatorPython.commonSetups) ? generatorPython.commonSetups : []),
             ...(Array.isArray(inlinePython.setups) ? inlinePython.setups : []),

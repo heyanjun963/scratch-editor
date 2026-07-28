@@ -4,6 +4,15 @@ import path from 'path';
 import JSZip from 'jszip';
 
 import generatePythonCode from '../../../../../scratch-vm/src/codegen/python';
+import {
+    getPythonCodegenTemplate,
+    registerPythonCodegenManifest,
+    unregisterPythonCodegenManifest
+} from '../../../../src/lib/custom-extension/codegen-registry';
+import {
+    normalizeCustomExtensionManifest,
+    serializeCustomExtensionManifest
+} from '../../../../src/lib/custom-extension/manifest-schema';
 import {readCustomExtensionPackageBuffer} from '../../../../src/lib/custom-extension/package-reader';
 
 const EXPECTED_AIDOGGY_OPCODES = [
@@ -172,6 +181,65 @@ describe('Mind+ package reader', () => {
             {text: '快速', value: 'fast'},
             {text: '稳定', value: 'stable'}
         ]);
+    });
+
+    test('converts addVariableForce into named variable override metadata', async () => {
+        const packageData = await createMindPlusPackage({
+            config: {
+                id: 'forcevariable',
+                name: {'zh-cn': '变量覆盖测试'},
+                version: '1.0.0',
+                scratchEditor: {
+                    blocks: {start_thread: {section: 'main'}}
+                },
+                asset: {python: {dir: 'python', main: 'main.ts', version: '1.0.0'}}
+            },
+            main: `
+                //% color="#4682b4"
+                namespace forcevariable {
+                    //% block="主程序" blockType="hat"
+                    export function start_thread(parameter: any, block: any) {
+                        Generator.addImport("import Hiwonder");
+                    }
+
+                    //% block="初始化 IMU" blockType="command"
+                    export function imu_init(parameter: any, block: any) {
+                        Generator.addObject("", "", "imu = Hiwonder.IMU()");
+                    }
+
+                    //% block="校准 IMU" blockType="command"
+                    export function imu_cali(parameter: any, block: any) {
+                        Generator.addObject("", "", "buttonA = Hiwonder.Button('A')");
+                        Generator.addVariableForce("imu", "imu = Hiwonder.IMU(True, is_stop)");
+                    }
+                }
+            `
+        });
+
+        const manifest = await readCustomExtensionPackageBuffer(packageData, 'forcevariable.mpext');
+        const blocksByOpcode = Object.fromEntries(manifest.blocks.map(block => [block.opcode, block]));
+
+        expect(blocksByOpcode.imu_cali.codegen.python.forcedVariables).toEqual([{
+            name: 'imu',
+            code: 'imu = Hiwonder.IMU(True, is_stop)'
+        }]);
+
+        const restoredManifest = normalizeCustomExtensionManifest(serializeCustomExtensionManifest(manifest));
+        registerPythonCodegenManifest(restoredManifest);
+        expect(getPythonCodegenTemplate('forcevariable_imu_cali').forcedVariables).toEqual([{
+            name: 'imu',
+            code: 'imu = Hiwonder.IMU(True, is_stop)'
+        }]);
+        unregisterPythonCodegenManifest(restoredManifest);
+
+        const main = new TestBlock('forcevariable_start_thread');
+        main.next = new TestBlock('forcevariable_imu_init');
+        main.next.next = new TestBlock('forcevariable_imu_cali');
+        const code = generatePythonCode(createWorkspace([main]), {
+            getPythonCodegenTemplate: getManifestTemplate(manifest)
+        });
+        expect(code).not.toContain('imu = Hiwonder.IMU()');
+        expect(code).toContain('imu = Hiwonder.IMU(True, is_stop)');
     });
 
     test('uses the Python asset version and merges locale fallbacks', async () => {

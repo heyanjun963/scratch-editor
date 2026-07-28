@@ -144,6 +144,25 @@ describe('ProductExtensionLibrary user extensions', () => {
         expect(props.onRequestClose).not.toHaveBeenCalled();
     });
 
+    test('renders a remote-only product as installable', async () => {
+        loadRemoteLibraryCatalog.mockResolvedValueOnce([{
+            packageId: 'aimech',
+            name: 'AI机甲双驱车',
+            version: '1.0.0',
+            status: 'published',
+            asset: 'aimech-1.0.0.mpext',
+            downloadUrl: 'https://github.com/company/extensions/aimech-1.0.0.mpext',
+            sha256: 'a'.repeat(64)
+        }]);
+
+        render(<ProductExtensionLibraryComponent {...props} />);
+
+        const card = await screen.findByText('AI机甲双驱车').then(title => title.closest('article'));
+        expect(card.className).not.toContain('cardDisabled');
+        expect(card.getAttribute('title')).toBe('AI机甲双驱车');
+        expect(screen.getByText('远程版本可下载安装。')).toBeTruthy();
+    });
+
     test('unloads a user extension without deleting its package', async () => {
         render(<ProductExtensionLibraryComponent {...props} />);
         await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));

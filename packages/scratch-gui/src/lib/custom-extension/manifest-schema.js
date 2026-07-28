@@ -135,6 +135,19 @@ const normalizeTemplateSelector = (opcode, rawSelector) => {
     return {argument, cases};
 };
 
+const normalizeForcedVariables = (opcode, rawVariables) => {
+    if (!Array.isArray(rawVariables)) return [];
+    return rawVariables.map((rawVariable, index) => {
+        assertObject(rawVariable, `积木 ${opcode} 的 forcedVariables[${index}] 必须是对象`);
+        const name = String(rawVariable.name || '').trim();
+        const code = String(rawVariable.code || '');
+        if (!name || !code) {
+            throw new Error(`积木 ${opcode} 的 forcedVariables[${index}] 必须声明 name 和 code`);
+        }
+        return {name, code};
+    });
+};
+
 // Python 生成配置允许声明 import、变量初始化、入口模板和回调 footer。
 const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
     assertObject(rawPythonCodegen, `积木 ${opcode} 缺少 codegen.python 配置`);
@@ -153,6 +166,7 @@ const normalizePythonCodegen = (opcode, rawPythonCodegen) => {
         variables: Array.isArray(rawPythonCodegen.variables) ?
             rawPythonCodegen.variables.map(String) :
             [],
+        forcedVariables: normalizeForcedVariables(opcode, rawPythonCodegen.forcedVariables),
         setups: Array.isArray(rawPythonCodegen.setups) ?
             rawPythonCodegen.setups.map(String) :
             [],
@@ -340,6 +354,7 @@ const serializeCustomExtensionManifest = manifest => {
                     imports: block.codegen.python.imports || [],
                     runtimeFiles: block.codegen.python.runtimeFiles || [],
                     variables: block.codegen.python.variables || [],
+                    forcedVariables: block.codegen.python.forcedVariables || [],
                     setups: block.codegen.python.setups || [],
                     entryTemplate: block.codegen.python.entryTemplate || '',
                     entryFooter: block.codegen.python.entryFooter || '',

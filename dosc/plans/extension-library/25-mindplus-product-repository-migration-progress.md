@@ -4,7 +4,7 @@
 
 把产品源码管理入口切换到独立产品仓库，并验证同一份 Mind+ Python 源码可以生成稳定 `.mpext`、进入远程 catalog、被编辑器解析并保持现有 Python 输出。
 
-> 当前状态：AiDoggy、miniHexa 和 AI 机甲麦轮车已统一使用 Mind+ Python 作者源，生成确定性 `.mpext` 并完成自动验证。三个 catalog 条目均已开放为 `published`；AiDoggy 已发布 `0.1.2`，编辑器仍内置 `0.1.0` 用于验证远程更新和离线缓存闭环。
+> 当前状态：AiDoggy、miniHexa、AI 机甲麦轮车和 AI 机甲双驱车已统一使用 Mind+ Python 作者源并生成确定性 `.mpext`，四个 catalog 条目均已开放为 `published`。AI 机甲双驱车仍待逐项人工校对和真机验收。
 
 ## 源码与发布职责
 
@@ -44,6 +44,7 @@ npm run sync:product-extensions
 | AiDoggy | `products/aidoggy/` | `aidoggy-0.1.2.mpext` | `9930fafa1811d496c99d32308ce4291ec51c5632c4f920aaf21879345e5c0305` | `published` |
 | miniHexa | `products/minihexa/` | `minihexa-0.1.1.mpext` | `7bbf1554e7dd67b7aa00d9e92b408f0ca7e2fb5cd2911c9597f71ca87d882478` | `published` |
 | AI 机甲麦轮车 | `products/aimecanum/` | `aimecanum-0.2.3.mpext` | `30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95` | `published` |
+| AI 机甲双驱车 | `products/aimech/` | `aimech-1.0.0.mpext` | `0d1b95ea60a647e2e664d432d72f418a7c71a72bae9ce4d3004fa498e37a76b1` | `published` |
 
 AiDoggy `0.1.2` 发布包为 4709 字节，GitHub Release 下载内容与 catalog SHA256 完全一致；Gitee 和 GitHub catalog 已同步为 `published`。编辑器内置快照继续锁定 AiDoggy `0.1.0`，安装远程 `0.1.2` 后由持久化缓存覆盖内置版本。miniHexa 发布包经过本地解析后，与内置基线的 39 个 opcode、19 个菜单、9 个分类、积木参数和 Python codegen 元数据逐项一致。
 

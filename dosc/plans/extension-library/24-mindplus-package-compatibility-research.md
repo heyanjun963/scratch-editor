@@ -30,6 +30,7 @@
 | `Generator.addCode` | `codegen.python.template` | 简单模板可映射 |
 | `Generator.addImport` | `imports` | 单纯 import 可映射，任意顶层代码需新增 preamble |
 | `Generator.addObject` | `variables` | 可映射 |
+| `Generator.addVariableForce` | `forcedVariables` | 按变量名覆盖普通初始化 |
 | `Generator.addSetup` | `setups` | 可映射 |
 | `Generator.addEvent` | `entryTemplate`、`entryFooter` | 需要专门转换规则 |
 | `_menus/*.json` | `menus` | 可映射，需处理分主板文件和默认值键 |
@@ -88,7 +89,7 @@ my-extension/
 - `block`、`shadow`、`options` 和 `defl`。
 - `_menus` 中的显示值、生成值和 `default_<function>_<argument>`。
 - `_locales` 中的 `namespace.function|block` 和 `namespace.menu.value|menu`。
-- `Generator.addImport`、`addObject`、`addSetup`、`addCode` 的静态字符串和模板字符串。
+- `Generator.addImport`、`addObject`、`addVariableForce`、`addSetup`、`addCode` 的静态字符串和模板字符串。
 - Python `dependencies` 和 `libraries/*.py` 的元数据读取。
 
 ### 暂不支持
@@ -168,7 +169,7 @@ node packages/scratch-gui/scripts/pack-mindplus-fixtures.mjs
 1. 一个与 `config.id` 相同的 `namespace`。
 2. `export function` 及其前方的 `//%` 指令。
 3. `const name = parameter.ARG.code` 形式的参数读取。
-4. `Generator.addImport`、`addObject`、`addSetup` 和 `addCode`。
+4. `Generator.addImport`、`addObject`、`addVariableForce`、`addSetup` 和 `addCode`。
 5. Generator 参数只能是字符串或仅引用已登记参数变量的模板字符串。
 
 函数内出现条件分支、循环、普通函数调用、成员赋值、动态模板表达式或其他语句时，解析器直接拒绝，并报告 opcode 和行号。
@@ -189,6 +190,7 @@ node packages/scratch-gui/scripts/pack-mindplus-fixtures.mjs
 | `addImport` 中的赋值 | `variables` |
 | `addImport` 中的其他顶层代码 | `setups` |
 | `addObject` | `variables` |
+| `addVariableForce` | `forcedVariables`，生成时按 `name` 覆盖普通变量初始化 |
 | `addSetup` | `setups` |
 | `addCode` | Python `template` |
 | `python/libraries/*.py` | `runtime.pythonLibraries` 和包内文件内容 |

@@ -252,6 +252,11 @@ const addCustomGenerationMetadata = (templateInfo, block, imports) => {
         const renderedLine = applyTemplateText(line, templateInfo, block, imports);
         if (renderedLine) codegenContext.addVariable(renderedLine);
     });
+    (templateInfo.forcedVariables || []).forEach(variable => {
+        const name = applyTemplateText(variable.name, templateInfo, block, imports);
+        const code = applyTemplateText(variable.code, templateInfo, block, imports);
+        if (name && code) codegenContext.addVariableForce(name, code);
+    });
     (templateInfo.setups || []).forEach(line => {
         const renderedLine = applyTemplateText(line, templateInfo, block, imports);
         if (renderedLine) codegenContext.addSetup(renderedLine);

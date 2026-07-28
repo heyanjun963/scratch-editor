@@ -3,7 +3,7 @@ class PythonCodegenContext {
     constructor (options = {}) {
         this.getPythonCodegenTemplate = options.getPythonCodegenTemplate || (() => null);
         this.imports = new Set();
-        this.variables = new Set();
+        this.variables = new Map();
         this.functions = new Set();
         this.setups = new Set();
         this.launcher = '';
@@ -18,7 +18,20 @@ class PythonCodegenContext {
     // 变量初始化集中放到文件头，供主函数和事件回调通过 global 引用。
     addVariable (tagOrCode, code) {
         const variableLine = code || tagOrCode;
-        if (variableLine) this.variables.add(variableLine);
+        if (!variableLine) return;
+        const variableName = code ? tagOrCode : this.getAssignmentName(variableLine);
+        const key = variableName || variableLine;
+        if (!this.variables.has(key)) this.variables.set(key, variableLine);
+    }
+
+    // 校准类积木按变量名替换普通初始化，语义与旧生成器 addVariableForce 一致。
+    addVariableForce (tagOrCode, code) {
+        const variableLine = code || tagOrCode;
+        if (!variableLine) return;
+        const variableName = code ? tagOrCode : this.getAssignmentName(variableLine);
+        const key = variableName || variableLine;
+        this.variables.delete(key);
+        this.variables.set(key, variableLine);
     }
 
     // 预留给后续产品库声明辅助函数，目前主要由模板驱动扩展使用。
@@ -51,7 +64,7 @@ class PythonCodegenContext {
 
     // 全局名排序保证多次生成代码的输出稳定，方便对比和测试。
     getGlobalNames () {
-        return Array.from(this.variables)
+        return Array.from(this.variables.values())
             .map(line => this.getAssignmentName(line))
             .filter(Boolean)
             .sort();
@@ -90,7 +103,7 @@ class PythonCodegenContext {
     // 最终拼装顺序对齐旧版：imports -> variables -> functions -> setup -> entry sections。
     finish (sections) {
         const importLines = this.getImportLines();
-        const variableLines = Array.from(this.variables);
+        const variableLines = Array.from(this.variables.values());
         const functionLines = Array.from(this.functions);
         const setupLines = Array.from(this.setups);
         return [

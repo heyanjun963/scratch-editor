@@ -94,3 +94,63 @@ describe('Blocks container ensurePythonExtensions', () => {
         ]);
     });
 });
+
+describe('Blocks container category selection', () => {
+    test('defers a remote extension category until the toolbox contains it', () => {
+        let categoryItem = null;
+        const toolbox = {
+            getToolboxItemById: jest.fn(() => categoryItem),
+            setSelectedItem: jest.fn()
+        };
+        const instance = {
+            pendingCategoryId: null,
+            withToolboxUpdates: callback => callback(),
+            workspace: {getToolbox: () => toolbox}
+        };
+        instance.selectPendingCategory = Blocks.prototype.selectPendingCategory.bind(instance);
+
+        Blocks.prototype.handleCategorySelected.call(instance, 'aimech');
+
+        expect(toolbox.setSelectedItem).not.toHaveBeenCalled();
+        expect(instance.pendingCategoryId).toBe('aimech');
+
+        categoryItem = {id: 'aimech'};
+        Blocks.prototype.selectPendingCategory.call(instance);
+
+        expect(toolbox.setSelectedItem).toHaveBeenCalledWith(categoryItem);
+        expect(instance.pendingCategoryId).toBeNull();
+    });
+});
+
+describe('Blocks container Python toolbox', () => {
+    test('keeps a loaded remote-only product category', () => {
+        const target = {
+            id: 'stage',
+            isStage: true,
+            getCostumes: () => [{name: 'Backdrop1'}],
+            getSounds: () => []
+        };
+        const instance = {
+            props: {
+                colorMode: 'default',
+                customExtensionIds: '',
+                editorMode: PYTHON_EDITOR_MODE,
+                vm: {
+                    editingTarget: target,
+                    runtime: {
+                        getBlocksXML: () => [{
+                            id: 'aimech',
+                            xml: '<category toolboxitemid="aimech"><block type="aimech_start_thread"></block></category>'
+                        }],
+                        getTargetForStage: () => target
+                    }
+                }
+            }
+        };
+
+        const toolboxXML = Blocks.prototype.getToolboxXML.call(instance);
+
+        expect(toolboxXML).toContain('toolboxitemid="aimech"');
+        expect(toolboxXML).toContain('aimech_start_thread');
+    });
+});

@@ -72,6 +72,50 @@ test('custom main template can collect imports variables globals and launcher', 
     t.end();
 });
 
+test('forced custom variables replace normal initialization by name', t => {
+    const templates = {
+        aimech_start: {
+            blockType: 'hat',
+            section: 'main',
+            template: ''
+        },
+        aimech_imu_init: {
+            blockType: 'command',
+            variables: ['imu = Hiwonder.IMU()'],
+            template: ''
+        },
+        aimech_imu_cali: {
+            blockType: 'command',
+            forcedVariables: [{
+                name: 'imu',
+                code: 'imu = Hiwonder.IMU(True, is_stop_3091ratyxq)'
+            }],
+            template: ''
+        }
+    };
+
+    const generateWithOrder = blockTypes => {
+        const main = new TestBlock('aimech_start');
+        blockTypes.reduce((previous, blockType) => {
+            previous.next = new TestBlock(blockType);
+            return previous.next;
+        }, main);
+        return generatePythonCode(createWorkspace([main]), {
+            getPythonCodegenTemplate: blockType => templates[blockType]
+        });
+    };
+
+    [
+        ['aimech_imu_init', 'aimech_imu_cali'],
+        ['aimech_imu_cali', 'aimech_imu_init']
+    ].forEach(blockTypes => {
+        const code = generateWithOrder(blockTypes);
+        t.notMatch(code, /imu = Hiwonder\.IMU\(\)/);
+        t.match(code, /imu = Hiwonder\.IMU\(True, is_stop_3091ratyxq\)/);
+    });
+    t.end();
+});
+
 test('multiple custom main hats receive stable entry names', t => {
     const firstMain = new TestBlock('company_start');
     const secondMain = new TestBlock('company_start');

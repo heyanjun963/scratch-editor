@@ -247,6 +247,11 @@ const messages = defineMessages({
         description: 'Description for available built-in extensions',
         id: 'gui.productExtensionLibrary.availableDescription'
     },
+    downloadableDescription: {
+        defaultMessage: '远程版本可下载安装。',
+        description: 'Description for downloadable remote extensions',
+        id: 'gui.productExtensionLibrary.downloadableDescription'
+    },
     placeholderDescription: {
         defaultMessage: '占位展示，等待后台发布积木包。',
         description: 'Description for placeholder extensions',
@@ -982,6 +987,8 @@ const ProductExtensionLibraryComponent = ({
                     <div className={styles.cardGrid}>
                         {items.map(item => {
                             const isAvailable = item.status === 'available';
+                            const isDownloadable = item.status === 'downloadable';
+                            const isInstallable = isAvailable || isDownloadable;
                             const isLoaded = loadedExtensionIds.includes(item.id) ||
                                 vm.extensionManager.isExtensionLoaded(item.id);
                             const isUser = item.source === LIBRARY_SOURCE_TYPES.USER_LOCAL;
@@ -994,12 +1001,12 @@ const ProductExtensionLibraryComponent = ({
                             return (
                                 <article
                                     className={classNames(styles.card, {
-                                        [styles.cardDisabled]: !isAvailable
+                                        [styles.cardDisabled]: !isInstallable
                                     })}
                                     key={item.id}
                                     role="button"
                                     tabIndex={0}
-                                    title={isAvailable ? item.name :
+                                    title={isInstallable ? item.name :
                                         intl.formatMessage(messages.unavailableNotice, {
                                             name: item.name
                                         })}
@@ -1078,11 +1085,13 @@ const ProductExtensionLibraryComponent = ({
                                             {item.name}
                                         </div>
                                         <div className={styles.cardDescription}>
-                                            {item.status === 'available' ?
+                                            {isAvailable ?
                                                 (isUser ?
                                                     intl.formatMessage(messages.localDescription) :
                                                     intl.formatMessage(messages.availableDescription)) :
-                                                intl.formatMessage(messages.placeholderDescription)}
+                                                (isDownloadable ?
+                                                    intl.formatMessage(messages.downloadableDescription) :
+                                                    intl.formatMessage(messages.placeholderDescription))}
                                         </div>
                                     </div>
                                     <footer className={styles.cardFooter}>

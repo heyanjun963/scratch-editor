@@ -4,6 +4,7 @@ import {parse} from '@babel/parser';
 const SUPPORTED_GENERATOR_METHODS = new Set([
     'addImport',
     'addObject',
+    'addVariableForce',
     'addSetup',
     'addCode'
 ]);
@@ -126,6 +127,7 @@ const parseFunctionGeneration = (functionNode, opcode, override = {}) => {
         template: '',
         imports: [],
         variables: [],
+        forcedVariables: [],
         setups: [],
         entryTemplate: override.entryTemplate ? String(override.entryTemplate) : '',
         entryFooter: override.entryFooter ? String(override.entryFooter) : '',
@@ -166,6 +168,11 @@ const parseFunctionGeneration = (functionNode, opcode, override = {}) => {
             addPreambleLines(renderStaticString(args[args.length - 1], parameterBindings, opcode), generation);
         } else if (method === 'addObject') {
             generation.variables.push(renderStaticString(args[2], parameterBindings, opcode));
+        } else if (method === 'addVariableForce') {
+            generation.forcedVariables.push({
+                name: renderStaticString(args[0], parameterBindings, opcode),
+                code: renderStaticString(args[1], parameterBindings, opcode)
+            });
         } else if (method === 'addSetup') {
             generation.setups.push(renderStaticString(args[1], parameterBindings, opcode));
         } else if (method === 'addCode') {
@@ -178,6 +185,7 @@ const parseFunctionGeneration = (functionNode, opcode, override = {}) => {
         template: codeParts.join('\n'),
         imports: uniqueStrings(generation.imports),
         variables: uniqueStrings(generation.variables),
+        forcedVariables: generation.forcedVariables,
         setups: uniqueStrings(generation.setups)
     };
 };
