@@ -615,6 +615,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -638,6 +639,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -664,6 +666,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -706,6 +709,7 @@
           "variables": [
             "beep = Hiwonder.Buzzer()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -744,6 +748,7 @@
           "variables": [
             "beep = Hiwonder.Buzzer()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -772,6 +777,7 @@
           "variables": [
             "beep = Hiwonder.Buzzer()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -795,6 +801,7 @@
           "variables": [
             "beep = Hiwonder.Buzzer()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -816,6 +823,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -827,6 +835,7 @@
     {
       "opcode": "get_battery_level",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "电量值(mV)",
       "arguments": {},
       "codegen": {
@@ -837,6 +846,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -865,6 +875,7 @@
           "variables": [
             "rgb = Hiwonder.RGB()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -901,6 +912,7 @@
           "variables": [
             "rgb = Hiwonder.RGB()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -935,6 +947,7 @@
           "variables": [
             "rgb = Hiwonder.RGB()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -958,6 +971,7 @@
           "variables": [
             "rgb = Hiwonder.RGB()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -981,6 +995,7 @@
           "variables": [
             "rgb = Hiwonder.RGB()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1007,6 +1022,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1033,6 +1049,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1065,6 +1082,7 @@
           "variables": [
             "button{KEYS} = Hiwonder.Button('{KEYS}')"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "def on_button{KEYS}_clicked():",
           "entryFooter": "button{KEYS}.Clicked(on_button{KEYS}_clicked)",
@@ -1097,6 +1115,7 @@
           "variables": [
             "button{KEYS} = Hiwonder.Button('{KEYS}')"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "def on_button{KEYS}_longpressed():",
           "entryFooter": "button{KEYS}.Longpressed(on_button{KEYS}_longpressed)",
@@ -1108,6 +1127,7 @@
     {
       "opcode": "key_is_pressed",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "[KEYS] 键被按下",
       "arguments": {
         "KEYS": {
@@ -1127,6 +1147,7 @@
           "variables": [
             "button{KEYS} = Hiwonder.Button('{KEYS}')"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1167,6 +1188,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1201,6 +1223,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1235,6 +1258,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1269,6 +1293,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1301,6 +1326,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1333,6 +1359,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1356,6 +1383,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1394,6 +1422,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1430,6 +1459,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1464,6 +1494,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1496,6 +1527,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1530,6 +1562,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1564,6 +1597,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1575,6 +1609,7 @@
     {
       "opcode": "get_motor_angle",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "读取麦轮 [ID] 角度",
       "arguments": {
         "ID": {
@@ -1594,6 +1629,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1617,6 +1653,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1628,6 +1665,7 @@
     {
       "opcode": "is_motor_ready",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "麦轮 [ID] 运动是否完成",
       "arguments": {
         "ID": {
@@ -1647,6 +1685,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1658,6 +1697,7 @@
     {
       "opcode": "is_all_ready",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "全部麦轮运动是否完成",
       "arguments": {},
       "codegen": {
@@ -1670,6 +1710,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1720,6 +1761,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1743,6 +1785,7 @@
           "variables": [
             "imu = Hiwonder.IMU()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1766,6 +1809,7 @@
           "variables": [
             "imu = Hiwonder.IMU()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1777,6 +1821,7 @@
     {
       "opcode": "get_euler_angle_element_value",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "获取欧拉角 [VALUE]",
       "arguments": {
         "VALUE": {
@@ -1796,6 +1841,7 @@
           "variables": [
             "imu = Hiwonder.IMU()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1807,6 +1853,7 @@
     {
       "opcode": "linefollower6_one_status",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "[SENSOR] 六路巡线传感器通道 [NUM] 检测到 [LINE]",
       "arguments": {
         "SENSOR": {
@@ -1838,6 +1885,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1849,6 +1897,7 @@
     {
       "opcode": "linefollower6_status",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "[SENSOR] 六路巡线传感器检测到 [LINE]",
       "arguments": {
         "SENSOR": {
@@ -1872,6 +1921,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1906,6 +1956,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1917,6 +1968,7 @@
     {
       "opcode": "linefollower6_get_value",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "[SENSOR] 六路巡线传感器通道 [NUM] 灰度值(0~100)",
       "arguments": {
         "SENSOR": {
@@ -1942,6 +1994,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1953,6 +2006,7 @@
     {
       "opcode": "linefollower6_read_offset",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "获取 [SENSOR] 六路巡线传感器偏移值",
       "arguments": {
         "SENSOR": {
@@ -1972,6 +2026,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -1983,6 +2038,7 @@
     {
       "opcode": "get_led_ultrasonic_distance",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "超声波传感器距离(cm)",
       "arguments": {},
       "codegen": {
@@ -1995,6 +2051,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2029,6 +2086,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2071,6 +2129,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2101,6 +2160,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2141,6 +2201,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2164,6 +2225,7 @@
           "variables": [
             "mecanumCar = Hiwonder_DEV.DEV_MecanumCar()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2198,6 +2260,7 @@
           "variables": [
             "ble = BLE({MODE}, {NAME})"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2209,6 +2272,7 @@
     {
       "opcode": "ble_is_connected",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "蓝牙是否已连接",
       "arguments": {},
       "codegen": {
@@ -2217,6 +2281,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2228,6 +2293,7 @@
     {
       "opcode": "get_ble_mac",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "获取蓝牙MAC地址",
       "arguments": {},
       "codegen": {
@@ -2236,6 +2302,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2247,6 +2314,7 @@
     {
       "opcode": "ble_wait_end",
       "blockType": "boolean",
+      "disableMonitor": true,
       "text": "蓝牙是否收到 [VALUE]",
       "arguments": {
         "VALUE": {
@@ -2260,6 +2328,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2271,6 +2340,7 @@
     {
       "opcode": "read_ble_data",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "读取蓝牙数据",
       "arguments": {},
       "codegen": {
@@ -2279,6 +2349,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2290,6 +2361,7 @@
     {
       "opcode": "get_ble_cmd",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "解析蓝牙数据 [DATA] 命令",
       "arguments": {
         "DATA": {
@@ -2303,6 +2375,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2314,6 +2387,7 @@
     {
       "opcode": "get_ble_args",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "解析蓝牙数据 [DATA] 参数 [NUM]",
       "arguments": {
         "DATA": {
@@ -2331,6 +2405,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -2355,6 +2430,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",

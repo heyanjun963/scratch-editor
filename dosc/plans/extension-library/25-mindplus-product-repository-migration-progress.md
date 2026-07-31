@@ -4,7 +4,7 @@
 
 把产品源码管理入口切换到独立产品仓库，并验证同一份 Mind+ Python 源码可以生成稳定 `.mpext`、进入远程 catalog、被编辑器解析并保持现有 Python 输出。
 
-> 当前状态：AiDoggy、miniHexa、AI 机甲麦轮车和 AI 机甲双驱车已统一使用 Mind+ Python 作者源并生成确定性 `.mpext`，四个 catalog 条目均已开放为 `published`。AI 机甲双驱车仍待逐项人工校对和真机验收。
+> 当前状态：AiDoggy、miniHexa、AI 机甲麦轮车、AI 机甲双驱车和 AI 机甲四足机器人已统一使用 Mind+ Python 作者源并生成确定性 `.mpext`。前四个 catalog 条目已开放为 `published`；AI 机甲四足机器人先作为 `1.0.0` 内置产品测试，远程保持 `draft`。
 
 ## 源码与发布职责
 
@@ -28,7 +28,7 @@ npm run sync:product-extensions
 | - | - | - |
 | `packages/scratch-gui/scripts/pack-mindplus-extension.mjs` | 按固定文件顺序、时间和压缩级别生成 `.mpext` | 相同源码重复打包得到相同二进制和 SHA256 |
 | `packages/scratch-gui/scripts/pack-mindplus-fixtures.mjs` | 复用通用打包器生成测试 fixture | 不再单独维护一套压缩规则 |
-| `scripts/sync-builtin-product-snapshots.mjs` | 校验产品包 SHA256、ID 和版本后生成内置 MPEXT 与同步 manifest | 编辑器启动不再读取旧的拆分 JSON 产品包 |
+| `scripts/sync-builtin-product-snapshots.mjs` | 按显式版本和 SHA256 锁定清单生成内置 MPEXT 与同步 manifest | 远程 catalog 升级不会意外改变内置版本 |
 | `scripts/sync-product-extensions.mjs` | 从产品仓库读取 Mind+ 或旧 SBEXT 源码，生成发布包并更新 catalog | 禁止低版本覆盖高版本；同版本资源或 SHA256 变化时自动回到 `draft` |
 | `mindplus-package-adapter.js` | 接收产品图标、三层颜色、特殊参数和 `templateSelector` | 可表达 miniHexa 方向模板和 AI 麦轮车 `line6` 参数 |
 | `package-reader.js` | 读取 Mind+ SVG/PNG 图标并交给静态转换器 | 导入过程仍不执行 `main.ts` |
@@ -45,12 +45,13 @@ npm run sync:product-extensions
 | miniHexa | `products/minihexa/` | `minihexa-0.1.1.mpext` | `7bbf1554e7dd67b7aa00d9e92b408f0ca7e2fb5cd2911c9597f71ca87d882478` | `published` |
 | AI 机甲麦轮车 | `products/aimecanum/` | `aimecanum-0.2.3.mpext` | `30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95` | `published` |
 | AI 机甲双驱车 | `products/aimech/` | `aimech-1.0.0.mpext` | `0d1b95ea60a647e2e664d432d72f418a7c71a72bae9ce4d3004fa498e37a76b1` | `published` |
+| AI 机甲四足机器人 | `products/aiquadruped/` | `aiquadruped-1.0.0.mpext` | `883abd0f9c51a74f1b7ce9c2b3bd1addb6b7cbc94c2475df3e0f32b71ea71c04` | `draft`（已内置） |
 
 AiDoggy `0.1.2` 发布包为 4709 字节，GitHub Release 下载内容与 catalog SHA256 完全一致；Gitee 和 GitHub catalog 已同步为 `published`。编辑器内置快照继续锁定 AiDoggy `0.1.0`，安装远程 `0.1.2` 后由持久化缓存覆盖内置版本。miniHexa 发布包经过本地解析后，与内置基线的 39 个 opcode、19 个菜单、9 个分类、积木参数和 Python codegen 元数据逐项一致。
 
 AI 机甲麦轮车新增 `config.json`、`python/main.ts` 和 `python/_menus/index.json`。`aimecanum-0.2.3.mpext` 与 0.2.3 旧 JSON 基线的 59 个积木、20 个菜单、10 个分类、三层颜色、参数和 Python codegen 元数据一致。完成校对后，产品仓库和编辑器中的旧拆分 JSON 均已删除。
 
-编辑器运行时从 `builtin-product-snapshots/manifests` 同步加载 manifest，`builtin-product-snapshots/packages` 保存对应 MPEXT。`index.json` 锁定版本和 SHA256。更新产品源码后先运行产品同步，再运行：
+编辑器运行时从 `builtin-product-snapshots/manifests` 同步加载 manifest，`builtin-product-snapshots/packages` 保存对应 MPEXT。`index.json` 和同步脚本共同锁定版本与 SHA256。更新产品源码后先运行产品同步、确认内置版本锁定值，再运行：
 
 ```powershell
 npm run sync:builtin-product-snapshots
@@ -63,6 +64,7 @@ cd D:\code\scratch-editor\packages\scratch-gui
 ..\..\node_modules\.bin\jest.cmd --runInBand --runTestsByPath `
   test/unit/lib/custom-extension/aidoggy-codegen.test.js `
   test/unit/lib/custom-extension/aidoggy-package.test.js `
+  test/unit/lib/custom-extension/aiquadruped-codegen.test.js `
   test/unit/lib/custom-extension/aimecanum-package.test.js `
   test/unit/lib/custom-extension/builtin-product-snapshots.test.js `
   test/unit/lib/custom-extension/library-sources.test.js `
@@ -78,7 +80,7 @@ cd D:\code\scratch-editor\packages\scratch-gui
   test/unit/containers/blocks.test.js
 ```
 
-本轮结果：15 个 suite、64 项测试全部通过。三个实际 `.mpext` 均通过旧行为深比较，重复打包二进制和 SHA256 保持稳定。内置快照测试会重新解析三个 MPEXT，并校验同步 manifest 和 SHA256。Jest 仍提示仓库已有的重复 mock，Browserslist 数据也提示过期，两者均不是本轮失败。
+本轮结果：16 个 suite、73 项测试全部通过。四个内置 `.mpext` 均通过实际包重新解析，产品专用测试锁定 Python 生成规则；AI机甲四足机器人重复打包二进制和 SHA256 保持稳定。Mind+ Python reporter/boolean 默认禁用无效的舞台监视器开关。Jest 仍提示仓库已有的重复 mock，Browserslist 数据也提示过期，两者均不是本轮失败。
 
 ## 人工发版与验收
 
@@ -94,6 +96,6 @@ cd D:\code\scratch-editor\packages\scratch-gui
 
 - `asset.python.dependencies` 当前只进入 manifest，不会自动安装 pip 依赖。
 - 项目文件尚未锁定产品拓展版本和 SHA256，旧项目的可重复生成仍需后续补齐。
-- 三个产品仍需继续补充全量真机回归；公开版本出现问题时必须提升补丁版本，不能覆盖既有标签和发布包。
+- 各产品仍需继续补充全量真机回归；公开版本出现问题时必须提升补丁版本，不能覆盖既有标签和发布包。
 - 内置 manifest 是 MPEXT 的同步生成结果，不在浏览器启动时异步解压；更新产品后必须同时提交内置包、manifest 和 `index.json`。
 - Arduino C 包解析和设备验证继续延后。

@@ -4,10 +4,41 @@ import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-import {serializeCustomExtensionManifest} from '../packages/scratch-gui/src/lib/custom-extension/manifest-schema.js';
-import {readCustomExtensionPackageBuffer} from '../packages/scratch-gui/src/lib/custom-extension/package-reader.js';
+import * as manifestSchemaModule from '../packages/scratch-gui/src/lib/custom-extension/manifest-schema.js';
+import * as packageReaderModule from '../packages/scratch-gui/src/lib/custom-extension/package-reader.js';
 
-const PRODUCT_IDS = ['aidoggy', 'aimecanum', 'minihexa'];
+// tsx 在不同 Node 版本下可能把 GUI 的 .js 判定为 ESM 或 CommonJS，统一兼容两种导出形态。
+const manifestSchema = manifestSchemaModule.default || manifestSchemaModule;
+const packageReader = packageReaderModule.default || packageReaderModule;
+const {serializeCustomExtensionManifest} = manifestSchema;
+const {readCustomExtensionPackageBuffer} = packageReader;
+
+const PRODUCT_SNAPSHOTS = [
+    {
+        packageId: 'aidoggy',
+        version: '0.1.0',
+        asset: 'aidoggy-0.1.0.mpext',
+        sha256: '987b83dc86aabe9262c1f9d9311537741d29be52c4cd259d1af2558627cfc754'
+    },
+    {
+        packageId: 'aimecanum',
+        version: '0.2.3',
+        asset: 'aimecanum-0.2.3.mpext',
+        sha256: '30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95'
+    },
+    {
+        packageId: 'aiquadruped',
+        version: '1.0.0',
+        asset: 'aiquadruped-1.0.0.mpext',
+        sha256: '883abd0f9c51a74f1b7ce9c2b3bd1addb6b7cbc94c2475df3e0f32b71ea71c04'
+    },
+    {
+        packageId: 'minihexa',
+        version: '0.1.1',
+        asset: 'minihexa-0.1.1.mpext',
+        sha256: '7bbf1554e7dd67b7aa00d9e92b408f0ca7e2fb5cd2911c9597f71ca87d882478'
+    }
+];
 const editorRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotRoot = path.join(
     editorRoot,
@@ -19,8 +50,6 @@ const getArgumentValue = flag => {
     return index >= 0 ? process.argv[index + 1] : null;
 };
 
-const readJson = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
-
 const writeJson = (filePath, value) => {
     fs.mkdirSync(path.dirname(filePath), {recursive: true});
     fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
@@ -28,23 +57,13 @@ const writeJson = (filePath, value) => {
 
 // 所有包先在内存中完成哈希、ID、版本和解析校验，通过后才整体替换内置快照目录。
 const loadVerifiedSnapshots = async productRepository => {
-    const catalogPath = path.join(productRepository, 'catalog.json');
-    const catalog = readJson(catalogPath);
-    if (catalog.formatVersion !== 1 || !Array.isArray(catalog.packages)) {
-        throw new Error(`产品 catalog 格式不受支持: ${catalogPath}`);
-    }
-
-    return Promise.all(PRODUCT_IDS.map(async packageId => {
-        const entry = catalog.packages.find(item => item.packageId === packageId);
-        if (!entry) throw new Error(`产品 catalog 缺少 ${packageId}`);
-        if (!String(entry.asset || '').toLowerCase().endsWith('.mpext')) {
-            throw new Error(`产品 ${packageId} 尚未切换为 MPEXT: ${entry.asset || '(empty)'}`);
-        }
+    return Promise.all(PRODUCT_SNAPSHOTS.map(async entry => {
+        const {packageId} = entry;
         const packagePath = path.join(productRepository, 'dist', entry.asset);
         const data = fs.readFileSync(packagePath);
         const sha256 = createHash('sha256').update(data).digest('hex');
-        if (sha256 !== String(entry.sha256 || '').toLowerCase()) {
-            throw new Error(`产品 ${packageId} 的 MPEXT 与 catalog SHA256 不一致`);
+        if (sha256 !== entry.sha256) {
+            throw new Error(`产品 ${packageId} 的 MPEXT 与内置版本锁定 SHA256 不一致`);
         }
         const manifest = await readCustomExtensionPackageBuffer(data, entry.asset);
         if (manifest.id !== packageId || manifest.version !== entry.version) {

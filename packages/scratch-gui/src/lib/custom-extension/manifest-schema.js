@@ -200,6 +200,7 @@ const normalizeBlock = (rawBlock, seenOpcodes) => {
         opcode,
         blockType,
         scratchBlockType: blockTypeMap[blockType],
+        disableMonitor: Boolean(rawBlock.disableMonitor),
         text: String(rawBlock.text || opcode),
         arguments: normalizeArguments({opcode}, rawBlock.arguments),
         category: rawBlock.category ? String(rawBlock.category) : null,
@@ -335,6 +336,7 @@ const serializeCustomExtensionManifest = manifest => {
         blocks: manifest.blocks.map(block => ({
             opcode: block.opcode,
             blockType: block.blockType,
+            disableMonitor: block.disableMonitor || undefined,
             text: block.text,
             category: block.category || undefined,
             arguments: Object.keys(block.arguments).reduce((argumentsByName, name) => {

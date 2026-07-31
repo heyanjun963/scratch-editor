@@ -454,6 +454,7 @@
           "variables": [
             "aidoggy = Hiwonder.AIDoggy()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -477,6 +478,7 @@
           "variables": [
             "aidoggy = Hiwonder.AIDoggy()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -519,6 +521,7 @@
           "variables": [
             "beep = Hiwonder.Buzzer()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -555,6 +558,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -566,6 +570,7 @@
     {
       "opcode": "get_battery_level",
       "blockType": "reporter",
+      "disableMonitor": true,
       "text": "电池电压(mV)",
       "arguments": {},
       "codegen": {
@@ -576,6 +581,7 @@
           "variables": [
             "rsys = Hiwonder.Robot_System()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -604,6 +610,7 @@
           "variables": [
             "rsys = Hiwonder.Robot_System()"
           ],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -630,6 +637,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -656,6 +664,7 @@
           ],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -700,6 +709,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -742,6 +752,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -782,6 +793,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -819,6 +831,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -845,6 +858,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -864,6 +878,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -894,6 +909,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -926,6 +942,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",
@@ -945,6 +962,7 @@
           "imports": [],
           "runtimeFiles": [],
           "variables": [],
+          "forcedVariables": [],
           "setups": [],
           "entryTemplate": "",
           "entryFooter": "",

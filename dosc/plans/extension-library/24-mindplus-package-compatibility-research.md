@@ -87,6 +87,7 @@ my-extension/
 - `command`、`reporter`、`boolean`、`hat`。
 - `normal`、`string`、`number`、`boolean`、`dropdown`、`dropdownRound`。
 - `block`、`shadow`、`options` 和 `defl`。
+- Python reporter/boolean 默认设置 `disableMonitor`，避免显示无法运行的舞台监视器开关。
 - `_menus` 中的显示值、生成值和 `default_<function>_<argument>`。
 - `_locales` 中的 `namespace.function|block` 和 `namespace.menu.value|menu`。
 - `Generator.addImport`、`addObject`、`addVariableForce`、`addSetup`、`addCode` 的静态字符串和模板字符串。

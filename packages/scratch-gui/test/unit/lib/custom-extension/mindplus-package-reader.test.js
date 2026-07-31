@@ -299,6 +299,7 @@ describe('Mind+ package reader', () => {
         expect(manifest.version).toBe('2.3.4');
         expect(manifest.icon).toMatch(/^data:image\/svg\+xml;utf8,/);
         expect(manifest.blocks[0].text).toBe('读取模式 [MODE]');
+        expect(manifest.blocks[0].disableMonitor).toBe(true);
         expect(manifest.blocks[0].codegen.python.templateSelector).toEqual({
             argument: 'MODE',
             cases: {
@@ -360,6 +361,7 @@ describe('Mind+ package reader', () => {
             color2: '#145fa8',
             color3: '#104b85'
         });
+        expect(manifest.blocks[0].disableMonitor).toBe(true);
         expect(manifest.blocks[0].arguments.LINE).toMatchObject({
             type: 'line6',
             scratchType: 'line6',

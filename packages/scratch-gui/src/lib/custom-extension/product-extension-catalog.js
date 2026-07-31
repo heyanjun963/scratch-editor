@@ -23,9 +23,9 @@ const productExtensionCatalog = [
                 id: 'aiquadruped',
                 name: 'AI机甲四足机器人',
                 sourceExtension: 'aiquadruped',
-                version: '0.0.0',
+                version: '1.0.0',
                 latestVersion: '1.0.0',
-                status: 'planned'
+                status: 'available'
             },
             {
                 id: 'aiquadrupedpro',

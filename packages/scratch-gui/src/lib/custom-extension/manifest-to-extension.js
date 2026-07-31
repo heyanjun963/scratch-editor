@@ -17,6 +17,7 @@ const createNoopBlockFunction = block => {
 const manifestBlockToExtensionBlock = block => ({
     opcode: block.opcode,
     blockType: block.scratchBlockType,
+    disableMonitor: block.disableMonitor || undefined,
     text: block.text,
         arguments: Object.keys(block.arguments).reduce((argumentsByName, name) => {
             const argument = block.arguments[name];

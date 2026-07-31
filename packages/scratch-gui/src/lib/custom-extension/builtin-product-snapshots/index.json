@@ -14,6 +14,12 @@
       "sha256": "30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95"
     },
     {
+      "packageId": "aiquadruped",
+      "version": "1.0.0",
+      "asset": "aiquadruped-1.0.0.mpext",
+      "sha256": "883abd0f9c51a74f1b7ce9c2b3bd1addb6b7cbc94c2475df3e0f32b71ea71c04"
+    },
+    {
       "packageId": "minihexa",
       "version": "0.1.1",
       "asset": "minihexa-0.1.1.mpext",

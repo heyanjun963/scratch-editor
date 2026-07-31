@@ -348,6 +348,7 @@ const adaptMindPlusPythonPackage = ({
         blocks.push({
             opcode,
             blockType,
+            disableMonitor: blockType === 'reporter' || blockType === 'boolean',
             text,
             arguments: argumentsByName
         });
