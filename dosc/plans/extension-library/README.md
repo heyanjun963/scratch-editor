@@ -32,7 +32,8 @@
 | [26 Mind+ 产品远程发布指南](./26-mindplus-product-release-guide.md) | 指导单人维护者升级版本、生成包、推送 GitHub/Gitee、创建 Release、开放 catalog 和验证离线缓存 |
 | [27 AI机甲双驱车积木与 Python 迁移记录](./27-aimech-block-python-migration-progress.md) | 记录 aimech 40 个积木、11 个菜单、远程可安装卡片和 IMU 强制变量覆盖的迁移结果 |
 | [28 AI机甲四足机器人积木与 Python 迁移记录](./28-aiquadruped-block-python-migration-progress.md) | 记录 aiquadruped 38 个启用积木、10 个菜单、四足运动生成规则和本地内置快照 |
+| [29 AI机甲四足竞赛版积木与 Python 迁移记录](./29-aiquadrupedpro-block-python-migration-progress.md) | 记录 aiquadrupedpro 44 个启用积木、10 个菜单、三自由度运动分支和本地内置快照 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用。AiDoggy、miniHexa 与三款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人 `1.0.0` 已作为内置包开放本地测试，远程保持 `draft`。Arduino C 继续延后处理。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用。AiDoggy、miniHexa 与四款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人和四足竞赛版 `1.0.0` 已作为内置包开放本地测试，远程保持 `draft`。Arduino C 继续延后处理。

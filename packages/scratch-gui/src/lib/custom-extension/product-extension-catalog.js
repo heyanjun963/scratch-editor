@@ -31,9 +31,9 @@ const productExtensionCatalog = [
                 id: 'aiquadrupedpro',
                 name: 'AI机甲四足竞赛版',
                 sourceExtension: 'aiquadrupedpro',
-                version: '0.0.0',
+                version: '1.0.0',
                 latestVersion: '1.0.0',
-                status: 'planned'
+                status: 'available'
             },
             {
                 id: 'aihexa',

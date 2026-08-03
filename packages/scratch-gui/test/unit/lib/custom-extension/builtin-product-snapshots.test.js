@@ -34,6 +34,12 @@ describe('built-in Mind+ product snapshots', () => {
                 sha256: '883abd0f9c51a74f1b7ce9c2b3bd1addb6b7cbc94c2475df3e0f32b71ea71c04'
             },
             {
+                packageId: 'aiquadrupedpro',
+                version: '1.0.0',
+                asset: 'aiquadrupedpro-1.0.0.mpext',
+                sha256: '910381e77f5d75bea69ab97550d0b411702fdafebe213019fce46ad4e1c1fecd'
+            },
+            {
                 packageId: 'minihexa',
                 version: '0.1.1',
                 asset: 'minihexa-0.1.1.mpext',
@@ -59,6 +65,15 @@ describe('built-in Mind+ product snapshots', () => {
         const manifest = builtinProductManifests.aiquadruped;
 
         expect(manifest.blocks).toHaveLength(38);
+        expect(manifest.categories).toHaveLength(8);
+        expect(Object.keys(manifest.menus)).toHaveLength(10);
+        expect(manifest.blocks.filter(block => block.blockType === 'hat')).toHaveLength(4);
+    });
+
+    test('bundles the complete AI quadruped pro product manifest', () => {
+        const manifest = builtinProductManifests.aiquadrupedpro;
+
+        expect(manifest.blocks).toHaveLength(44);
         expect(manifest.categories).toHaveLength(8);
         expect(Object.keys(manifest.menus)).toHaveLength(10);
         expect(manifest.blocks.filter(block => block.blockType === 'hat')).toHaveLength(4);

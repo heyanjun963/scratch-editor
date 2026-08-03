@@ -4,7 +4,7 @@
 
 把产品源码管理入口切换到独立产品仓库，并验证同一份 Mind+ Python 源码可以生成稳定 `.mpext`、进入远程 catalog、被编辑器解析并保持现有 Python 输出。
 
-> 当前状态：AiDoggy、miniHexa、AI 机甲麦轮车、AI 机甲双驱车和 AI 机甲四足机器人已统一使用 Mind+ Python 作者源并生成确定性 `.mpext`。前四个 catalog 条目已开放为 `published`；AI 机甲四足机器人先作为 `1.0.0` 内置产品测试，远程保持 `draft`。
+> 当前状态：AiDoggy、miniHexa、AI 机甲麦轮车、AI 机甲双驱车、AI 机甲四足机器人和 AI 机甲四足竞赛版已统一使用 Mind+ Python 作者源并生成确定性 `.mpext`。前四个 catalog 条目已开放为 `published`；两款四足产品先作为 `1.0.0` 内置产品测试，远程保持 `draft`。
 
 ## 源码与发布职责
 
@@ -46,6 +46,7 @@ npm run sync:product-extensions
 | AI 机甲麦轮车 | `products/aimecanum/` | `aimecanum-0.2.3.mpext` | `30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95` | `published` |
 | AI 机甲双驱车 | `products/aimech/` | `aimech-1.0.0.mpext` | `0d1b95ea60a647e2e664d432d72f418a7c71a72bae9ce4d3004fa498e37a76b1` | `published` |
 | AI 机甲四足机器人 | `products/aiquadruped/` | `aiquadruped-1.0.0.mpext` | `883abd0f9c51a74f1b7ce9c2b3bd1addb6b7cbc94c2475df3e0f32b71ea71c04` | `draft`（已内置） |
+| AI 机甲四足竞赛版 | `products/aiquadrupedpro/` | `aiquadrupedpro-1.0.0.mpext` | `910381e77f5d75bea69ab97550d0b411702fdafebe213019fce46ad4e1c1fecd` | `draft`（已内置） |
 
 AiDoggy `0.1.2` 发布包为 4709 字节，GitHub Release 下载内容与 catalog SHA256 完全一致；Gitee 和 GitHub catalog 已同步为 `published`。编辑器内置快照继续锁定 AiDoggy `0.1.0`，安装远程 `0.1.2` 后由持久化缓存覆盖内置版本。miniHexa 发布包经过本地解析后，与内置基线的 39 个 opcode、19 个菜单、9 个分类、积木参数和 Python codegen 元数据逐项一致。
 
@@ -65,6 +66,7 @@ cd D:\code\scratch-editor\packages\scratch-gui
   test/unit/lib/custom-extension/aidoggy-codegen.test.js `
   test/unit/lib/custom-extension/aidoggy-package.test.js `
   test/unit/lib/custom-extension/aiquadruped-codegen.test.js `
+  test/unit/lib/custom-extension/aiquadrupedpro-codegen.test.js `
   test/unit/lib/custom-extension/aimecanum-package.test.js `
   test/unit/lib/custom-extension/builtin-product-snapshots.test.js `
   test/unit/lib/custom-extension/library-sources.test.js `
@@ -80,7 +82,7 @@ cd D:\code\scratch-editor\packages\scratch-gui
   test/unit/containers/blocks.test.js
 ```
 
-本轮结果：16 个 suite、73 项测试全部通过。四个内置 `.mpext` 均通过实际包重新解析，产品专用测试锁定 Python 生成规则；AI机甲四足机器人重复打包二进制和 SHA256 保持稳定。Mind+ Python reporter/boolean 默认禁用无效的舞台监视器开关。Jest 仍提示仓库已有的重复 mock，Browserslist 数据也提示过期，两者均不是本轮失败。
+本轮结果：17 个 suite、79 项测试全部通过。五个内置 `.mpext` 均通过实际包重新解析，产品专用测试锁定 Python 生成规则；两款 AI机甲四足产品重复打包二进制和 SHA256 保持稳定。Mind+ Python reporter/boolean 默认禁用无效的舞台监视器开关。Jest 仍提示仓库已有的重复 mock，Browserslist 数据也提示过期，两者均不是本轮失败。
 
 ## 人工发版与验收
 
