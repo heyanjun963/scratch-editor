@@ -52,7 +52,7 @@
 | `aiquadrupedpro` | 44（另有 1 个已注释） | 4 | 有 |
 | `midc` / `largec` | 45 | 4 | 有 |
 | `mechdog` | 44 | 4 | 有 |
-| `aihexa` | 43 | 4 | 有 |
+| `aihexa` | 42（另有 1 个已注释） | 4 | 有 |
 | `tonybot` | 40 | 5 | 有 |
 | `communication` | 23 | 2 | 有 |
 

@@ -39,9 +39,9 @@ const productExtensionCatalog = [
                 id: 'aihexa',
                 name: 'AI机甲六足机器人',
                 sourceExtension: 'aihexa',
-                version: '0.0.0',
+                version: '1.0.0',
                 latestVersion: '1.0.0',
-                status: 'planned'
+                status: 'available'
             },
             {
                 id: 'minihexa',

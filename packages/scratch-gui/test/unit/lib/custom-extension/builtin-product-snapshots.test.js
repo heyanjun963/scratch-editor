@@ -22,6 +22,12 @@ describe('built-in Mind+ product snapshots', () => {
                 sha256: '987b83dc86aabe9262c1f9d9311537741d29be52c4cd259d1af2558627cfc754'
             },
             {
+                packageId: 'aihexa',
+                version: '1.0.0',
+                asset: 'aihexa-1.0.0.mpext',
+                sha256: '86ab31786d4741e9640a45ee70985bf66a2893010bbbb2db3418e948d2b8961c'
+            },
+            {
                 packageId: 'aimecanum',
                 version: '0.2.3',
                 asset: 'aimecanum-0.2.3.mpext',
@@ -65,6 +71,15 @@ describe('built-in Mind+ product snapshots', () => {
         const manifest = builtinProductManifests.aiquadruped;
 
         expect(manifest.blocks).toHaveLength(38);
+        expect(manifest.categories).toHaveLength(8);
+        expect(Object.keys(manifest.menus)).toHaveLength(10);
+        expect(manifest.blocks.filter(block => block.blockType === 'hat')).toHaveLength(4);
+    });
+
+    test('bundles the complete AI hexapod product manifest', () => {
+        const manifest = builtinProductManifests.aihexa;
+
+        expect(manifest.blocks).toHaveLength(42);
         expect(manifest.categories).toHaveLength(8);
         expect(Object.keys(manifest.menus)).toHaveLength(10);
         expect(manifest.blocks.filter(block => block.blockType === 'hat')).toHaveLength(4);
