@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import omit from 'lodash.omit';
 import PropTypes from 'prop-types';
-import React, {useEffect, useCallback} from 'react';
+import React, {useEffect, useCallback, useRef, useState} from 'react';
 import {defineMessages, FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import MediaQuery from 'react-responsive';
@@ -40,6 +40,10 @@ import {colorModeMap} from '../../lib/settings/color-mode/index.js';
 import {DEFAULT_THEME, themeMap} from '../../lib/settings/theme/index.js';
 import {PYTHON_EDITOR_MODE, SCRATCH_EDITOR_MODE, setEditorMode} from '../../reducers/mode';
 import {AccountMenuOptionsPropTypes} from '../../lib/account-menu-options';
+import {
+    clampPythonPanelWidth,
+    getDefaultPythonPanelWidth
+} from '../../lib/python-panel-layout';
 
 import styles from './gui.css';
 import codeIcon from './icon--code.svg';
@@ -51,6 +55,8 @@ import {setTheme} from '../../reducers/settings.js';
 import {PLATFORM} from '../../lib/platform.js';
 import {MenuRefProvider} from '../../contexts/menu-ref-context.jsx';
 import {ModalFocusProvider} from '../../contexts/modal-focus-context.jsx';
+
+const PYTHON_PANEL_KEYBOARD_RESIZE_STEP = 16;
 
 const ariaMessages = defineMessages({
     menuBar: {
@@ -236,6 +242,70 @@ const GUIComponent = props => {
         return <Box {...componentProps}>{children}</Box>;
     }
 
+    const editorLayoutRef = useRef(null);
+    const pythonPanelRef = useRef(null);
+    const pythonPanelResizeHandleRef = useRef(null);
+    const removePythonPanelDragListenersRef = useRef(null);
+    const [pythonPanelWidth, setPythonPanelWidth] = useState(null);
+
+    // 根据分隔条横向位置计算 Python 区宽度，同时给左右两区保留最小操作空间。
+    const resizePythonPanelAt = useCallback(clientX => {
+        if (!editorLayoutRef.current) return;
+        const layoutRect = editorLayoutRef.current.getBoundingClientRect();
+        const separatorWidth = pythonPanelResizeHandleRef.current?.getBoundingClientRect().width || 0;
+        const requestedWidth = isRtl ? clientX - layoutRect.left : layoutRect.right - clientX;
+        setPythonPanelWidth(clampPythonPanelWidth(layoutRect.width, requestedWidth, separatorWidth));
+    }, [isRtl]);
+
+    // 拖拽结束后清除 document 级事件，避免指针离开分隔条后遗留监听。
+    const stopPythonPanelDragging = useCallback(() => {
+        if (removePythonPanelDragListenersRef.current) {
+            removePythonPanelDragListenersRef.current();
+            removePythonPanelDragListenersRef.current = null;
+        }
+    }, []);
+
+    // 在 document 上跟踪拖拽，使鼠标越过左右面板时仍可连续调整宽度。
+    const handlePythonPanelResizeMouseDown = useCallback(event => {
+        event.preventDefault();
+        stopPythonPanelDragging();
+        resizePythonPanelAt(event.clientX);
+        const handleMouseMove = moveEvent => resizePythonPanelAt(moveEvent.clientX);
+        const handleMouseUp = () => stopPythonPanelDragging();
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        removePythonPanelDragListenersRef.current = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [
+        resizePythonPanelAt,
+        stopPythonPanelDragging
+    ]);
+
+    // 分隔条聚焦后可用左右方向键按固定步长移动。
+    const handlePythonPanelResizeKeyDown = useCallback(event => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        if (!editorLayoutRef.current) return;
+        event.preventDefault();
+        const layoutRect = editorLayoutRef.current.getBoundingClientRect();
+        const separatorWidth = pythonPanelResizeHandleRef.current?.getBoundingClientRect().width || 0;
+        const currentWidth = pythonPanelRef.current?.getBoundingClientRect().width ||
+            getDefaultPythonPanelWidth(layoutRect.width, separatorWidth);
+        const dividerMovement = event.key === 'ArrowLeft' ?
+            -PYTHON_PANEL_KEYBOARD_RESIZE_STEP : PYTHON_PANEL_KEYBOARD_RESIZE_STEP;
+        const requestedWidth = currentWidth + (isRtl ? dividerMovement : -dividerMovement);
+        setPythonPanelWidth(clampPythonPanelWidth(layoutRect.width, requestedWidth, separatorWidth));
+    }, [isRtl]);
+
+    useEffect(() => stopPythonPanelDragging, [stopPythonPanelDragging]);
+
+    // 宽度落到 DOM 后广播布局变化，让 Blockly、代码文本区和控制台同步重算尺寸。
+    useEffect(() => {
+        if (pythonPanelWidth === null) return;
+        window.dispatchEvent(new Event('resize'));
+    }, [pythonPanelWidth]);
+
     // 如果桌面 tab 指定了模式，GUI 内部 Redux 必须同步到这个模式。
     useEffect(() => {
         if (props.platform) {
@@ -417,11 +487,19 @@ const GUIComponent = props => {
                         />
                     </MenuRefProvider>
                     }
-                    <Box className={classNames(boxStyles, styles.flexWrapper)}>
+                    <Box
+                        className={classNames(boxStyles, styles.flexWrapper)}
+                        componentRef={node => {
+                            editorLayoutRef.current = node;
+                        }}
+                    >
                         <Box
                             role="main"
                             aria-label={intl.formatMessage(ariaMessages.editor)}
-                            className={styles.editorWrapper}
+                            className={classNames(
+                                styles.editorWrapper,
+                                isPythonEditorMode && styles.pythonEditorMode
+                            )}
                             element="main"
                         >
                             <Tabs
@@ -585,6 +663,20 @@ const GUIComponent = props => {
                             ) : null}
                         </Box>
 
+                        {isPythonEditorMode ? (
+                            <div
+                                aria-controls="python-coding-panel"
+                                aria-labelledby="python-code-header"
+                                aria-orientation="vertical"
+                                className={styles.pythonPanelResizeHandle}
+                                ref={pythonPanelResizeHandleRef}
+                                role="separator"
+                                tabIndex={0}
+                                onKeyDown={handlePythonPanelResizeKeyDown}
+                                onMouseDown={handlePythonPanelResizeMouseDown}
+                            />
+                        ) : null}
+
                         <Box
                             role="complementary"
                             aria-label={intl.formatMessage(ariaMessages.stageAndTarget)}
@@ -593,7 +685,15 @@ const GUIComponent = props => {
                                 styles[stageSize],
                                 editorMode === PYTHON_EDITOR_MODE && styles.pythonEditorMode
                             )}
+                            componentRef={node => {
+                                pythonPanelRef.current = node;
+                            }}
                             element="aside"
+                            id={isPythonEditorMode ? 'python-coding-panel' : undefined}
+                            style={isPythonEditorMode && pythonPanelWidth !== null ? {
+                                flexBasis: `${pythonPanelWidth}px`,
+                                width: `${pythonPanelWidth}px`
+                            } : undefined}
                         >
                             {editorMode === PYTHON_EDITOR_MODE ? (
                                 <PythonCodingPanel />

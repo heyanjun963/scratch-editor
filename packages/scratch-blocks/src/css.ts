@@ -403,6 +403,12 @@ const styles = `
     position: absolute;
     z-index: 20;
   }
+
+  /* 悬停工具箱时只解除 SVG 裁切，工具箱本身仍保持固定宽度。 */
+  .blocklyFlyout:hover {
+    overflow: visible;
+  }
+
   .blocklyFlyoutButton {
     fill: none;
     pointer-events: all;

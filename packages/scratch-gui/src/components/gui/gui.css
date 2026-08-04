@@ -60,6 +60,12 @@
     flex-direction: column;
 }
 
+.editor-wrapper.python-editor-mode {
+    flex-basis: 0;
+    flex-shrink: 1;
+    min-width: 30rem;
+}
+
 .tab-list {
     height: $stage-menu-height;
     width: 250px; /* Match width of the toolbox */
@@ -227,7 +233,33 @@
     flex: 0 0 40vw;
     width: 40vw;
     min-width: 25rem;
-    max-width: 50vw;
+}
+
+.python-panel-resize-handle {
+    position: relative;
+    z-index: 21;
+    flex: 0 0 0.5rem;
+    cursor: col-resize;
+    touch-action: none;
+    background: $ui-primary;
+}
+
+.python-panel-resize-handle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0.1875rem;
+    width: 0.125rem;
+    height: 2rem;
+    transform: translateY(-50%);
+    border-radius: 1px;
+    background: $text-primary-transparent;
+}
+
+.python-panel-resize-handle:hover,
+.python-panel-resize-handle:focus-visible {
+    outline: none;
+    background: #f78a2a;
 }
 
 .target-wrapper {

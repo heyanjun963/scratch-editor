@@ -6,6 +6,12 @@ import {
     ProductExtensionLibraryComponent
 } from '../../../src/components/product-extension-library/product-extension-library';
 import {normalizeCustomExtensionManifest} from '../../../src/lib/custom-extension/manifest-schema';
+import {builtinProductManifests} from '../../../src/lib/custom-extension/builtin-product-manifests';
+import {
+    composeProductModuleManifest,
+    getEnabledProductModuleIds,
+    setProductModuleState
+} from '../../../src/lib/custom-extension/product-module-support';
 import {readCustomExtensionPackageBuffer} from '../../../src/lib/custom-extension/package-reader';
 import {
     downloadRemoteLibraryPackage,
@@ -102,6 +108,78 @@ describe('ProductExtensionLibrary user extensions', () => {
 
         fireEvent.click(screen.getByRole('button', {name: '用户拓展'}));
         expect(screen.getByText('My Device')).toBeTruthy();
+    });
+
+    test('enables only migrated sensors supported by the loaded product', async () => {
+        const {rerender} = render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
+
+        expect(document.querySelector('article[title="旋钮"]')).toBeNull();
+        expect(screen.getAllByText('旋钮')[0].closest('article').title).toContain('占位拓展');
+
+        loadedExtensionIds.add('aihexa');
+        rerender(<ProductExtensionLibraryComponent {...props} />);
+
+        expect(document.querySelector('article[title="旋钮"]')).toBeTruthy();
+        expect(document.querySelector('article[title="温湿度传感器"]')).toBeNull();
+    });
+
+    test('adds supported sensors to one shared input module extension', async () => {
+        let extensionAddedHandler = null;
+        loadedExtensionIds.add('aihexa');
+        vm.addListener.mockImplementation((event, handler) => {
+            if (event === 'EXTENSION_ADDED') extensionAddedHandler = handler;
+        });
+        vm.extensionManager.registerExtensionObject.mockImplementation((extensionId, extensionObject) => {
+            loadedExtensionIds.add(extensionId);
+            extensionAddedHandler({id: extensionId});
+            return Promise.resolve(extensionObject);
+        });
+
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
+        fireEvent.click(document.querySelector('article[title="旋钮"]'));
+
+        await waitFor(() => expect(vm.extensionManager.registerExtensionObject).toHaveBeenCalledWith(
+            'sensor',
+            expect.any(Object)
+        ));
+        fireEvent.click(document.querySelector('article[title="声音传感器"]'));
+
+        await waitFor(() => expect(vm.extensionManager.registerExtensionObject).toHaveBeenCalledTimes(2));
+        const extensionObject = vm.extensionManager.registerExtensionObject.mock.calls[1][1];
+        expect(extensionObject.getInfo().blocks.filter(block => block.subCategory)).toEqual([
+            {subCategory: '旋钮'},
+            {subCategory: '声音传感器'}
+        ]);
+        expect(getEnabledProductModuleIds(vm, 'sensor')).toEqual(['knob', 'sound-sensor']);
+        expect(props.onCategorySelected).toHaveBeenLastCalledWith('sensor');
+    });
+
+    test('clears shared sensor state when switching the main product', async () => {
+        let extensionAddedHandler = null;
+        const sensorManifest = composeProductModuleManifest(builtinProductManifests.sensor, ['knob']);
+        setProductModuleState(vm, 'sensor', ['knob'], sensorManifest);
+        loadedExtensionIds.add('aihexa');
+        loadedExtensionIds.add('sensor');
+        vm.addListener.mockImplementation((event, handler) => {
+            if (event === 'EXTENSION_ADDED') extensionAddedHandler = handler;
+        });
+        vm.extensionManager.registerExtensionObject.mockImplementation(extensionId => {
+            loadedExtensionIds.add(extensionId);
+            extensionAddedHandler({id: extensionId});
+            return Promise.resolve();
+        });
+
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByText('AI机甲四足机器人').closest('article'));
+        fireEvent.click(screen.getByRole('button', {name: '确定加载'}));
+
+        await waitFor(() => expect(vm.extensionManager.unregisterExtensionObject).toHaveBeenCalledWith('sensor'));
+        expect(getEnabledProductModuleIds(vm, 'sensor')).toEqual([]);
     });
 
     test('renders only products from the legacy main controller catalog', async () => {

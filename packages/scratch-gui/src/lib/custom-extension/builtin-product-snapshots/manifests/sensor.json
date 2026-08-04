@@ -1,0 +1,435 @@
+{
+  "formatVersion": 2,
+  "id": "sensor",
+  "name": "输入模块",
+  "version": "1.0.0",
+  "description": "适用于 Hiwonder Python 产品的基础输入传感器积木包。",
+  "color1": "#2e8b57",
+  "color2": "#267348",
+  "color3": "#1e5c39",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "knob",
+      "name": "旋钮",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_read_knob"
+      ]
+    },
+    {
+      "id": "light-sensor",
+      "name": "光线传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_read_light"
+      ]
+    },
+    {
+      "id": "rain-sensor",
+      "name": "雨滴传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_get_rain_drop_value"
+      ]
+    },
+    {
+      "id": "soil-sensor",
+      "name": "土壤传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_get_soil_value"
+      ]
+    },
+    {
+      "id": "sound-sensor",
+      "name": "声音传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_read_sound"
+      ]
+    },
+    {
+      "id": "infrared-sensor",
+      "name": "红外检测传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_get_avoid_value"
+      ]
+    },
+    {
+      "id": "touch-sensor",
+      "name": "触摸传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_read_touch"
+      ]
+    },
+    {
+      "id": "button-module",
+      "name": "按键模块",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_key_is_pressed"
+      ]
+    },
+    {
+      "id": "ultrasonic",
+      "name": "超声波传感器",
+      "hideLabel": false,
+      "blocks": [
+        "get_ultrasonic_distance"
+      ]
+    }
+  ],
+  "menus": {
+    "aimech_iicport": {
+      "items": [
+        {
+          "text": "A",
+          "value": "1"
+        },
+        {
+          "text": "B",
+          "value": "2"
+        },
+        {
+          "text": "C",
+          "value": "3"
+        },
+        {
+          "text": "D",
+          "value": "4"
+        },
+        {
+          "text": "E",
+          "value": "5"
+        },
+        {
+          "text": "J",
+          "value": "9"
+        },
+        {
+          "text": "K",
+          "value": "10"
+        }
+      ]
+    },
+    "ultra_port": {
+      "items": [
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "6",
+          "value": "6"
+        },
+        {
+          "text": "8",
+          "value": "8"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "aimech_read_knob",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 旋钮模拟值(0~100)",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "knob.read_value()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "knob = Hiwonder_DEV.DEV_KNOB(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_read_light",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 光敏模拟值(0~100)",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "light.read_value()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "light = Hiwonder_DEV.DEV_LIGHT(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_rain_drop_value",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 雨滴模拟值(0~100)",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rain.read_value()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "rain = Hiwonder_DEV.DEV_RAIN(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_soil_value",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 土壤湿度模拟值(0~100)",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "soil.read_value()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "soil = Hiwonder_DEV.DEV_SOIL(Hiwonder_DEV.Port({PORT},0x5A))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_read_sound",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 音量模拟值(0~100)",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "sound.read_value()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "sound = Hiwonder_DEV.DEV_SOUND(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_avoid_value",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 红外检测传感器检测到障碍物?",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ir_{PORT}.read_state()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ir_{PORT} = Hiwonder_DEV.DEV_IR(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_read_touch",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 触摸传感器被触碰?",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "touch.read_state()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "touch = Hiwonder_DEV.DEV_TOUCH(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_key_is_pressed",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "接口 [PORT] 按键被按下",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "key.read_state()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "key = Hiwonder_DEV.DEV_BUTTON(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_ultrasonic_distance",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "端口 [ULTRA_PORT] 超声波传感器检测到障碍物的距离(cm)",
+      "arguments": {
+        "ULTRA_PORT": {
+          "type": "string",
+          "defaultValue": "2",
+          "menu": "ultra_port",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "sonar_{ULTRA_PORT}.read()",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "sonar_{ULTRA_PORT} = Hiwonder.Sonar(Hiwonder.Port({ULTRA_PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "package": {
+    "fileName": "sensor-1.0.0.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

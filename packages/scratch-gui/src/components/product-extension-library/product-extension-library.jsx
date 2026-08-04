@@ -10,6 +10,15 @@ import downloadBlob from '../../lib/download-blob';
 import {builtinProductManifests} from '../../lib/custom-extension/builtin-product-manifests';
 import {productExtensionCatalog} from '../../lib/custom-extension/product-extension-catalog.js';
 import {
+    clearProductModuleState,
+    composeProductModuleManifest,
+    getEnabledProductModuleIds,
+    getLoadedMainProductId,
+    getProductModuleState,
+    isProductModuleSupported,
+    setProductModuleState
+} from '../../lib/custom-extension/product-module-support';
+import {
     LIBRARY_SOURCE_TYPES,
     createUserLibraryItem,
     resolveProductLibraryItem
@@ -257,6 +266,11 @@ const messages = defineMessages({
         description: 'Description for placeholder extensions',
         id: 'gui.productExtensionLibrary.placeholderDescription'
     },
+    unsupportedProductDescription: {
+        defaultMessage: '请先加载支持该模块的主产品。',
+        description: 'Description for modules unavailable for the current main product',
+        id: 'gui.productExtensionLibrary.unsupportedProductDescription'
+    },
     localDescription: {
         defaultMessage: '已导入的本地拓展库，可继续管理和使用。',
         description: 'Description for local custom extension libraries',
@@ -338,6 +352,21 @@ const getInitials = name => name
 // 产品目录按主控/模块铺平；内置默认包和后续后台包通过统一来源模型解析。
 const getFlatCatalogItems = () => productExtensionCatalog.flatMap(section => section.children);
 
+// 已迁移模块由共享 manifest 中的同名分类识别，未迁移占位卡仍保持 planned 状态。
+const getBundledManifestForCatalogItem = item => {
+    if (builtinProductManifests[item.id]) return builtinProductManifests[item.id];
+    const sharedManifest = builtinProductManifests[item.sourceExtension];
+    if (!sharedManifest || !sharedManifest.categories.some(category => category.id === item.id)) return null;
+    return sharedManifest;
+};
+
+const isSharedProductModuleItem = item => Boolean(
+    item.manifest &&
+    item.sourceExtension === item.manifest.id &&
+    item.categoryId !== 'robots' &&
+    item.manifest.categories.some(category => category.id === item.id)
+);
+
 const getFlatItems = (activeTab, remoteCatalog = [], cachedRemotePackages = []) => (
     activeTab === 'user' ? [] : productExtensionCatalog
     .filter(section => (activeTab === 'main') === mainCategoryIds.includes(section.id))
@@ -347,7 +376,7 @@ const getFlatItems = (activeTab, remoteCatalog = [], cachedRemotePackages = []) 
         return {
             ...resolveProductLibraryItem(
                 item,
-                builtinProductManifests[item.id] || null,
+                getBundledManifestForCatalogItem(item),
                 cachedRemotePackage,
                 remotePackage
             ),
@@ -600,6 +629,13 @@ const ProductExtensionLibraryComponent = ({
     const clearLoadedProductExtensions = nextExtensionId => {
         const extensionManager = vm.extensionManager;
         const productExtensionIds = getFlatCatalogItems().map(item => item.id);
+        const sharedModuleExtensionIds = new Set(getFlatCatalogItems()
+            .filter(item => item.sourceExtension && item.sourceExtension !== item.id)
+            .map(item => item.sourceExtension));
+        sharedModuleExtensionIds.forEach(extensionId => {
+            const loadedManifest = clearProductModuleState(vm, extensionId);
+            if (loadedManifest) unregisterPythonCodegenManifest(loadedManifest);
+        });
         productExtensionIds
             .filter(extensionId => extensionId !== nextExtensionId)
             .forEach(extensionId => {
@@ -613,6 +649,7 @@ const ProductExtensionLibraryComponent = ({
 
         const extensionIds = new Set([
             ...productExtensionIds.filter(extensionId => extensionId !== nextExtensionId),
+            ...sharedModuleExtensionIds,
             ...installedLibraries.map(library => library.manifest.id)
         ]);
         const unloadPromises = Array.from(extensionIds)
@@ -731,6 +768,28 @@ const ProductExtensionLibraryComponent = ({
 
     // 卡片点击根据来源分流：用户包按需加载，产品包优先远程版本并保留内置兜底。
     const handleItemClick = (item, options = {}) => {
+        if (isSharedProductModuleItem(item)) {
+            const productId = getLoadedMainProductId(vm);
+            if (!isProductModuleSupported(productId, item.sourceExtension, item.id)) {
+                // eslint-disable-next-line no-alert
+                alert(intl.formatMessage(messages.unavailableNotice, {name: item.name}));
+                return;
+            }
+            const enabledModuleIds = getEnabledProductModuleIds(vm, item.sourceExtension);
+            if (enabledModuleIds.includes(item.id)) {
+                selectExtensionCategory(item.sourceExtension);
+                return;
+            }
+            const previousManifest = getProductModuleState(vm, item.sourceExtension).manifest;
+            const nextEnabledModuleIds = enabledModuleIds.concat(item.id);
+            const nextManifest = composeProductModuleManifest(item.manifest, nextEnabledModuleIds);
+            unregisterPythonCodegenManifest(previousManifest || item.manifest);
+            installBuiltinProductManifest(nextManifest).then(() => {
+                setProductModuleState(vm, item.sourceExtension, nextEnabledModuleIds, nextManifest);
+                selectExtensionCategory(item.sourceExtension);
+            });
+            return;
+        }
         if (item.source === LIBRARY_SOURCE_TYPES.USER_LOCAL) {
             if (vm.extensionManager.isExtensionLoaded(item.id)) {
                 selectExtensionCategory(item.id);
@@ -986,12 +1045,26 @@ const ProductExtensionLibraryComponent = ({
                 {items.length ? (
                     <div className={styles.cardGrid}>
                         {items.map(item => {
+                            const isSharedModule = isSharedProductModuleItem(item);
+                            const isSupportedModule = !isSharedModule || isProductModuleSupported(
+                                getLoadedMainProductId(vm),
+                                item.sourceExtension,
+                                item.id
+                            );
                             const isAvailable = item.status === 'available';
                             const isDownloadable = item.status === 'downloadable';
-                            const isInstallable = isAvailable || isDownloadable;
-                            const isLoaded = loadedExtensionIds.includes(item.id) ||
-                                vm.extensionManager.isExtensionLoaded(item.id);
+                            const isInstallable = (isAvailable || isDownloadable) && isSupportedModule;
+                            const isLoaded = isSharedModule ?
+                                getEnabledProductModuleIds(vm, item.sourceExtension).includes(item.id) :
+                                (loadedExtensionIds.includes(item.id) ||
+                                    vm.extensionManager.isExtensionLoaded(item.id));
                             const isUser = item.source === LIBRARY_SOURCE_TYPES.USER_LOCAL;
+                            const descriptionMessage = !isSupportedModule ?
+                                messages.unsupportedProductDescription :
+                                (isAvailable ?
+                                    (isUser ? messages.localDescription : messages.availableDescription) :
+                                    (isDownloadable ?
+                                        messages.downloadableDescription : messages.placeholderDescription));
                             const sourceMessage = isUser ? messages.userSource :
                                 ([
                                     LIBRARY_SOURCE_TYPES.REMOTE_CACHE,
@@ -1000,6 +1073,7 @@ const ProductExtensionLibraryComponent = ({
                                     messages.remoteSource : messages.bundledSource);
                             return (
                                 <article
+                                    aria-disabled={!isInstallable}
                                     className={classNames(styles.card, {
                                         [styles.cardDisabled]: !isInstallable
                                     })}
@@ -1085,13 +1159,7 @@ const ProductExtensionLibraryComponent = ({
                                             {item.name}
                                         </div>
                                         <div className={styles.cardDescription}>
-                                            {isAvailable ?
-                                                (isUser ?
-                                                    intl.formatMessage(messages.localDescription) :
-                                                    intl.formatMessage(messages.availableDescription)) :
-                                                (isDownloadable ?
-                                                    intl.formatMessage(messages.downloadableDescription) :
-                                                    intl.formatMessage(messages.placeholderDescription))}
+                                            {intl.formatMessage(descriptionMessage)}
                                         </div>
                                     </div>
                                     <footer className={styles.cardFooter}>

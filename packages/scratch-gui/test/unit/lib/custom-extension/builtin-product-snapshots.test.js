@@ -50,6 +50,12 @@ describe('built-in Mind+ product snapshots', () => {
                 version: '0.1.1',
                 asset: 'minihexa-0.1.1.mpext',
                 sha256: '7bbf1554e7dd67b7aa00d9e92b408f0ca7e2fb5cd2911c9597f71ca87d882478'
+            },
+            {
+                packageId: 'sensor',
+                version: '1.0.0',
+                asset: 'sensor-1.0.0.mpext',
+                sha256: '819427089bd8d5fac83695b80daf7ad13805ce6925c5e667c5ddb3debaeb5174'
             }
         ]);
         for (const item of index.packages) {

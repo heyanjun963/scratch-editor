@@ -7,6 +7,12 @@ const productExtensionCatalog = [
                 id: 'aimech',
                 name: 'AI机甲双驱车',
                 sourceExtension: 'aimech',
+                modules: {
+                    sensor: [
+                        'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
+                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic'
+                    ]
+                },
                 version: '0.0.0',
                 latestVersion: '1.0.0',
                 status: 'planned'
@@ -15,6 +21,12 @@ const productExtensionCatalog = [
                 id: 'aimecanum',
                 name: 'AI机甲麦轮车',
                 sourceExtension: 'aimecanum',
+                modules: {
+                    sensor: [
+                        'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
+                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic'
+                    ]
+                },
                 version: '0.2.3',
                 latestVersion: '0.2.3',
                 status: 'available'
@@ -23,6 +35,12 @@ const productExtensionCatalog = [
                 id: 'aiquadruped',
                 name: 'AI机甲四足机器人',
                 sourceExtension: 'aiquadruped',
+                modules: {
+                    sensor: [
+                        'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
+                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic'
+                    ]
+                },
                 version: '1.0.0',
                 latestVersion: '1.0.0',
                 status: 'available'
@@ -31,6 +49,12 @@ const productExtensionCatalog = [
                 id: 'aiquadrupedpro',
                 name: 'AI机甲四足竞赛版',
                 sourceExtension: 'aiquadrupedpro',
+                modules: {
+                    sensor: [
+                        'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
+                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic'
+                    ]
+                },
                 version: '1.0.0',
                 latestVersion: '1.0.0',
                 status: 'available'
@@ -39,6 +63,12 @@ const productExtensionCatalog = [
                 id: 'aihexa',
                 name: 'AI机甲六足机器人',
                 sourceExtension: 'aihexa',
+                modules: {
+                    sensor: [
+                        'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
+                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic'
+                    ]
+                },
                 version: '1.0.0',
                 latestVersion: '1.0.0',
                 status: 'available'
@@ -47,6 +77,9 @@ const productExtensionCatalog = [
                 id: 'minihexa',
                 name: 'miniHexa',
                 sourceExtension: 'minihexa',
+                modules: {
+                    sensor: ['ultrasonic']
+                },
                 version: '0.1.1',
                 latestVersion: '0.1.1',
                 status: 'available'
@@ -55,6 +88,9 @@ const productExtensionCatalog = [
                 id: 'aidoggy',
                 name: 'AiDoggy',
                 sourceExtension: 'aidoggy',
+                modules: {
+                    sensor: ['ultrasonic']
+                },
                 version: '0.1.0',
                 latestVersion: '0.1.0',
                 status: 'available'
