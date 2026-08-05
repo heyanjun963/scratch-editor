@@ -21,14 +21,16 @@ const FIRST_SENSOR_BATCH = [
     'ultrasonic'
 ];
 
+const SECOND_SENSOR_BATCH = ['color-sensor', 'temperature-humidity'];
+
 const getProduct = productId => productExtensionCatalog
     .find(category => category.id === 'robots')
     .children.find(item => item.id === productId);
 
 describe('product module support', () => {
-    test('stores the first sensor batch on each supported product', () => {
+    test('stores both migrated sensor batches on each supported product', () => {
         ['aimech', 'aimecanum', 'aiquadruped', 'aiquadrupedpro', 'aihexa'].forEach(productId => {
-            expect(getProduct(productId).modules.sensor).toEqual(FIRST_SENSOR_BATCH);
+            expect(getProduct(productId).modules.sensor).toEqual(FIRST_SENSOR_BATCH.concat(SECOND_SENSOR_BATCH));
         });
         ['minihexa', 'aidoggy'].forEach(productId => {
             expect(getProduct(productId).modules.sensor).toEqual(['ultrasonic']);

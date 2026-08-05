@@ -12,13 +12,21 @@ const EXPECTED_OPCODES = [
     'aimech_get_avoid_value',
     'aimech_read_touch',
     'aimech_key_is_pressed',
-    'get_ultrasonic_distance'
+    'get_ultrasonic_distance',
+    'aimech_colorsensor_init',
+    'aiblocks_check_color',
+    'aiblocks_get_color',
+    'aiblocks_get_color_arg',
+    'aimech_temphumi_init',
+    'aimech_get_temp_and_humi',
+    'aimech_get_temp_or_humi'
 ];
 
 class TestBlock {
-    constructor (type, fields = {}) {
+    constructor (type, fields = {}, inputs = {}) {
         this.type = type;
         this.fields = fields;
+        this.inputs = inputs;
         this.next = null;
     }
 
@@ -26,8 +34,8 @@ class TestBlock {
         return this.fields[name];
     }
 
-    getInputTargetBlock () {
-        return null;
+    getInputTargetBlock (name) {
+        return this.inputs[name] || null;
     }
 
     getNextBlock () {
@@ -58,24 +66,27 @@ const getTemplate = blockType => {
 };
 
 describe('sensor built-in Mind+ snapshot', () => {
-    test('keeps the first migrated sensor surface and toolbox labels', () => {
+    test('keeps both migrated sensor batches and toolbox labels', () => {
         const manifest = builtinProductManifests.sensor;
         const extensionBlocks = manifestToExtensionObject(manifest).getInfo().blocks;
 
         expect(manifest).toMatchObject({
             id: 'sensor',
             name: '输入模块',
-            version: '1.0.0',
+            version: '1.1.0',
             package: {structure: 'mindplus-python-package-v1'}
         });
         expect(manifest.blocks.map(block => block.opcode)).toEqual(EXPECTED_OPCODES);
         expect(manifest.categories.map(category => category.name)).toEqual([
             '旋钮', '光线传感器', '雨滴传感器', '土壤传感器', '声音传感器',
-            '红外检测传感器', '触摸传感器', '按键模块', '超声波传感器'
+            '红外检测传感器', '触摸传感器', '按键模块', '超声波传感器',
+            '颜色识别模块', '温湿度传感器'
         ]);
         expect(extensionBlocks.filter(block => block && block.subCategory).map(block => block.subCategory))
             .toEqual(manifest.categories.map(category => category.name));
-        manifest.blocks.forEach(block => expect(block.disableMonitor).toBe(true));
+        manifest.blocks
+            .filter(block => block.blockType === 'reporter' || block.blockType === 'boolean')
+            .forEach(block => expect(block.disableMonitor).toBe(true));
     });
 
     test('keeps the legacy port menus and defaults', () => {
@@ -88,6 +99,15 @@ describe('sensor built-in Mind+ snapshot', () => {
         ]);
         expect(manifest.menus.ultra_port.items).toEqual([
             {text: '2', value: '2'}, {text: '6', value: '6'}, {text: '8', value: '8'}
+        ]);
+        expect(manifest.menus.aiblocks_colors.items).toEqual([
+            {text: '红', value: '1'}, {text: '绿', value: '2'}, {text: '蓝', value: '3'}
+        ]);
+        expect(manifest.menus.aiblocks_colors2.items).toEqual([
+            {text: '红', value: '0'}, {text: '绿', value: '1'}, {text: '蓝', value: '2'}
+        ]);
+        expect(manifest.menus.temphumi.items).toEqual([
+            {text: '温度', value: '0'}, {text: '湿度', value: '1'}
         ]);
         expect(manifest.blocks.slice(0, 8).every(block => block.arguments.PORT.defaultValue === '1')).toBe(true);
         expect(manifest.blocks[8].arguments.ULTRA_PORT.defaultValue).toBe('2');
@@ -127,5 +147,35 @@ describe('sensor built-in Mind+ snapshot', () => {
         ].forEach(line => expect(code).toContain(line));
         expect(code).toContain('import Hiwonder_DEV');
         expect(code).toContain('import Hiwonder');
+    });
+
+    test('generates the legacy color and temperature-humidity calls', () => {
+        const main = new TestBlock('aihexa_start_thread');
+        const blocks = [
+            new TestBlock('sensor_aimech_colorsensor_init', {PORT: '2'}),
+            new TestBlock('sensor_aiblocks_check_color', {COLOR: '3'}),
+            new TestBlock('sensor_aiblocks_get_color'),
+            new TestBlock('sensor_aiblocks_get_color_arg', {COLOR: '1'}, {
+                NUM: new TestBlock('math_number', {NUM: 7})
+            }),
+            new TestBlock('sensor_aimech_temphumi_init', {PORT: '4'}),
+            new TestBlock('sensor_aimech_get_temp_and_humi'),
+            new TestBlock('sensor_aimech_get_temp_or_humi', {TEMPHUMI: '1'})
+        ];
+        blocks.reduce((previous, block) => {
+            previous.next = block;
+            return block;
+        }, main);
+
+        const code = generatePythonCode(createWorkspace([main]), {getPythonCodegenTemplate: getTemplate});
+        [
+            'color = Hiwonder_DEV.DEV_COLOR_RECOGNIZE(Hiwonder_DEV.Port(2))',
+            'color.get_color_name() == 3',
+            'color.get_color_data()',
+            '7[1]',
+            'temphumi = Hiwonder_DEV.DEV_TH(Hiwonder_DEV.Port(4))',
+            'temphumi.read_Temp_Humi()',
+            'temphumi.read_Temp_Humi()[1]'
+        ].forEach(line => expect(code).toContain(line));
     });
 });

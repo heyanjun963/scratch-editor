@@ -122,7 +122,8 @@ describe('ProductExtensionLibrary user extensions', () => {
         rerender(<ProductExtensionLibraryComponent {...props} />);
 
         expect(document.querySelector('article[title="旋钮"]')).toBeTruthy();
-        expect(document.querySelector('article[title="温湿度传感器"]')).toBeNull();
+        expect(document.querySelector('article[title="温湿度传感器"]')).toBeTruthy();
+        expect(document.querySelector('article[title="四路巡线传感器"]')).toBeNull();
     });
 
     test('adds supported sensors to one shared input module extension', async () => {

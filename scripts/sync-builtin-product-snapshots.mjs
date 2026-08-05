@@ -52,9 +52,9 @@ const PRODUCT_SNAPSHOTS = [
     },
     {
         packageId: 'sensor',
-        version: '1.0.0',
-        asset: 'sensor-1.0.0.mpext',
-        sha256: '819427089bd8d5fac83695b80daf7ad13805ce6925c5e667c5ddb3debaeb5174'
+        version: '1.1.0',
+        asset: 'sensor-1.1.0.mpext',
+        sha256: 'd7e266374a330c4843901548967cfdc0bfe264ea253672ba6f429ece45ee7cb2'
     }
 ];
 const editorRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

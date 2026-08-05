@@ -35,7 +35,8 @@
 | [29 AI机甲四足竞赛版积木与 Python 迁移记录](./29-aiquadrupedpro-block-python-migration-progress.md) | 记录 aiquadrupedpro 44 个启用积木、10 个菜单、三自由度运动分支和本地内置快照 |
 | [30 AI机甲六足机器人积木与 Python 迁移记录](./30-aihexa-block-python-migration-progress.md) | 记录 aihexa 42 个启用积木、10 个菜单、六足运动生成规则和本地内置快照 |
 | [31 输入传感器首批迁移与评审记录](./31-sensor-first-batch-migration-progress.md) | 记录 9 类基础传感器、产品支持列表、共享输入模块组合流程和本地内置快照 |
+| [32 输入传感器第二批迁移与评审记录](./32-sensor-second-batch-migration-progress.md) | 记录颜色识别、温湿度 7 个积木、产品兼容边界和 sensor 1.1.0 内置快照 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人、四足竞赛版、六足机器人和首批 9 类输入传感器已作为内置包开放本地测试。Arduino C 继续延后处理。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人、四足竞赛版、六足机器人和两批共 11 类输入传感器已作为内置包开放本地测试。Arduino C 继续延后处理。

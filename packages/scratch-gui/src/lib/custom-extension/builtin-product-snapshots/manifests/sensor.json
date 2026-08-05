@@ -2,7 +2,7 @@
   "formatVersion": 2,
   "id": "sensor",
   "name": "输入模块",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "适用于 Hiwonder Python 产品的基础输入传感器积木包。",
   "color1": "#2e8b57",
   "color2": "#267348",
@@ -81,6 +81,27 @@
       "blocks": [
         "get_ultrasonic_distance"
       ]
+    },
+    {
+      "id": "color-sensor",
+      "name": "颜色识别模块",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_colorsensor_init",
+        "aiblocks_check_color",
+        "aiblocks_get_color",
+        "aiblocks_get_color_arg"
+      ]
+    },
+    {
+      "id": "temperature-humidity",
+      "name": "温湿度传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_temphumi_init",
+        "aimech_get_temp_and_humi",
+        "aimech_get_temp_or_humi"
+      ]
     }
   ],
   "menus": {
@@ -129,6 +150,50 @@
         {
           "text": "8",
           "value": "8"
+        }
+      ]
+    },
+    "aiblocks_colors": {
+      "items": [
+        {
+          "text": "红",
+          "value": "1"
+        },
+        {
+          "text": "绿",
+          "value": "2"
+        },
+        {
+          "text": "蓝",
+          "value": "3"
+        }
+      ]
+    },
+    "aiblocks_colors2": {
+      "items": [
+        {
+          "text": "红",
+          "value": "0"
+        },
+        {
+          "text": "绿",
+          "value": "1"
+        },
+        {
+          "text": "蓝",
+          "value": "2"
+        }
+      ]
+    },
+    "temphumi": {
+      "items": [
+        {
+          "text": "温度",
+          "value": "0"
+        },
+        {
+          "text": "湿度",
+          "value": "1"
         }
       ]
     }
@@ -426,10 +491,202 @@
           "section": ""
         }
       }
+    },
+    {
+      "opcode": "aimech_colorsensor_init",
+      "blockType": "command",
+      "text": "初始化颜色传感器IIC接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "color = Hiwonder_DEV.DEV_COLOR_RECOGNIZE(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocks_check_color",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "检测到 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_colors",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "color.get_color_name() == {COLOR}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocks_get_color",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取颜色值",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "color.get_color_data()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocks_get_color_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "颜色值 [NUM] 的 [COLOR] 色值",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "aiblocks_colors2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{NUM}[{COLOR}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_temphumi_init",
+      "blockType": "command",
+      "text": "初始化温湿度传感器接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "temphumi = Hiwonder_DEV.DEV_TH(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_temp_and_humi",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "温湿度值",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "temphumi.read_Temp_Humi()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_temp_or_humi",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[TEMPHUMI] 值",
+      "arguments": {
+        "TEMPHUMI": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "temphumi",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "temphumi.read_Temp_Humi()[{TEMPHUMI}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
     }
   ],
   "package": {
-    "fileName": "sensor-1.0.0.mpext",
+    "fileName": "sensor-1.1.0.mpext",
     "structure": "mindplus-python-package-v1"
   }
 }
