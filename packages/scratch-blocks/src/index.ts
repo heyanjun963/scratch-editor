@@ -8,6 +8,7 @@ import './blocks/colour'
 import './blocks/control'
 import './blocks/data'
 import './blocks/event'
+import './blocks/line4'
 import './blocks/line6'
 import './blocks/looks'
 import './blocks/math'
@@ -32,6 +33,7 @@ import './events/events_block_comment_move'
 import './events/events_block_comment_resize'
 import './events/events_scratch_variable_create'
 import { registerFieldColourSlider, FieldColourSlider } from './fields/field_colour_slider'
+import { registerFieldLine4 } from './fields/field_line4'
 import { registerFieldLine6 } from './fields/field_line6'
 import { registerFieldMatrix } from './fields/field_matrix'
 import { registerFieldNote, FieldNote } from './fields/field_note'
@@ -96,6 +98,7 @@ function sanitizeTheme(theme?: ScratchBlocksTheme) {
 export function inject(container: Element, options: ScratchBlocksOptions) {
   registerScratchFieldAngle()
   registerFieldColourSlider()
+  registerFieldLine4()
   registerFieldLine6()
   registerScratchFieldDropdown()
   registerFieldMatrix()

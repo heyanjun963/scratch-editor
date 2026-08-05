@@ -333,7 +333,7 @@ const adaptMindPlusPythonPackage = ({
         const defaultText = String(blockAttributes.block || opcode);
         const text = String(rawLocales[`${namespace}.${opcode}|block`] || defaultText);
         const blockOverride = overrides[opcode] || {};
-        // Mind+ 没有 line6 等 Scratch 专用参数类型，只允许配置层覆盖声明，后续仍由 manifest schema 校验。
+        // Mind+ 没有 line4/line6 等 Scratch 专用参数类型，只允许配置层覆盖声明并由 schema 校验。
         const argumentsByName = parseBlockArguments(
             opcode,
             defaultText,

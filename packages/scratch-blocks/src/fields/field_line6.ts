@@ -17,32 +17,36 @@
  * limitations under the License.
  */
 /**
- * @file 六路巡线传感器状态输入字段。
+ * @file 巡线传感器状态输入字段，提供四路和六路共用的位掩码交互。
  */
 import * as Blockly from 'blockly/core'
 
 /**
- * 六路巡线字段负责把“六个探头亮/不亮”的可视化选择，转换成 Python 模板需要的十六进制掩码。
+ * 巡线字段负责把“多个探头亮/不亮”的可视化选择，转换成 Python 模板需要的十六进制掩码。
  *
  * 数据约定：
- * - 用户看到的是 1-6 六个圆点。
- * - 字段真实值保存为 00-3f，例如第 1、2、6 路点亮就是 0x23，对应字段值 23。
+ * - 用户看到的是按传感器通道数排列的圆点。
+ * - 字段真实值保存为两位十六进制，例如第 1、2 路点亮就是 0x03。
  * - VM / Python codegen 只关心字段值，不关心弹层 UI。
  */
-class FieldLine6 extends Blockly.Field<string> {
+export class FieldLine6 extends Blockly.Field<string> {
   SERIALIZABLE = true
   EDITABLE = true
 
   // shadow block 被选中时会临时换样式，关闭弹层时用 originalStyle 还原。
   private originalStyle = ''
-  // 积木本体上的 6 个小圆点缩略图，随字段值变化同步刷新。
+  // 积木本体上的小圆点缩略图，数量由传感器通道数决定。
   private previewNodes_: SVGCircleElement[] = []
-  // 弹层里的 6 个可点击圆点，编辑中的临时值变化时刷新。
+  // 弹层里的可点击圆点，编辑中的临时值变化时刷新。
   private editorNodes_: HTMLElement[] = []
   // Blockly 事件需要手动解绑，否则频繁打开弹层会积累事件监听。
   private editorEventWrappers_: Blockly.browserEvents.Data[] = []
   // 弹层编辑中的临时值；只有点击绿色确认按钮才写回真正字段值。
   private pendingValue_ = '00'
+  // 四路和六路字段共用同一交互，只通过通道数、最大掩码和标题区分。
+  private readonly channelCount_: number
+  private readonly maxMask_: number
+  private readonly editorTitle_: string
 
   static readonly CHANNEL_COUNT = 6
   static readonly DEFAULT_VALUE = '00'
@@ -55,9 +59,17 @@ class FieldLine6 extends Blockly.Field<string> {
   static readonly INACTIVE_COLOUR = '#d9dde7'
   static readonly STROKE_COLOUR = '#ffffff'
 
-  constructor(value = FieldLine6.DEFAULT_VALUE) {
-    super(FieldLine6.normalizeValue_(value))
-    this.pendingValue_ = FieldLine6.normalizeValue_(value)
+  constructor(
+    value = FieldLine6.DEFAULT_VALUE,
+    channelCount = FieldLine6.CHANNEL_COUNT,
+    editorTitle = '六路巡线状态',
+  ) {
+    const maxMask = (1 << channelCount) - 1
+    super(FieldLine6.normalizeValue_(value, maxMask))
+    this.channelCount_ = channelCount
+    this.maxMask_ = maxMask
+    this.editorTitle_ = editorTitle
+    this.pendingValue_ = FieldLine6.normalizeValue_(value, maxMask)
   }
 
   /**
@@ -65,47 +77,47 @@ class FieldLine6 extends Blockly.Field<string> {
    * @param options 字段配置，line6 是可选默认值。
    * @returns 六路巡线字段实例。
    */
-  static fromJson(options: FieldLine6Config): FieldLine6 {
+  static fromJson(options: FieldLineConfig): FieldLine6 {
     return new FieldLine6(options.line6 || FieldLine6.DEFAULT_VALUE)
   }
 
   /**
    * 把外部传入值统一规整成两位十六进制，避免保存脏值影响代码生成。
    *
-   * 六路通道按低位到高位映射：
+   * 通道按低位到高位映射：
    * - 第 1 路是 0x01
    * - 第 2 路是 0x02
-   * - 第 6 路是 0x20
+   * - 第 n 路是 1 << (n - 1)
    *
    * @param value 字段值，允许 23、0x23、空值等输入。
    * @returns 规整后的两位十六进制掩码。
    */
-  private static normalizeValue_(value: string): string {
+  private static normalizeValue_(value: string, maxMask = FieldLine6.MAX_MASK): string {
     const normalized = String(value || FieldLine6.DEFAULT_VALUE)
       .trim()
       .toLowerCase()
       .replace(/^0x/, '')
     const parsed = Number.parseInt(normalized, 16)
     if (Number.isNaN(parsed)) return FieldLine6.DEFAULT_VALUE
-    return (parsed & FieldLine6.MAX_MASK).toString(16).padStart(2, '0')
+    return (parsed & maxMask).toString(16).padStart(2, '0')
   }
 
   /**
    * 把字段值转成数字掩码，供圆点渲染和通道切换使用。
    * @param value 字段值。
-   * @returns 限制在六路范围内的位掩码。
+   * @returns 限制在当前通道范围内的位掩码。
    */
-  private static valueToMask_(value: string): number {
-    return Number.parseInt(FieldLine6.normalizeValue_(value), 16) & FieldLine6.MAX_MASK
+  private static valueToMask_(value: string, maxMask = FieldLine6.MAX_MASK): number {
+    return Number.parseInt(FieldLine6.normalizeValue_(value, maxMask), 16) & maxMask
   }
 
   /**
    * 把数字掩码转回字段保存值，最终会进入 Python 模板里的 0x{LINE}。
-   * @param mask 六路状态位掩码。
+   * @param mask 巡线状态位掩码。
    * @returns 两位十六进制字段值。
    */
-  private static maskToValue_(mask: number): string {
-    return (mask & FieldLine6.MAX_MASK).toString(16).padStart(2, '0')
+  private static maskToValue_(mask: number, maxMask = FieldLine6.MAX_MASK): string {
+    return (mask & maxMask).toString(16).padStart(2, '0')
   }
 
   /**
@@ -114,15 +126,15 @@ class FieldLine6 extends Blockly.Field<string> {
    * @returns 规整后的字段值。
    */
   doClassValidation_(value: string) {
-    return FieldLine6.normalizeValue_(value)
+    return FieldLine6.normalizeValue_(value, this.maxMask_)
   }
 
   /**
-   * 字段值真正变化后刷新积木本体上的 6 个缩略圆点。
+   * 字段值真正变化后刷新积木本体上的缩略圆点。
    * @param newValue 新字段值。
    */
   doValueUpdate_(newValue: string) {
-    super.doValueUpdate_(FieldLine6.normalizeValue_(newValue))
+    super.doValueUpdate_(FieldLine6.normalizeValue_(newValue, this.maxMask_))
     this.updatePreview_()
   }
 
@@ -136,7 +148,7 @@ class FieldLine6 extends Blockly.Field<string> {
     const centerY = this.size_.height / 2
 
     this.previewNodes_ = []
-    for (let i = 0; i < FieldLine6.CHANNEL_COUNT; i++) {
+    for (let i = 0; i < this.channelCount_; i++) {
       // 缩略图只负责展示当前状态，不直接提交值；真正编辑在 DropDownDiv 弹层里完成。
       const x = startX + FieldLine6.PREVIEW_NODE_RADIUS + i * (
         FieldLine6.PREVIEW_NODE_SIZE + FieldLine6.PREVIEW_NODE_GAP
@@ -195,7 +207,10 @@ class FieldLine6 extends Blockly.Field<string> {
       )
     }
 
-    this.pendingValue_ = FieldLine6.normalizeValue_(this.getValue() || FieldLine6.DEFAULT_VALUE)
+    this.pendingValue_ = FieldLine6.normalizeValue_(
+      this.getValue() || FieldLine6.DEFAULT_VALUE,
+      this.maxMask_,
+    )
     const div = Blockly.DropDownDiv.getContentDiv()
     const wrapper = this.createEditor_()
     div.appendChild(wrapper)
@@ -219,7 +234,7 @@ class FieldLine6 extends Blockly.Field<string> {
   }
 
   /**
-   * 创建六路选择弹层。这里使用普通 HTML，交给 Blockly.DropDownDiv 挂载和定位。
+   * 创建巡线状态选择弹层。这里使用普通 HTML，交给 Blockly.DropDownDiv 挂载和定位。
    * @returns 弹层根节点。
    */
   private createEditor_(): HTMLDivElement {
@@ -237,7 +252,7 @@ class FieldLine6 extends Blockly.Field<string> {
     header.style.fontSize = '12px'
     header.style.fontWeight = '600'
     header.style.color = '#575e75'
-    header.textContent = '六路巡线状态'
+    header.textContent = this.editorTitle_
 
     const closeButton = this.createActionButton_('×', '#d9dde7', '#575e75')
     header.appendChild(closeButton)
@@ -245,7 +260,7 @@ class FieldLine6 extends Blockly.Field<string> {
 
     const labels = document.createElement('div')
     labels.style.display = 'grid'
-    labels.style.gridTemplateColumns = `repeat(${FieldLine6.CHANNEL_COUNT}, 1fr)`
+    labels.style.gridTemplateColumns = `repeat(${this.channelCount_}, 1fr)`
     labels.style.gap = '6px'
     labels.style.marginBottom = '6px'
     labels.style.textAlign = 'center'
@@ -254,12 +269,12 @@ class FieldLine6 extends Blockly.Field<string> {
 
     const buttons = document.createElement('div')
     buttons.style.display = 'grid'
-    buttons.style.gridTemplateColumns = `repeat(${FieldLine6.CHANNEL_COUNT}, 1fr)`
+    buttons.style.gridTemplateColumns = `repeat(${this.channelCount_}, 1fr)`
     buttons.style.gap = '6px'
     buttons.style.marginBottom = '12px'
 
     this.editorNodes_ = []
-    for (let i = 0; i < FieldLine6.CHANNEL_COUNT; i++) {
+    for (let i = 0; i < this.channelCount_; i++) {
       const label = document.createElement('div')
       label.textContent = String(i + 1)
       labels.appendChild(label)
@@ -332,11 +347,11 @@ class FieldLine6 extends Blockly.Field<string> {
 
   /**
    * 切换指定通道对应的位，等待确认按钮提交到积木字段。
-   * @param channelIndex 从 0 开始的通道序号；0 表示第 1 路，5 表示第 6 路。
+   * @param channelIndex 从 0 开始的通道序号，最大值由当前字段通道数决定。
    */
   private toggleChannel_(channelIndex: number) {
-    const mask = FieldLine6.valueToMask_(this.pendingValue_) ^ (1 << channelIndex)
-    this.pendingValue_ = FieldLine6.maskToValue_(mask)
+    const mask = FieldLine6.valueToMask_(this.pendingValue_, this.maxMask_) ^ (1 << channelIndex)
+    this.pendingValue_ = FieldLine6.maskToValue_(mask, this.maxMask_)
     this.updateEditor_()
   }
 
@@ -344,7 +359,7 @@ class FieldLine6 extends Blockly.Field<string> {
    * 根据真实字段值刷新积木本体上的缩略圆点。
    */
   private updatePreview_() {
-    const mask = FieldLine6.valueToMask_(this.getValue() || FieldLine6.DEFAULT_VALUE)
+    const mask = FieldLine6.valueToMask_(this.getValue() || FieldLine6.DEFAULT_VALUE, this.maxMask_)
     // Blockly.Field 构造期间可能先触发 doValueUpdate_，此时子类 SVG 节点还没有创建。
     const previewNodes = this.previewNodes_ || []
     previewNodes.forEach((node, index) => {
@@ -356,7 +371,7 @@ class FieldLine6 extends Blockly.Field<string> {
    * 根据 pendingValue_ 刷新弹层里的圆点状态，蓝色表示该路被选中。
    */
   private updateEditor_() {
-    const mask = FieldLine6.valueToMask_(this.pendingValue_)
+    const mask = FieldLine6.valueToMask_(this.pendingValue_, this.maxMask_)
     const editorNodes = this.editorNodes_ || []
     editorNodes.forEach((node, index) => {
       const active = Boolean(mask & (1 << index))
@@ -375,8 +390,8 @@ class FieldLine6 extends Blockly.Field<string> {
     this.size_.height = totalHeight
     this.size_.width =
       constants.GRID_UNIT * 2 +
-      FieldLine6.CHANNEL_COUNT * FieldLine6.PREVIEW_NODE_SIZE +
-      (FieldLine6.CHANNEL_COUNT - 1) * FieldLine6.PREVIEW_NODE_GAP +
+      this.channelCount_ * FieldLine6.PREVIEW_NODE_SIZE +
+      (this.channelCount_ - 1) * FieldLine6.PREVIEW_NODE_GAP +
       FieldLine6.ARROW_SIZE +
       constants.GRID_UNIT
 
@@ -392,7 +407,8 @@ class FieldLine6 extends Blockly.Field<string> {
   }
 }
 
-interface FieldLine6Config extends Blockly.FieldConfig {
+export interface FieldLineConfig extends Blockly.FieldConfig {
+  line4?: string
   line6?: string
 }
 

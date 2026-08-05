@@ -22,15 +22,26 @@ const FIRST_SENSOR_BATCH = [
 ];
 
 const SECOND_SENSOR_BATCH = ['color-sensor', 'temperature-humidity'];
+const THIRD_SENSOR_BATCH = ['line-6'];
+const FOURTH_SENSOR_BATCH = ['line-4', 'line-4-rotary'];
 
 const getProduct = productId => productExtensionCatalog
     .find(category => category.id === 'robots')
     .children.find(item => item.id === productId);
 
 describe('product module support', () => {
-    test('stores both migrated sensor batches on each supported product', () => {
-        ['aimech', 'aimecanum', 'aiquadruped', 'aiquadrupedpro', 'aihexa'].forEach(productId => {
-            expect(getProduct(productId).modules.sensor).toEqual(FIRST_SENSOR_BATCH.concat(SECOND_SENSOR_BATCH));
+    test('stores migrated sensor batches on each supported product', () => {
+        ['aimech', 'aiquadruped', 'aiquadrupedpro', 'aihexa'].forEach(productId => {
+            expect(getProduct(productId).modules.sensor)
+                .toEqual(FIRST_SENSOR_BATCH.concat(
+                    SECOND_SENSOR_BATCH,
+                    THIRD_SENSOR_BATCH,
+                    FOURTH_SENSOR_BATCH
+                ));
+        });
+        ['aimecanum'].forEach(productId => {
+            expect(getProduct(productId).modules.sensor)
+                .toEqual(FIRST_SENSOR_BATCH.concat(SECOND_SENSOR_BATCH, FOURTH_SENSOR_BATCH));
         });
         ['minihexa', 'aidoggy'].forEach(productId => {
             expect(getProduct(productId).modules.sensor).toEqual(['ultrasonic']);
@@ -47,6 +58,10 @@ describe('product module support', () => {
 
         expect(getLoadedMainProductId(vm)).toBe('aihexa');
         expect(isProductModuleSupported('aihexa', 'sensor', 'knob')).toBe(true);
+        expect(isProductModuleSupported('aihexa', 'sensor', 'line-6')).toBe(true);
+        expect(isProductModuleSupported('aihexa', 'sensor', 'line-4')).toBe(true);
+        expect(isProductModuleSupported('aimecanum', 'sensor', 'line-4-rotary')).toBe(true);
+        expect(isProductModuleSupported('aimecanum', 'sensor', 'line-6')).toBe(false);
         expect(isProductModuleSupported('minihexa', 'sensor', 'knob')).toBe(false);
         expect(isProductModuleSupported(null, 'sensor', 'ultrasonic')).toBe(false);
     });

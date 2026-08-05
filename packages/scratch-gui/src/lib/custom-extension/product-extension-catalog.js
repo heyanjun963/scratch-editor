@@ -11,7 +11,7 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
                     ]
                 },
                 version: '0.0.0',
@@ -26,7 +26,7 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity'
+                        'color-sensor', 'temperature-humidity', 'line-4', 'line-4-rotary'
                     ]
                 },
                 version: '0.2.3',
@@ -41,7 +41,7 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
                     ]
                 },
                 version: '1.0.0',
@@ -56,7 +56,7 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
                     ]
                 },
                 version: '1.0.0',
@@ -71,7 +71,7 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
                     ]
                 },
                 version: '1.0.0',

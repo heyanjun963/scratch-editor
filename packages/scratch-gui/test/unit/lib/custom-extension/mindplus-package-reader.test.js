@@ -313,7 +313,7 @@ describe('Mind+ package reader', () => {
         ]);
     });
 
-    test('preserves Scratch-specific colors and line6 arguments declared by a Mind+ product', async () => {
+    test('preserves Scratch-specific colors and line mask arguments declared by a Mind+ product', async () => {
         const packageData = await createMindPlusPackage({
             config: {
                 id: 'linefixture',
@@ -324,10 +324,18 @@ describe('Mind+ package reader', () => {
                     color2: '#145fa8',
                     color3: '#104b85',
                     blocks: {
-                        read: {
+                        read6: {
                             arguments: {
                                 LINE: {
                                     type: 'line6',
+                                    defaultValue: '00'
+                                }
+                            }
+                        },
+                        read4: {
+                            arguments: {
+                                LINE: {
+                                    type: 'line4',
                                     defaultValue: '00'
                                 }
                             }
@@ -344,9 +352,15 @@ describe('Mind+ package reader', () => {
             main: [
                 '//% color="#1874cd"',
                 'namespace linefixture {',
-                '    //% block="read [LINE]" blockType="boolean"',
+                '    //% block="read six [LINE]" blockType="boolean"',
                 '    //% LINE.shadow="string" LINE.defl="00"',
-                '    export function read(parameter: any, block: any) {',
+                '    export function read6(parameter: any, block: any) {',
+                '        const line = parameter.LINE.code;',
+                '        Generator.addCode(`read_line(${line})`);',
+                '    }',
+                '    //% block="read four [LINE]" blockType="boolean"',
+                '    //% LINE.shadow="string" LINE.defl="00"',
+                '    export function read4(parameter: any, block: any) {',
                 '        const line = parameter.LINE.code;',
                 '        Generator.addCode(`read_line(${line})`);',
                 '    }',
@@ -365,6 +379,12 @@ describe('Mind+ package reader', () => {
         expect(manifest.blocks[0].arguments.LINE).toMatchObject({
             type: 'line6',
             scratchType: 'line6',
+            defaultValue: '00',
+            literal: false
+        });
+        expect(manifest.blocks[1].arguments.LINE).toMatchObject({
+            type: 'line4',
+            scratchType: 'line4',
             defaultValue: '00',
             literal: false
         });

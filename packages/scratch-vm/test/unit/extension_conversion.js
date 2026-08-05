@@ -321,3 +321,45 @@ test('custom field types should be added to block and EXTENSION_FIELD_ADDED call
     t.equal(fieldAddedCallbacks, 2);
     t.end();
 });
+
+test('line follower arguments use their dedicated shadow blocks and fields', t => {
+    const runtime = new Runtime();
+    const extensionInfo = {
+        id: 'line_masks',
+        name: 'line masks',
+        blocks: [
+            {
+                opcode: 'line4',
+                blockType: BlockType.BOOLEAN,
+                text: 'four [VALUE]',
+                arguments: {
+                    VALUE: {
+                        type: ArgumentType.LINE4,
+                        defaultValue: '0a'
+                    }
+                }
+            },
+            {
+                opcode: 'line6',
+                blockType: BlockType.BOOLEAN,
+                text: 'six [VALUE]',
+                arguments: {
+                    VALUE: {
+                        type: ArgumentType.LINE6,
+                        defaultValue: '23'
+                    }
+                }
+            }
+        ]
+    };
+
+    runtime.on(Runtime.EXTENSION_ADDED, categoryInfo => {
+        t.match(categoryInfo.blocks[0].xml,
+            '<shadow type="line4"><field name="LINE4">0a</field></shadow>');
+        t.match(categoryInfo.blocks[1].xml,
+            '<shadow type="line6"><field name="LINE6">23</field></shadow>');
+        t.end();
+    });
+
+    runtime._registerExtensionPrimitives(extensionInfo);
+});

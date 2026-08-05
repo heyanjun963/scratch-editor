@@ -14,7 +14,8 @@ const argumentTypeMap = {
     string: 'string',
     number: 'number',
     boolean: 'Boolean',
-    // line6 对应 scratch-vm 的 ArgumentType.LINE6，用于六路巡线传感器位掩码选择器。
+    // line4/line6 对应 scratch-vm 的专用参数类型，用于巡线传感器位掩码选择器。
+    line4: 'line4',
     line6: 'line6'
 };
 

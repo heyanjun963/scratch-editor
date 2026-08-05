@@ -96,6 +96,12 @@ const ArgumentTypeMap = (() => {
             fieldName: 'MATRIX'
         }
     };
+    map[ArgumentType.LINE4] = {
+        shadow: {
+            type: 'line4',
+            fieldName: 'LINE4'
+        }
+    };
     map[ArgumentType.LINE6] = {
         shadow: {
             type: 'line6',

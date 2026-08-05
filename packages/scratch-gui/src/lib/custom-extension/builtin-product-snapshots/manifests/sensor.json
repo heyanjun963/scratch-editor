@@ -2,7 +2,7 @@
   "formatVersion": 2,
   "id": "sensor",
   "name": "输入模块",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "description": "适用于 Hiwonder Python 产品的基础输入传感器积木包。",
   "color1": "#2e8b57",
   "color2": "#267348",
@@ -102,6 +102,42 @@
         "aimech_get_temp_and_humi",
         "aimech_get_temp_or_humi"
       ]
+    },
+    {
+      "id": "line-6",
+      "name": "六路巡线传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_linefollower6_init",
+        "linefollower6_one_status",
+        "linefollower6_status",
+        "linefollower6_set_threshold",
+        "linefollower6_get_value",
+        "linefollower6_read_offset"
+      ]
+    },
+    {
+      "id": "line-4",
+      "name": "四路巡线传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_linefollower_init",
+        "linefollower_one_status",
+        "linefollower_status",
+        "linefollower_status_result",
+        "linefollower_read_offset"
+      ]
+    },
+    {
+      "id": "line-4-rotary",
+      "name": "旋钮四路巡线传感器",
+      "hideLabel": false,
+      "blocks": [
+        "linefollower4_init",
+        "linefollower4_one_status",
+        "linefollower4_status_result",
+        "linefollower4_read_offset"
+      ]
     }
   ],
   "menus": {
@@ -194,6 +230,94 @@
         {
           "text": "湿度",
           "value": "1"
+        }
+      ]
+    },
+    "linefollows6Mask": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "4"
+        },
+        {
+          "text": "4",
+          "value": "8"
+        },
+        {
+          "text": "5",
+          "value": "16"
+        },
+        {
+          "text": "6",
+          "value": "32"
+        }
+      ]
+    },
+    "linefollows6": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "4",
+          "value": "4"
+        },
+        {
+          "text": "5",
+          "value": "5"
+        },
+        {
+          "text": "6",
+          "value": "6"
+        }
+      ]
+    },
+    "linedot2": {
+      "items": [
+        {
+          "text": "◌",
+          "value": "0"
+        },
+        {
+          "text": "●",
+          "value": "1"
+        }
+      ]
+    },
+    "linefollows4Mask": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "4"
+        },
+        {
+          "text": "4",
+          "value": "8"
         }
       ]
     }
@@ -683,10 +807,446 @@
           "section": ""
         }
       }
+    },
+    {
+      "opcode": "aimech_linefollower6_init",
+      "blockType": "command",
+      "text": "初始化六路巡线传感器IIC接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "linefollow6 = Hiwonder_DEV.DEV_LINE_FOLLOW_6(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_one_status",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "六路巡线传感器通道 [NUM] 检测到 [LINE]",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "linefollows6Mask",
+          "literal": true
+        },
+        "LINE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "linedot2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "(linefollow6.get_result_data() & {NUM}) > {LINE}",
+          "templateSelector": {
+            "argument": "LINE",
+            "cases": {
+              "0": "(linefollow6.get_result_data() & {NUM}) == 0",
+              "1": "(linefollow6.get_result_data() & {NUM}) > 0"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_status",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "六路巡线传感器通道检测到 [LINE]",
+      "arguments": {
+        "LINE": {
+          "type": "line6",
+          "defaultValue": "00"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "linefollow6.get_result_data() == 0x{LINE}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_set_threshold",
+      "blockType": "command",
+      "text": "设置六路巡线传感器阈值比例(范围1~9)为 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 7
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "linefollow6.set_ThresholdRatioReg({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_get_value",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "六路巡线传感器通道 [NUM] 灰度值(0~100)",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "linefollows6",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "linefollow6.read_AnalogQuantity({NUM})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower6_read_offset",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取六路巡线传感器偏差值",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "linefollow6.read_offset()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_linefollower_init",
+      "blockType": "command",
+      "text": "初始化四路巡线传感器IIC接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "linefollow = Hiwonder_DEV.DEV_LINE_FOLLOW_4(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower_one_status",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "四路巡线传感器通道 [NUM] 识别到 [LINE]",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "linefollows4Mask",
+          "literal": true
+        },
+        "LINE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "linedot2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "(linefollow.get_result_data() & {NUM}) > {LINE}",
+          "templateSelector": {
+            "argument": "LINE",
+            "cases": {
+              "0": "(linefollow.get_result_data() & {NUM}) == 0",
+              "1": "(linefollow.get_result_data() & {NUM}) > 0"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower_status",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "四路巡线传感器识别到 [LINE]",
+      "arguments": {
+        "LINE": {
+          "type": "line4",
+          "defaultValue": "00"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "linefollow.get_result_data() == 0x{LINE}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower_status_result",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "四路巡线传感器通道识别到 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "line4",
+          "defaultValue": "00"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "linefollow.get_result_data() == 0x{VALUE}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower_read_offset",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取四路巡线传感器偏差值",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "linefollow.read_offset()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower4_init",
+      "blockType": "command",
+      "text": "初始化旋钮四路巡线传感器IIC接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "linefollow4 = Hiwonder_DEV.DEV_LINE_FOLLOW_4_O(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower4_one_status",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "四路巡线传感器通道 [NUM] 识别到 [LINE]",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "linefollows4Mask",
+          "literal": true
+        },
+        "LINE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "linedot2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "(linefollow4.get_result_data() & {NUM}) > {LINE}",
+          "templateSelector": {
+            "argument": "LINE",
+            "cases": {
+              "0": "(linefollow4.get_result_data() & {NUM}) == 0",
+              "1": "(linefollow4.get_result_data() & {NUM}) > 0"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower4_status_result",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "四路巡线传感器通道识别到 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "line4",
+          "defaultValue": "00"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "linefollow4.get_result_data() == 0x{VALUE}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "linefollower4_read_offset",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取四路巡线传感器偏差值",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "linefollow4.read_offset()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
     }
   ],
   "package": {
-    "fileName": "sensor-1.1.0.mpext",
+    "fileName": "sensor-1.3.0.mpext",
     "structure": "mindplus-python-package-v1"
   }
 }
