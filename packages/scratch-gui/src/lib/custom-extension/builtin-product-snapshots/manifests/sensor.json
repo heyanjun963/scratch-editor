@@ -2,7 +2,7 @@
   "formatVersion": 2,
   "id": "sensor",
   "name": "输入模块",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "description": "适用于 Hiwonder Python 产品的基础输入传感器积木包。",
   "color1": "#2e8b57",
   "color2": "#267348",
@@ -137,6 +137,31 @@
         "linefollower4_one_status",
         "linefollower4_status_result",
         "linefollower4_read_offset"
+      ]
+    },
+    {
+      "id": "imu-sensor",
+      "name": "IMU传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_imu_init",
+        "get_euler_angle_element_value",
+        "get_euler_angle",
+        "get_euler_angle_element"
+      ]
+    },
+    {
+      "id": "led-ultrasonic",
+      "name": "LED超声波传感器",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_led_ultrasonic_init",
+        "aimech_get_led_ultrasonic_distance",
+        "aimech_set_led_ultrasonic_color",
+        "aimech_set_led_ultrasonic_color_arg",
+        "aimech_close_led_ultrasonic",
+        "aimech_set_led_ultrasonic_breath",
+        "aimech_set_led_ultrasonic_random"
       ]
     }
   ],
@@ -318,6 +343,66 @@
         {
           "text": "4",
           "value": "8"
+        }
+      ]
+    },
+    "euler_element": {
+      "items": [
+        {
+          "text": "Z轴转角",
+          "value": "0"
+        },
+        {
+          "text": "X轴转角",
+          "value": "1"
+        },
+        {
+          "text": "Y轴转角",
+          "value": "2"
+        }
+      ]
+    },
+    "nums": {
+      "items": [
+        {
+          "text": "全部",
+          "value": "0"
+        },
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        }
+      ]
+    },
+    "num": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        }
+      ]
+    },
+    "rgb": {
+      "items": [
+        {
+          "text": "红",
+          "value": "1"
+        },
+        {
+          "text": "绿",
+          "value": "2"
+        },
+        {
+          "text": "蓝",
+          "value": "3"
         }
       ]
     }
@@ -1243,10 +1328,324 @@
           "section": ""
         }
       }
+    },
+    {
+      "opcode": "aimech_imu_init",
+      "blockType": "command",
+      "text": "初始化IMU传感器IIC接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "imu_sensor = Hiwonder_DEV.DEV_IMU(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_euler_angle_element_value",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取欧拉角 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "euler_element",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "imu_sensor.read_euler()[{VALUE}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_euler_angle",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取欧拉角",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "imu_sensor.read_euler()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_euler_angle_element",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "euler_element",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{VALUE}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_led_ultrasonic_init",
+      "blockType": "command",
+      "text": "初始化LED超声波传感器接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "sonar = Hiwonder_DEV.DEV_SONAR(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_led_ultrasonic_distance",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "LED超声波传感器检测到障碍物距离(cm)",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "sonar.getDistance()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_led_ultrasonic_color",
+      "blockType": "command",
+      "text": "LED超声波传感器灯 [NUMS] 颜色 [COLOR]",
+      "arguments": {
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        },
+        "COLOR": {
+          "type": "color",
+          "defaultValue": "#ff0000"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "sonar.setRGB({NUMS},{COLOR.rgb})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_led_ultrasonic_color_arg",
+      "blockType": "command",
+      "text": "LED超声波传感器灯 [NUMS] 红 [RED] 绿 [GREEN] 蓝 [BLUE]",
+      "arguments": {
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        },
+        "RED": {
+          "type": "number",
+          "defaultValue": 255
+        },
+        "GREEN": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "BLUE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "sonar.setRGB({NUMS},{RED},{GREEN},{BLUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_close_led_ultrasonic",
+      "blockType": "command",
+      "text": "关闭LED超声波传感器灯 [NUMS]",
+      "arguments": {
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "nums",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "sonar.setRGB({NUMS},0x00,0x00,0x00)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_led_ultrasonic_breath",
+      "blockType": "command",
+      "text": "LED超声波传感器灯 [NUM] [RGB] 呼吸周期 [TIME] 秒",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "num",
+          "literal": true
+        },
+        "RGB": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "rgb",
+          "literal": true
+        },
+        "TIME": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "sonar.setBreathingCycle({NUM},{RGB},{TIME} * 1000)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_led_ultrasonic_random",
+      "blockType": "command",
+      "text": "LED超声波传感器进入随机变色模式",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "sonar.startSymphony()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
     }
   ],
   "package": {
-    "fileName": "sensor-1.3.0.mpext",
+    "fileName": "sensor-1.5.0.mpext",
     "structure": "mindplus-python-package-v1"
   }
 }

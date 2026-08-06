@@ -34,7 +34,18 @@ const EXPECTED_OPCODES = [
     'linefollower4_init',
     'linefollower4_one_status',
     'linefollower4_status_result',
-    'linefollower4_read_offset'
+    'linefollower4_read_offset',
+    'aimech_imu_init',
+    'get_euler_angle_element_value',
+    'get_euler_angle',
+    'get_euler_angle_element',
+    'aimech_led_ultrasonic_init',
+    'aimech_get_led_ultrasonic_distance',
+    'aimech_set_led_ultrasonic_color',
+    'aimech_set_led_ultrasonic_color_arg',
+    'aimech_close_led_ultrasonic',
+    'aimech_set_led_ultrasonic_breath',
+    'aimech_set_led_ultrasonic_random'
 ];
 
 class TestBlock {
@@ -88,7 +99,7 @@ describe('sensor built-in Mind+ snapshot', () => {
         expect(manifest).toMatchObject({
             id: 'sensor',
             name: '输入模块',
-            version: '1.3.0',
+            version: '1.5.0',
             package: {structure: 'mindplus-python-package-v1'}
         });
         expect(manifest.blocks.map(block => block.opcode)).toEqual(EXPECTED_OPCODES);
@@ -96,7 +107,7 @@ describe('sensor built-in Mind+ snapshot', () => {
             '旋钮', '光线传感器', '雨滴传感器', '土壤传感器', '声音传感器',
             '红外检测传感器', '触摸传感器', '按键模块', '超声波传感器',
             '颜色识别模块', '温湿度传感器', '六路巡线传感器',
-            '四路巡线传感器', '旋钮四路巡线传感器'
+            '四路巡线传感器', '旋钮四路巡线传感器', 'IMU传感器', 'LED超声波传感器'
         ]);
         expect(extensionBlocks.filter(block => block && block.subCategory).map(block => block.subCategory))
             .toEqual(manifest.categories.map(category => category.name));
@@ -139,6 +150,20 @@ describe('sensor built-in Mind+ snapshot', () => {
         expect(manifest.menus.linefollows4Mask.items).toEqual([
             {text: '1', value: '1'}, {text: '2', value: '2'},
             {text: '3', value: '4'}, {text: '4', value: '8'}
+        ]);
+        expect(manifest.menus.euler_element.items).toEqual([
+            {text: 'Z轴转角', value: '0'},
+            {text: 'X轴转角', value: '1'},
+            {text: 'Y轴转角', value: '2'}
+        ]);
+        expect(manifest.menus.nums.items).toEqual([
+            {text: '全部', value: '0'}, {text: '1', value: '1'}, {text: '2', value: '2'}
+        ]);
+        expect(manifest.menus.num.items).toEqual([
+            {text: '1', value: '1'}, {text: '2', value: '2'}
+        ]);
+        expect(manifest.menus.rgb.items).toEqual([
+            {text: '红', value: '1'}, {text: '绿', value: '2'}, {text: '蓝', value: '3'}
         ]);
         expect(manifest.menus.linedot).toBeUndefined();
         expect(manifest.blocks.find(block => block.opcode === 'linefollower6_status').arguments.LINE)
@@ -286,6 +311,64 @@ describe('sensor built-in Mind+ snapshot', () => {
             '(linefollow4.get_result_data() & 8) == 0',
             'linefollow4.get_result_data() == 0x0f',
             'linefollow4.read_offset()'
+        ].forEach(line => expect(code).toContain(line));
+    });
+
+    test('generates the legacy external IMU initialization and Euler readings', () => {
+        const main = new TestBlock('aihexa_start_thread');
+        const blocks = [
+            new TestBlock('sensor_aimech_imu_init', {PORT: '10'}),
+            new TestBlock('sensor_get_euler_angle_element_value', {VALUE: '2'}),
+            new TestBlock('sensor_get_euler_angle'),
+            new TestBlock('sensor_get_euler_angle_element', {VALUE: '1'})
+        ];
+        blocks.reduce((previous, block) => {
+            previous.next = block;
+            return block;
+        }, main);
+
+        const code = generatePythonCode(createWorkspace([main]), {getPythonCodegenTemplate: getTemplate});
+        [
+            'imu_sensor = Hiwonder_DEV.DEV_IMU(Hiwonder_DEV.Port(10))',
+            'imu_sensor.read_euler()[2]',
+            'imu_sensor.read_euler()'
+        ].forEach(line => expect(code).toContain(line));
+        expect(code).toContain('\n    1\n');
+    });
+
+    test('generates the legacy LED ultrasonic initialization, readings and light controls', () => {
+        const main = new TestBlock('aihexa_start_thread');
+        const blocks = [
+            new TestBlock('sensor_aimech_led_ultrasonic_init', {PORT: '5'}),
+            new TestBlock('sensor_aimech_get_led_ultrasonic_distance'),
+            new TestBlock('sensor_aimech_set_led_ultrasonic_color', {NUMS: '0'}, {
+                COLOR: new TestBlock('colour_picker', {COLOUR: '#ff8040'})
+            }),
+            new TestBlock('sensor_aimech_set_led_ultrasonic_color_arg', {NUMS: '2'}, {
+                RED: new TestBlock('math_number', {NUM: 255}),
+                GREEN: new TestBlock('math_number', {NUM: 128}),
+                BLUE: new TestBlock('math_number', {NUM: 64})
+            }),
+            new TestBlock('sensor_aimech_close_led_ultrasonic', {NUMS: '1'}),
+            new TestBlock('sensor_aimech_set_led_ultrasonic_breath', {NUM: '2', RGB: '3'}, {
+                TIME: new TestBlock('math_number', {NUM: 1.5})
+            }),
+            new TestBlock('sensor_aimech_set_led_ultrasonic_random')
+        ];
+        blocks.reduce((previous, block) => {
+            previous.next = block;
+            return block;
+        }, main);
+
+        const code = generatePythonCode(createWorkspace([main]), {getPythonCodegenTemplate: getTemplate});
+        [
+            'sonar = Hiwonder_DEV.DEV_SONAR(Hiwonder_DEV.Port(5))',
+            'sonar.getDistance()',
+            'sonar.setRGB(0,0xff,0x80,0x40)',
+            'sonar.setRGB(2,255,128,64)',
+            'sonar.setRGB(1,0x00,0x00,0x00)',
+            'sonar.setBreathingCycle(2,3,1.5 * 1000)',
+            'sonar.startSymphony()'
         ].forEach(line => expect(code).toContain(line));
     });
 });

@@ -1,14 +1,21 @@
 const {spawn} = require('child_process');
 const http = require('http');
 const path = require('path');
+const {
+    createGuiServerSpawnConfig,
+    createShutdownHandler,
+    getGuiServerMode,
+    stopChildProcess
+} = require('./process-lifecycle');
 
 const port = process.env.PORT || 8601;
 const guiUrl = process.env.SCRATCH_DESKTOP_URL || `http://127.0.0.1:${port}/`;
 const skipGuiServer = process.env.SCRATCH_DESKTOP_SKIP_GUI_SERVER === '1';
+const workspaceRoot = path.resolve(__dirname, '..');
 
 const log = message => console.log(`[desktop] ${message}`);
 
-// 已有开发服务时直接复用，避免再次监听同一端口触发 EADDRINUSE。
+// 检测未知服务占用，普通启动时拒绝复用，避免加载残留的旧 bundle。
 const isUrlAvailable = url => new Promise(resolve => {
     const request = http.get(url, response => {
         response.resume();
@@ -71,7 +78,7 @@ const spawnChild = (command, args, options = {}) => spawn(command, args, {
     ...options
 });
 
-// 使用 node 直接执行 npm-cli，规避 Windows shell=true 拼接参数导致的 spawn EINVAL。
+// 直接持有 webpack 进程，Electron 或控制台退出时才能可靠释放 8601。
 const startGuiServer = () => {
     if (skipGuiServer) {
         log('Skipping scratch-gui dev server because SCRATCH_DESKTOP_SKIP_GUI_SERVER=1');
@@ -79,12 +86,8 @@ const startGuiServer = () => {
     }
 
     log(`Starting scratch-gui dev server on ${guiUrl}`);
-    const npmCli = path.join(__dirname, '..', 'node_modules', 'npm', 'bin', 'npm-cli.js');
-    const child = spawnChild(process.execPath, [npmCli, '--workspace', '@scratch/scratch-gui', 'start'], {
-        env: createChildEnv({
-            PORT: String(port)
-        })
-    });
+    const config = createGuiServerSpawnConfig(workspaceRoot, port, createChildEnv({}));
+    const child = spawnChild(config.command, config.args, config.options);
     child.on('exit', (code, signal) => {
         log(`scratch-gui dev server exited with code ${code} signal ${signal}`);
     });
@@ -115,10 +118,26 @@ const startElectron = electronBinary => {
 const main = async () => {
     const electronBinary = getElectronBinary();
     let guiServer = null;
-    if (skipGuiServer) {
+    let electron = null;
+    const getManagedChildren = () => [electron, guiServer];
+    const shutdown = createShutdownHandler(getManagedChildren, code => process.exit(code));
+
+    // Windows 控制台关闭、Ctrl+C 和外部终止都走同一套子进程清理。
+    process.once('SIGINT', () => shutdown(130));
+    process.once('SIGTERM', () => shutdown(143));
+    process.once('SIGHUP', () => shutdown(129));
+    if (process.platform === 'win32') process.once('SIGBREAK', () => shutdown(131));
+    process.once('exit', () => getManagedChildren().forEach(stopChildProcess));
+
+    const urlAvailable = skipGuiServer ? false : await isUrlAvailable(guiUrl);
+    const guiServerMode = getGuiServerMode(skipGuiServer, urlAvailable);
+    if (guiServerMode === 'external') {
         guiServer = startGuiServer();
-    } else if (await isUrlAvailable(guiUrl)) {
-        log(`Reusing existing scratch-gui dev server on ${guiUrl}`);
+    } else if (guiServerMode === 'occupied') {
+        console.error(`[desktop] ${guiUrl} is already in use; refusing to reuse an unknown dev server.`);
+        console.error('[desktop] Stop the existing process or set a different PORT.');
+        shutdown(1);
+        return;
     } else {
         guiServer = startGuiServer();
     }
@@ -130,15 +149,15 @@ const main = async () => {
     } catch (error) {
         console.error(`Timed out waiting for ${guiUrl}`);
         console.error(error);
-        if (guiServer) guiServer.kill();
-        process.exit(1);
+        shutdown(1);
+        return;
     }
 
-    const electron = startElectron(electronBinary);
+    electron = startElectron(electronBinary);
+    electron.once('error', () => shutdown(1));
     electron.on('exit', (code, signal) => {
         log(`Electron exited with code ${code} signal ${signal}`);
-        if (guiServer) guiServer.kill();
-        process.exit(code || 0);
+        shutdown(code || 0);
     });
 };
 

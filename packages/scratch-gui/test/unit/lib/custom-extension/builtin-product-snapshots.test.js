@@ -25,25 +25,25 @@ describe('built-in Mind+ product snapshots', () => {
                 packageId: 'aihexa',
                 version: '1.0.0',
                 asset: 'aihexa-1.0.0.mpext',
-                sha256: '86ab31786d4741e9640a45ee70985bf66a2893010bbbb2db3418e948d2b8961c'
+                sha256: 'c90b9c09ab64ce88cefd89a93b276acc7abf8311c9f99cfbfdf88eecfa337fe0'
             },
             {
                 packageId: 'aimecanum',
                 version: '0.2.3',
                 asset: 'aimecanum-0.2.3.mpext',
-                sha256: '30c5da5f7698f0a8c5b988aa462087ac82be06cd65027231294a9940ff651b95'
+                sha256: 'c5cbbdc546cc6cc215bbc774b66a98606ae7a6b1a91ed356333046788cc937be'
             },
             {
                 packageId: 'aiquadruped',
                 version: '1.0.0',
                 asset: 'aiquadruped-1.0.0.mpext',
-                sha256: '883abd0f9c51a74f1b7ce9c2b3bd1addb6b7cbc94c2475df3e0f32b71ea71c04'
+                sha256: 'a1504b49876cc78c4bc454bb93c0f23ec05999eb48e34c6ec833f21e8a03f456'
             },
             {
                 packageId: 'aiquadrupedpro',
                 version: '1.0.0',
                 asset: 'aiquadrupedpro-1.0.0.mpext',
-                sha256: '910381e77f5d75bea69ab97550d0b411702fdafebe213019fce46ad4e1c1fecd'
+                sha256: '7f93e619466d5e4a895942825c60b269042c399c28490f348f2df5ce2cd1a458'
             },
             {
                 packageId: 'minihexa',
@@ -53,9 +53,9 @@ describe('built-in Mind+ product snapshots', () => {
             },
             {
                 packageId: 'sensor',
-                version: '1.3.0',
-                asset: 'sensor-1.3.0.mpext',
-                sha256: '38fb296f13c31754ff6d9c2269aae74cc2acd4d534c7fba1de6fa25d6ca7bef2'
+                version: '1.5.0',
+                asset: 'sensor-1.5.0.mpext',
+                sha256: '3a4f4279fec5d7245bd5c379323942602a0bd0ba8663101864e82abe8877a6ae'
             }
         ]);
         for (const item of index.packages) {

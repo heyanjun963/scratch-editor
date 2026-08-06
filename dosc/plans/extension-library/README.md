@@ -39,7 +39,9 @@
 | [33 输入传感器第三批迁移与评审记录](./33-sensor-third-batch-migration-progress.md) | 记录六路巡线 6 个积木、LINE6 位掩码、产品去重边界和 sensor 1.2.0 内置快照 |
 | [34 输入传感器第四批迁移与评审记录](./34-sensor-fourth-batch-migration-progress.md) | 记录两类四路巡线 9 个积木、LINE4 字段链路和 sensor 1.3.0 内置快照 |
 | [35 2026-08-05 开发日志](./35-2026-08-05-development-log.md) | 汇总输入传感器第二至第四批迁移、巡线字段实现、验收排障和后续事项 |
+| [36 输入传感器第五批迁移与评审记录](./36-sensor-fifth-batch-migration-progress.md) | 记录外接 IMU 4 个积木、欧拉角菜单、产品支持边界和 sensor 1.4.0 内置快照 |
+| [37 输入传感器第六批迁移与评审记录](./37-sensor-sixth-batch-migration-progress.md) | 记录 LED 超声波 7 个积木、颜色参数适配、Python RGB 通道转换和 sensor 1.5.0 内置快照 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人、四足竞赛版、六足机器人和四批共 14 类输入传感器已作为内置包开放本地测试。Arduino C 继续延后处理。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人、四足竞赛版、六足机器人和六批共 16 类输入传感器已作为内置包开放本地测试。Arduino C 继续延后处理。

@@ -11,7 +11,8 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
+                        'imu-sensor', 'led-ultrasonic'
                     ]
                 },
                 version: '0.0.0',
@@ -26,7 +27,8 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity', 'line-4', 'line-4-rotary'
+                        'color-sensor', 'temperature-humidity', 'line-4', 'line-4-rotary', 'imu-sensor',
+                        'led-ultrasonic'
                     ]
                 },
                 version: '0.2.3',
@@ -41,7 +43,8 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
+                        'imu-sensor', 'led-ultrasonic'
                     ]
                 },
                 version: '1.0.0',
@@ -56,7 +59,8 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
+                        'imu-sensor', 'led-ultrasonic'
                     ]
                 },
                 version: '1.0.0',
@@ -71,7 +75,8 @@ const productExtensionCatalog = [
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
                         'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary'
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
+                        'imu-sensor', 'led-ultrasonic'
                     ]
                 },
                 version: '1.0.0',
@@ -229,6 +234,14 @@ const productExtensionCatalog = [
             {
                 id: 'imu-sensor',
                 name: 'IMU传感器',
+                sourceExtension: 'sensor',
+                version: '0.0.0',
+                latestVersion: '1.0.0',
+                status: 'planned'
+            },
+            {
+                id: 'led-ultrasonic',
+                name: 'LED超声波传感器',
                 sourceExtension: 'sensor',
                 version: '0.0.0',
                 latestVersion: '1.0.0',

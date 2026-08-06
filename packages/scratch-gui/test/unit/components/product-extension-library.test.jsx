@@ -69,6 +69,7 @@ describe('ProductExtensionLibrary user extensions', () => {
         readCustomExtensionPackageBuffer.mockReset();
         loadedExtensionIds = new Set(['mydevice']);
         vm = Object.create(VM.prototype);
+        vm.clearWorkspaceBlocks = jest.fn();
         vm.emitWorkspaceUpdate = jest.fn();
         vm.addListener = jest.fn();
         vm.removeListener = jest.fn();
@@ -126,6 +127,8 @@ describe('ProductExtensionLibrary user extensions', () => {
         expect(document.querySelector('article[title="六路巡线传感器"]')).toBeTruthy();
         expect(document.querySelector('article[title="四路巡线传感器"]')).toBeTruthy();
         expect(document.querySelector('article[title="旋钮四路巡线传感器"]')).toBeTruthy();
+        expect(document.querySelector('article[title="IMU传感器"]')).toBeTruthy();
+        expect(document.querySelector('article[title="LED超声波传感器"]')).toBeTruthy();
     });
 
     test('adds supported sensors to one shared input module extension', async () => {
@@ -183,6 +186,7 @@ describe('ProductExtensionLibrary user extensions', () => {
 
         await waitFor(() => expect(vm.extensionManager.unregisterExtensionObject).toHaveBeenCalledWith('sensor'));
         expect(getEnabledProductModuleIds(vm, 'sensor')).toEqual([]);
+        expect(vm.clearWorkspaceBlocks).toHaveBeenCalledTimes(1);
     });
 
     test('renders only products from the legacy main controller catalog', async () => {

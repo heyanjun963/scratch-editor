@@ -163,6 +163,8 @@ const expressionFromSelf = (block, imports, fallback = '') => {
         return getFieldValue(block, ['NUM'], fallback);
     case 'text':
         return quotePythonString(getFieldValue(block, ['TEXT'], fallback));
+    case 'colour_picker':
+        return quotePythonString(getFieldValue(block, ['COLOUR'], fallback));
     case 'line4':
         // 四路巡线 shadow 字段内部保存十六进制掩码，生成 Python 时直接拼到 0x 后面。
         return getFieldValue(block, ['LINE4'], fallback);
@@ -225,16 +227,36 @@ const getLiteralArgumentValue = (templateInfo, block, inputName, fallback) => {
     );
 };
 
+// 颜色模板显式使用 {COLOR.rgb} 时，按旧硬件接口需要的三个十六进制通道展开。
+const getRgbChannelArgumentValue = (block, inputName, fallback) => {
+    const inputBlock = getInputBlock(block, inputName);
+    const value = inputBlock ?
+        getFieldValue(inputBlock, ['COLOUR', inputName, 'VALUE'], fallback) :
+        getFieldValue(block, [inputName], fallback);
+    const match = String(value).match(/^#([0-9a-f]{6})$/i);
+    if (!match) {
+        throw new Error(`Python 代码生成参数 ${inputName} 的颜色值必须是 #RRGGBB 格式`);
+    }
+    const channels = match[1];
+    return [channels.slice(0, 2), channels.slice(2, 4), channels.slice(4, 6)]
+        .map(channel => `0x${channel.toLowerCase()}`)
+        .join(',');
+};
+
 // 把 manifest 模板里的 {ARG} 替换为积木当前输入对应的 Python 代码。
 const applyTemplateText = (template, templateInfo, block, imports) => (
-    String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, inputName) => {
-        const argument = templateInfo.arguments && templateInfo.arguments[inputName];
-        const fallback = getDefaultArgumentValue(templateInfo, inputName, '');
-        if (argument && argument.literal) {
-            return getLiteralArgumentValue(templateInfo, block, inputName, fallback);
-        }
-        return valueToPython(block, inputName, fallback, imports);
-    })
+    String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)(?:\.([A-Za-z][A-Za-z0-9_]*))?\}/g,
+        (match, inputName, formatter) => {
+            const argument = templateInfo.arguments && templateInfo.arguments[inputName];
+            const fallback = getDefaultArgumentValue(templateInfo, inputName, '');
+            if (formatter === 'rgb') {
+                return getRgbChannelArgumentValue(block, inputName, fallback);
+            }
+            if (argument && argument.literal) {
+                return getLiteralArgumentValue(templateInfo, block, inputName, fallback);
+            }
+            return valueToPython(block, inputName, fallback, imports);
+        })
 );
 
 // 选择器按菜单字段值挑选模板；未命中时回退到基础 template，保证旧包仍按原规则生成。

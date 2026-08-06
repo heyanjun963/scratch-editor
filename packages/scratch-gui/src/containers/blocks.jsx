@@ -285,8 +285,9 @@ class Blocks extends React.Component {
         }
 
         if (this.props.isVisible === prevProps.isVisible) {
-            if (this.props.stageSize !== prevProps.stageSize) {
-                // force workspace to redraw for the new stage size
+            const modalClosed = !this.props.anyModalVisible && prevProps.anyModalVisible && this.props.isVisible;
+            if (this.props.stageSize !== prevProps.stageSize || modalClosed) {
+                // 扩展库关闭后重新计算 Blockly 尺寸，恢复工具箱滚轮与可视区域。
                 window.dispatchEvent(new Event('resize'));
             }
             return;

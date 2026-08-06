@@ -1302,3 +1302,17 @@ test('clearFlyoutBlocks removes all of the flyout blocks', t => {
 
     t.end();
 });
+
+test('clearWorkspaceBlocks removes editing target blocks and refreshes the workspace', t => {
+    const vm = new VirtualMachine();
+    let deleteCallCount = 0;
+    let updateCallCount = 0;
+    vm.editingTarget = {blocks: {deleteAllBlocks: () => deleteCallCount++}};
+    vm.emitWorkspaceUpdate = () => updateCallCount++;
+
+    vm.clearWorkspaceBlocks();
+
+    t.equal(deleteCallCount, 1);
+    t.equal(updateCallCount, 1);
+    t.end();
+});

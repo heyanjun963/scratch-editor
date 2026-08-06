@@ -664,7 +664,8 @@ const ProductExtensionLibraryComponent = ({
             const nextLibraries = installedLibraries.map(library => ({...library, enabled: false}));
             saveInstalledCustomExtensionLibraries(nextLibraries);
             onSetCustomExtensionLibraries(nextLibraries);
-            vm.emitWorkspaceUpdate();
+            // 主控积木只对当前产品有效，切换时同步清空 VM 与 Blockly 画布。
+            vm.clearWorkspaceBlocks();
             setExtensionStateVersion(version => version + 1);
         });
     };

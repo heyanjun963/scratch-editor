@@ -14,6 +14,7 @@ const SHADOW_TYPES = {
     string: 'string',
     number: 'number',
     boolean: 'boolean',
+    color: 'color',
     dropdown: 'string',
     dropdownRound: 'string'
 };
@@ -265,6 +266,42 @@ const parseBlockArguments = (opcode, blockText, directives, rawMenus, rawOverrid
     }, {});
 };
 
+// 已发布的早期产品包在 Python 中运行时切片颜色字符串；导入时规范化为 editor 的颜色参数格式。
+const normalizeLegacyRgbGeneration = (generation, argumentsByName) => {
+    const argumentPattern = '([A-Za-z][A-Za-z0-9_]*)';
+    const legacyRgbPattern = new RegExp(
+        `int\\(\\{${argumentPattern}\\}\\[1:3\\],\\s*16\\),\\s*` +
+        `int\\(\\{${argumentPattern}\\}\\[3:5\\],\\s*16\\),\\s*` +
+        `int\\(\\{${argumentPattern}\\}\\[5:7\\],\\s*16\\)`,
+        'g'
+    );
+    const colorArguments = new Set();
+    const template = String(generation.template || '').replace(
+        legacyRgbPattern,
+        (match, redArgument, greenArgument, blueArgument) => {
+            if (redArgument !== greenArgument || redArgument !== blueArgument) return match;
+            const argument = argumentsByName[redArgument];
+            if (!argument || argument.type !== 'string' ||
+                !/^#[0-9a-f]{6}$/i.test(String(argument.defaultValue))) {
+                return match;
+            }
+            colorArguments.add(redArgument);
+            return `{${redArgument}.rgb}`;
+        }
+    );
+    colorArguments.forEach(name => {
+        argumentsByName[name] = {
+            ...argumentsByName[name],
+            type: 'color',
+            literal: false
+        };
+    });
+    return {
+        ...generation,
+        template
+    };
+};
+
 const parseMainAst = source => {
     try {
         return parse(source, {
@@ -345,6 +382,10 @@ const adaptMindPlusPythonPackage = ({
             throw new Error(`Mind+ 帽子积木 ${opcode} 必须通过 scratchEditor.blocks 声明 section`);
         }
 
+        const generation = normalizeLegacyRgbGeneration(
+            parseFunctionGeneration(functionNode, opcode, blockOverride),
+            argumentsByName
+        );
         blocks.push({
             opcode,
             blockType,
@@ -352,7 +393,7 @@ const adaptMindPlusPythonPackage = ({
             text,
             arguments: argumentsByName
         });
-        generatorBlocks[opcode] = parseFunctionGeneration(functionNode, opcode, blockOverride);
+        generatorBlocks[opcode] = generation;
     });
 
     if (!blocks.length) {

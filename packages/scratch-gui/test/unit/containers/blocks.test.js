@@ -122,6 +122,38 @@ describe('Blocks container category selection', () => {
     });
 });
 
+describe('Blocks container modal layout', () => {
+    test('recalculates Blockly layout after the extension library closes', () => {
+        const resizeListener = jest.fn();
+        const props = {
+            anyModalVisible: false,
+            customExtensionIds: '',
+            editorMode: PYTHON_EDITOR_MODE,
+            isVisible: true,
+            locale: 'zh-cn',
+            stageSize: 'large',
+            toolboxXML: '<xml/>'
+        };
+        const instance = {
+            _renderedToolboxXML: props.toolboxXML,
+            props,
+            ScratchBlocks: {hideChaff: jest.fn()},
+            ensurePythonExtensions: jest.fn(),
+            onPythonWorkspaceChange: jest.fn(),
+            requestToolboxUpdate: jest.fn()
+        };
+
+        window.addEventListener('resize', resizeListener);
+        Blocks.prototype.componentDidUpdate.call(instance, {
+            ...props,
+            anyModalVisible: true
+        });
+        window.removeEventListener('resize', resizeListener);
+
+        expect(resizeListener).toHaveBeenCalledTimes(1);
+    });
+});
+
 describe('Blocks container Python toolbox', () => {
     test('keeps a loaded remote-only product category', () => {
         const target = {

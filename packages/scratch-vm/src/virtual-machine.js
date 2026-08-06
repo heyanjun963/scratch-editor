@@ -1235,6 +1235,15 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * 清空当前编辑目标的积木，并通知编辑器刷新画布。
+     */
+    clearWorkspaceBlocks () {
+        if (!this.editingTarget) return;
+        this.editingTarget.blocks.deleteAllBlocks();
+        this.emitWorkspaceUpdate();
+    }
+
+    /**
      * Set an editing target. An editor UI can use this function to switch
      * between editing different targets, sprites, etc.
      * After switching the editing target, the VM may emit updates

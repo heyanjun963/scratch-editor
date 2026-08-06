@@ -14,6 +14,7 @@ const argumentTypeMap = {
     string: 'string',
     number: 'number',
     boolean: 'Boolean',
+    color: 'color',
     // line4/line6 对应 scratch-vm 的专用参数类型，用于巡线传感器位掩码选择器。
     line4: 'line4',
     line6: 'line6'
@@ -47,19 +48,23 @@ const extractTextArgs = text => {
 // 从 Python 模板 {ARG} 中提取参数名，避免导入后才在代码生成阶段报错。
 const extractTemplateArgs = template => {
     const args = new Set();
-    String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (match, name) => {
-        args.add(name);
-        return match;
-    });
+    String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)(?:\.([A-Za-z][A-Za-z0-9_]*))?\}/g,
+        (match, name, formatter) => {
+            if (formatter && formatter !== 'rgb') {
+                throw new Error(`Python 模板参数 ${name} 使用了不支持的格式化方式 ${formatter}`);
+            }
+            args.add(name);
+            return match;
+        });
     return args;
 };
 
 const validateArgumentReferences = (block, argumentNames) => {
     const textArgs = extractTextArgs(block.text);
     const templateSelector = block.codegen.python.templateSelector;
-    const selectedTemplateArgs = templateSelector ?
-        Object.values(templateSelector.cases).flatMap(template => Array.from(extractTemplateArgs(template))) :
-        [];
+    const selectedTemplates = templateSelector ? Object.values(templateSelector.cases) : [];
+    const selectedTemplateArgs = selectedTemplates
+        .flatMap(template => Array.from(extractTemplateArgs(template)));
     const templateArgs = new Set([
         ...extractTemplateArgs(block.codegen.python.template),
         ...selectedTemplateArgs
@@ -76,6 +81,14 @@ const validateArgumentReferences = (block, argumentNames) => {
         if (!argumentNames.includes(name)) {
             throw new Error(`积木 ${block.opcode} 引用了未定义参数 ${name}`);
         }
+    });
+    [block.codegen.python.template, ...selectedTemplates].forEach(template => {
+        String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\.rgb\}/g, (match, name) => {
+            if (!block.arguments[name] || block.arguments[name].type !== 'color') {
+                throw new Error(`积木 ${block.opcode} 的 RGB 格式化参数 ${name} 必须是 color 类型`);
+            }
+            return match;
+        });
     });
 };
 

@@ -390,6 +390,53 @@ describe('Mind+ package reader', () => {
         });
     });
 
+    test('preserves a Mind+ color picker argument and its RGB channel formatter', async () => {
+        const packageData = await createMindPlusPackage({
+            config: {
+                id: 'colorfixture',
+                name: {en: 'Color fixture'},
+                version: '1.0.0',
+                asset: {
+                    python: {dir: 'python/', main: 'main.ts'}
+                }
+            },
+            main: [
+                '//% color="#123456"',
+                'namespace colorfixture {',
+                '    //% block="set color [COLOR]" blockType="command"',
+                '    //% COLOR.shadow="color" COLOR.defl="#ff8040"',
+                '    export function set_color(parameter: any, block: any) {',
+                '        Generator.addCode(`set_rgb({COLOR.rgb})`);',
+                '    }',
+                '    //% block="set legacy color [COLOR]" blockType="command"',
+                '    //% COLOR.shadow="string" COLOR.defl="#ff9966"',
+                '    export function set_legacy_color(parameter: any, block: any) {',
+                '        const color = parameter.COLOR.code;',
+                '        Generator.addCode(`set_rgb(int(${color}[1:3],16),int(${color}[3:5],16),' +
+                    'int(${color}[5:7],16))`);',
+                '    }',
+                '}'
+            ].join('\n')
+        });
+
+        const manifest = await readCustomExtensionPackageBuffer(packageData, 'colorfixture.mpext');
+
+        expect(manifest.blocks[0].arguments.COLOR).toMatchObject({
+            type: 'color',
+            scratchType: 'color',
+            defaultValue: '#ff8040',
+            literal: false
+        });
+        expect(manifest.blocks[0].codegen.python.template).toBe('set_rgb({COLOR.rgb})');
+        expect(manifest.blocks[1].arguments.COLOR).toMatchObject({
+            type: 'color',
+            scratchType: 'color',
+            defaultValue: '#ff9966',
+            literal: false
+        });
+        expect(manifest.blocks[1].codegen.python.template).toBe('set_rgb({COLOR.rgb})');
+    });
+
     test('rejects Arduino C assets with an explicit target error', async () => {
         const packageData = await createMindPlusPackage({
             config: {
