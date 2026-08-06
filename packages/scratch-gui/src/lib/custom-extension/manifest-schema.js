@@ -2,6 +2,9 @@ const ID_PATTERN = /^[a-z0-9]+$/;
 // Scratch 扩展允许使用驼峰 opcode；保留原值才能兼容旧工程中的积木标识。
 const OPCODE_PATTERN = /^[a-z][A-Za-z0-9_]*$/;
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
+const PYTHON_TEMPLATE_FORMATTERS = new Set([
+    'rgb', 'colorName', 'compactJson', 'jsonValue', 'identifier'
+]);
 
 const blockTypeMap = {
     command: 'command',
@@ -50,7 +53,7 @@ const extractTemplateArgs = template => {
     const args = new Set();
     String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)(?:\.([A-Za-z][A-Za-z0-9_]*))?\}/g,
         (match, name, formatter) => {
-            if (formatter && formatter !== 'rgb') {
+            if (formatter && !PYTHON_TEMPLATE_FORMATTERS.has(formatter)) {
                 throw new Error(`Python 模板参数 ${name} 使用了不支持的格式化方式 ${formatter}`);
             }
             args.add(name);
@@ -111,6 +114,32 @@ const normalizeArguments = (block, rawArguments) => {
             literal: Boolean(argument.literal)
         };
         return argumentsByName;
+    }, {});
+};
+
+// 同一 opcode 可按产品覆盖菜单或默认值，积木结构和 Python 模板保持共享。
+const normalizeProductArguments = (opcode, rawProductArguments, argumentsByName) => {
+    if (!rawProductArguments || typeof rawProductArguments !== 'object' || Array.isArray(rawProductArguments)) {
+        return {};
+    }
+    return Object.keys(rawProductArguments).reduce((byProduct, productId) => {
+        const rawOverrides = rawProductArguments[productId];
+        assertObject(rawOverrides, `积木 ${opcode} 的产品 ${productId} 参数覆盖必须是对象`);
+        byProduct[productId] = Object.keys(rawOverrides).reduce((overrides, argumentName) => {
+            if (!argumentsByName[argumentName]) {
+                throw new Error(`积木 ${opcode} 的产品 ${productId} 覆盖了未定义参数 ${argumentName}`);
+            }
+            const rawOverride = rawOverrides[argumentName];
+            assertObject(rawOverride, `积木 ${opcode} 的产品 ${productId} 参数 ${argumentName} 覆盖必须是对象`);
+            const normalizedOverride = {};
+            if (rawOverride.menu) normalizedOverride.menu = String(rawOverride.menu);
+            if (typeof rawOverride.defaultValue !== 'undefined') {
+                normalizedOverride.defaultValue = rawOverride.defaultValue;
+            }
+            overrides[argumentName] = normalizedOverride;
+            return overrides;
+        }, {});
+        return byProduct;
     }, {});
 };
 
@@ -210,14 +239,19 @@ const normalizeBlock = (rawBlock, seenOpcodes) => {
     }
 
     const rawPythonCodegen = rawBlock.codegen && rawBlock.codegen.python;
+    const argumentsByName = normalizeArguments({opcode}, rawBlock.arguments);
     const block = {
         opcode,
         blockType,
         scratchBlockType: blockTypeMap[blockType],
         disableMonitor: Boolean(rawBlock.disableMonitor),
         text: String(rawBlock.text || opcode),
-        arguments: normalizeArguments({opcode}, rawBlock.arguments),
+        arguments: argumentsByName,
         category: rawBlock.category ? String(rawBlock.category) : null,
+        products: Array.isArray(rawBlock.products) ?
+            Array.from(new Set(rawBlock.products.map(String).filter(Boolean))) :
+            [],
+        productArguments: normalizeProductArguments(opcode, rawBlock.productArguments, argumentsByName),
         codegen: {
             python: normalizePythonCodegen(opcode, rawPythonCodegen)
         }
@@ -353,6 +387,9 @@ const serializeCustomExtensionManifest = manifest => {
             disableMonitor: block.disableMonitor || undefined,
             text: block.text,
             category: block.category || undefined,
+            products: Array.isArray(block.products) && block.products.length ? block.products : undefined,
+            productArguments: block.productArguments && Object.keys(block.productArguments).length ?
+                block.productArguments : undefined,
             arguments: Object.keys(block.arguments).reduce((argumentsByName, name) => {
                 const argument = block.arguments[name];
                 argumentsByName[name] = {

@@ -127,7 +127,8 @@ const parseFunctionGeneration = (functionNode, opcode, override = {}) => {
     const generation = {
         template: '',
         imports: [],
-        variables: [],
+        // 默认 MCP 配置等声明型积木可直接在 config 中提供静态变量集合。
+        variables: Array.isArray(override.variables) ? override.variables.map(String) : [],
         forcedVariables: [],
         setups: [],
         entryTemplate: override.entryTemplate ? String(override.entryTemplate) : '',
@@ -391,7 +392,10 @@ const adaptMindPlusPythonPackage = ({
             blockType,
             disableMonitor: blockType === 'reporter' || blockType === 'boolean',
             text,
-            arguments: argumentsByName
+            arguments: argumentsByName,
+            // 共享模块可在 config 中声明产品范围，组合工具箱时再按当前主产品过滤。
+            products: Array.isArray(blockOverride.products) ? blockOverride.products.map(String) : [],
+            productArguments: blockOverride.productArguments || {}
         });
         generatorBlocks[opcode] = generation;
     });

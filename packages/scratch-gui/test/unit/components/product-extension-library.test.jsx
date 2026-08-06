@@ -117,7 +117,7 @@ describe('ProductExtensionLibrary user extensions', () => {
         fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
 
         expect(document.querySelector('article[title="旋钮"]')).toBeNull();
-        expect(screen.getAllByText('旋钮')[0].closest('article').title).toContain('占位拓展');
+        expect(screen.getAllByText('旋钮')[0].closest('article').textContent).toContain('请先加载主产品');
 
         loadedExtensionIds.add('aihexa');
         rerender(<ProductExtensionLibraryComponent {...props} />);
@@ -129,6 +129,8 @@ describe('ProductExtensionLibrary user extensions', () => {
         expect(document.querySelector('article[title="旋钮四路巡线传感器"]')).toBeTruthy();
         expect(document.querySelector('article[title="IMU传感器"]')).toBeTruthy();
         expect(document.querySelector('article[title="LED超声波传感器"]')).toBeTruthy();
+        expect(document.querySelector('article[title="WonderEcho语音模块"]')).toBeTruthy();
+        expect(document.querySelector('article[title="K230视觉模块"]')).toBeTruthy();
     });
 
     test('adds supported sensors to one shared input module extension', async () => {
@@ -162,6 +164,81 @@ describe('ProductExtensionLibrary user extensions', () => {
         ]);
         expect(getEnabledProductModuleIds(vm, 'sensor')).toEqual(['knob', 'sound-sensor']);
         expect(props.onCategorySelected).toHaveBeenLastCalledWith('sensor');
+    });
+
+    test('removes the last shared sensor module without deleting its package', async () => {
+        const sensorManifest = composeProductModuleManifest(
+            builtinProductManifests.sensor,
+            ['knob'],
+            'aihexa'
+        );
+        setProductModuleState(vm, 'sensor', ['knob'], sensorManifest);
+        loadedExtensionIds.add('aihexa');
+        loadedExtensionIds.add('sensor');
+
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
+        fireEvent.click(screen.getByRole('button', {name: '移除旋钮'}));
+
+        await waitFor(() => expect(vm.extensionManager.unregisterExtensionObject).toHaveBeenCalledWith('sensor'));
+        expect(getEnabledProductModuleIds(vm, 'sensor')).toEqual([]);
+        expect(vm.emitWorkspaceUpdate).toHaveBeenCalled();
+        expect(screen.queryByRole('button', {name: '移除旋钮'})).toBeNull();
+    });
+
+    test('removes one shared sensor module while keeping the others loaded', async () => {
+        let extensionAddedHandler = null;
+        const sensorManifest = composeProductModuleManifest(
+            builtinProductManifests.sensor,
+            ['knob', 'sound-sensor'],
+            'aihexa'
+        );
+        setProductModuleState(vm, 'sensor', ['knob', 'sound-sensor'], sensorManifest);
+        loadedExtensionIds.add('aihexa');
+        loadedExtensionIds.add('sensor');
+        vm.addListener.mockImplementation((event, handler) => {
+            if (event === 'EXTENSION_ADDED') extensionAddedHandler = handler;
+        });
+        vm.extensionManager.registerExtensionObject.mockImplementation((extensionId, extensionObject) => {
+            loadedExtensionIds.add(extensionId);
+            extensionAddedHandler({id: extensionId});
+            return Promise.resolve(extensionObject);
+        });
+
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
+        fireEvent.click(screen.getByRole('button', {name: '移除旋钮'}));
+
+        await waitFor(() => expect(getEnabledProductModuleIds(vm, 'sensor')).toEqual(['sound-sensor']));
+        const extensionObject = vm.extensionManager.registerExtensionObject.mock.calls[0][1];
+        expect(extensionObject.getInfo().blocks.filter(block => block.subCategory)).toEqual([
+            {subCategory: '声音传感器'}
+        ]);
+        expect(screen.queryByRole('button', {name: '移除旋钮'})).toBeNull();
+        expect(screen.getByRole('button', {name: '移除声音传感器'})).toBeTruthy();
+    });
+
+    test('hides debug cards and unloaded module corner icons', async () => {
+        loadedExtensionIds.add('aihexa');
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
+
+        expect(screen.queryByText('HTTP / DeepSeek')).toBeNull();
+        expect(screen.queryByText('Python基础积木')).toBeNull();
+        expect(screen.queryByText('↓')).toBeNull();
+    });
+
+    test('distinguishes unpublished modules from unsupported modules', async () => {
+        loadedExtensionIds.add('aihexa');
+        render(<ProductExtensionLibraryComponent {...props} />);
+        await waitFor(() => expect(screen.getByRole('button', {name: '检查版本'}).disabled).toBe(false));
+        fireEvent.click(screen.getByRole('button', {name: '模块扩展'}));
+
+        expect(screen.getByText('WonderLens视觉模块').closest('article').textContent).toContain('待发布');
+        expect(screen.getByText('180°舵机').closest('article').textContent).toContain('当前主控不支持该模块');
     });
 
     test('clears shared sensor state when switching the main product', async () => {
@@ -229,7 +306,7 @@ describe('ProductExtensionLibrary user extensions', () => {
         expect(props.onRequestClose).not.toHaveBeenCalled();
     });
 
-    test('renders a remote-only product as installable', async () => {
+    test('prefers the built-in AI mech package over the same remote version', async () => {
         loadRemoteLibraryCatalog.mockResolvedValueOnce([{
             packageId: 'aimech',
             name: 'AI机甲双驱车',
@@ -245,7 +322,8 @@ describe('ProductExtensionLibrary user extensions', () => {
         const card = await screen.findByText('AI机甲双驱车').then(title => title.closest('article'));
         expect(card.className).not.toContain('cardDisabled');
         expect(card.getAttribute('title')).toBe('AI机甲双驱车');
-        expect(screen.getByText('远程版本可下载安装。')).toBeTruthy();
+        expect(card.textContent).toContain('当前内置可加载的基础拓展。');
+        expect(card.textContent).toContain('内置默认');
     });
 
     test('unloads a user extension without deleting its package', async () => {

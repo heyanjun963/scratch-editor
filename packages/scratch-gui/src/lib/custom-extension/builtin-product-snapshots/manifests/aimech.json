@@ -1,0 +1,1693 @@
+{
+  "formatVersion": 2,
+  "id": "aimech",
+  "name": "AI机甲双驱车",
+  "version": "1.0.0",
+  "description": "适用于 AI机甲双驱车的 Python 积木拓展包。",
+  "color1": "#1874cd",
+  "color2": "#145fa8",
+  "color3": "#104b85",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "main",
+      "name": "主程序",
+      "hideLabel": true,
+      "blocks": [
+        "start_thread",
+        "start_run_thread"
+      ]
+    },
+    {
+      "id": "boardResource",
+      "name": "板载资源",
+      "hideLabel": false,
+      "blocks": [
+        "buzzer_tone_set",
+        "buzzer_tone_set_arg",
+        "buzzer_tone_set_volume",
+        "close_buzzer",
+        "close_lowpower_warning",
+        "get_battery_level"
+      ]
+    },
+    {
+      "id": "rgb",
+      "name": "RGB彩灯",
+      "hideLabel": false,
+      "blocks": [
+        "set_led_color",
+        "set_led_color_arg",
+        "rgb_module_breath_one",
+        "rgb_module_breath",
+        "close_led"
+      ]
+    },
+    {
+      "id": "output",
+      "name": "输出打印",
+      "hideLabel": false,
+      "blocks": [
+        "print_str",
+        "print_number"
+      ]
+    },
+    {
+      "id": "button",
+      "name": "按键",
+      "hideLabel": false,
+      "blocks": [
+        "when_key_click_thread",
+        "when_key_longclick_thread",
+        "key_is_pressed"
+      ]
+    },
+    {
+      "id": "motion",
+      "name": "编码电机控制",
+      "hideLabel": false,
+      "blocks": [
+        "motor_speed_set",
+        "set_motor_run_distance",
+        "set_motor_run_oriention_angle",
+        "set_motor_run_speed",
+        "set_motor_run_angle",
+        "set_motor_run_two_wheel",
+        "set_motor_run_two_wheel_percent",
+        "set_motor_stop",
+        "get_servo_run_angle",
+        "reset_run_angle",
+        "pd_set_pd_line"
+      ]
+    },
+    {
+      "id": "imu",
+      "name": "IMU传感器",
+      "hideLabel": false,
+      "blocks": [
+        "imu_init",
+        "imu_cali",
+        "get_euler_angle_element_value"
+      ]
+    },
+    {
+      "id": "bluetooth",
+      "name": "蓝牙通信",
+      "hideLabel": false,
+      "blocks": [
+        "set_ble_mode",
+        "ble_is_connected",
+        "get_ble_mac",
+        "ble_wait_end",
+        "read_ble_data",
+        "get_ble_cmd",
+        "get_ble_args",
+        "ble_write"
+      ]
+    }
+  ],
+  "menus": {
+    "tones": {
+      "items": [
+        {
+          "text": "C2",
+          "value": "65"
+        },
+        {
+          "text": "D2",
+          "value": "73"
+        },
+        {
+          "text": "E2",
+          "value": "82"
+        },
+        {
+          "text": "F2",
+          "value": "87"
+        },
+        {
+          "text": "G2",
+          "value": "98"
+        },
+        {
+          "text": "A2",
+          "value": "110"
+        },
+        {
+          "text": "B2",
+          "value": "123"
+        },
+        {
+          "text": "C3",
+          "value": "131"
+        },
+        {
+          "text": "D3",
+          "value": "147"
+        },
+        {
+          "text": "E3",
+          "value": "165"
+        },
+        {
+          "text": "F3",
+          "value": "175"
+        },
+        {
+          "text": "G3",
+          "value": "196"
+        },
+        {
+          "text": "A3",
+          "value": "220"
+        },
+        {
+          "text": "B3",
+          "value": "247"
+        },
+        {
+          "text": "C4",
+          "value": "262"
+        },
+        {
+          "text": "D4",
+          "value": "294"
+        },
+        {
+          "text": "E4",
+          "value": "330"
+        },
+        {
+          "text": "F4",
+          "value": "349"
+        },
+        {
+          "text": "G4",
+          "value": "392"
+        },
+        {
+          "text": "A4",
+          "value": "440"
+        },
+        {
+          "text": "B4",
+          "value": "494"
+        },
+        {
+          "text": "C5",
+          "value": "523"
+        },
+        {
+          "text": "D5",
+          "value": "587"
+        },
+        {
+          "text": "E5",
+          "value": "659"
+        },
+        {
+          "text": "F5",
+          "value": "698"
+        },
+        {
+          "text": "G5",
+          "value": "784"
+        },
+        {
+          "text": "A5",
+          "value": "880"
+        },
+        {
+          "text": "B5",
+          "value": "988"
+        },
+        {
+          "text": "C6",
+          "value": "1047"
+        },
+        {
+          "text": "D6",
+          "value": "1175"
+        },
+        {
+          "text": "E6",
+          "value": "1319"
+        },
+        {
+          "text": "F6",
+          "value": "1397"
+        },
+        {
+          "text": "G6",
+          "value": "1568"
+        },
+        {
+          "text": "A6",
+          "value": "1760"
+        },
+        {
+          "text": "B6",
+          "value": "1976"
+        },
+        {
+          "text": "C7",
+          "value": "2093"
+        },
+        {
+          "text": "D7",
+          "value": "2349"
+        },
+        {
+          "text": "E7",
+          "value": "2637"
+        },
+        {
+          "text": "F7",
+          "value": "2794"
+        },
+        {
+          "text": "G7",
+          "value": "3136"
+        },
+        {
+          "text": "A7",
+          "value": "3520"
+        },
+        {
+          "text": "B7",
+          "value": "3951"
+        },
+        {
+          "text": "C8",
+          "value": "4186"
+        },
+        {
+          "text": "D8",
+          "value": "4699"
+        }
+      ]
+    },
+    "rhythms": {
+      "items": [
+        {
+          "text": "二分之一",
+          "value": "500"
+        },
+        {
+          "text": "四分之一",
+          "value": "250"
+        },
+        {
+          "text": "八分之一",
+          "value": "125"
+        },
+        {
+          "text": "一拍",
+          "value": "1000"
+        },
+        {
+          "text": "两拍",
+          "value": "2000"
+        },
+        {
+          "text": "长音",
+          "value": "5000"
+        },
+        {
+          "text": "0",
+          "value": "0"
+        }
+      ]
+    },
+    "buzzerMode": {
+      "items": [
+        {
+          "text": "后台播放",
+          "value": "False"
+        },
+        {
+          "text": "前台播放(阻塞)",
+          "value": "True"
+        }
+      ]
+    },
+    "lightColors": {
+      "items": [
+        {
+          "text": "红",
+          "value": "0"
+        },
+        {
+          "text": "绿",
+          "value": "1"
+        },
+        {
+          "text": "蓝",
+          "value": "2"
+        },
+        {
+          "text": "黄",
+          "value": "3"
+        },
+        {
+          "text": "紫",
+          "value": "4"
+        },
+        {
+          "text": "青",
+          "value": "5"
+        },
+        {
+          "text": "白",
+          "value": "6"
+        }
+      ]
+    },
+    "keys": {
+      "items": [
+        {
+          "text": "A",
+          "value": "A"
+        },
+        {
+          "text": "B",
+          "value": "B"
+        }
+      ]
+    },
+    "oriention2": {
+      "items": [
+        {
+          "text": "前进",
+          "value": "1"
+        },
+        {
+          "text": "后退",
+          "value": "-1"
+        }
+      ]
+    },
+    "orientionTurn": {
+      "items": [
+        {
+          "text": "原地左转",
+          "value": "1"
+        },
+        {
+          "text": "原地右转",
+          "value": "-1"
+        }
+      ]
+    },
+    "wheel": {
+      "items": [
+        {
+          "text": "左轮(EM1)",
+          "value": "1"
+        },
+        {
+          "text": "右轮(EM2)",
+          "value": "2"
+        },
+        {
+          "text": "全部",
+          "value": "0"
+        }
+      ]
+    },
+    "wheel2": {
+      "items": [
+        {
+          "text": "左轮(EM1)",
+          "value": "1"
+        },
+        {
+          "text": "右轮(EM2)",
+          "value": "2"
+        }
+      ]
+    },
+    "eulerElement": {
+      "items": [
+        {
+          "text": "Z轴角度",
+          "value": "0"
+        },
+        {
+          "text": "X轴角度",
+          "value": "1"
+        },
+        {
+          "text": "Y轴角度",
+          "value": "2"
+        }
+      ]
+    },
+    "bleMode": {
+      "items": [
+        {
+          "text": "从机模式",
+          "value": "BLE.MODE_BLE_SLAVE"
+        },
+        {
+          "text": "主机模式",
+          "value": "BLE.MODE_BLE_MASTER"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "start_thread",
+      "blockType": "hat",
+      "text": "主程序",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "Hiwonder.startMain({MAIN})",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "start_run_thread",
+      "blockType": "hat",
+      "text": "当启动时",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": "setup"
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 模式为 [MODE]",
+      "arguments": {
+        "TONES": {
+          "type": "string",
+          "defaultValue": "65",
+          "menu": "tones",
+          "literal": true
+        },
+        "RHYTHMS": {
+          "type": "string",
+          "defaultValue": "500",
+          "menu": "rhythms",
+          "literal": true
+        },
+        "MODE": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "buzzerMode",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.playTone({TONES},{RHYTHMS},{MODE})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_arg",
+      "blockType": "command",
+      "text": "播放音调为 [TONES] 节拍为 [RHYTHMS] 模式为 [MODE]",
+      "arguments": {
+        "TONES": {
+          "type": "number",
+          "defaultValue": 65
+        },
+        "RHYTHMS": {
+          "type": "number",
+          "defaultValue": 500
+        },
+        "MODE": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "buzzerMode",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.playTone({TONES},{RHYTHMS},{MODE})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "buzzer_tone_set_volume",
+      "blockType": "command",
+      "text": "设置蜂鸣器音量为 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 100
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "beep.setVolume({VALUE})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "close_buzzer",
+      "blockType": "command",
+      "text": "关闭蜂鸣器",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "beep.onoff(False)",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "beep = Hiwonder.Buzzer()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "close_lowpower_warning",
+      "blockType": "command",
+      "text": "关闭低压报警",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "Hiwonder.disableLowPowerAlarm()",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_battery_level",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "电量值(mV)",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "Hiwonder.Battery_power()",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_led_color",
+      "blockType": "command",
+      "text": "设置RGB彩灯颜色 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "color",
+          "defaultValue": "#ff0000"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rgb.setRGB(0,{COLOR.rgb})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "rgb = Hiwonder.RGB()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_led_color_arg",
+      "blockType": "command",
+      "text": "设置RGB彩灯红色 [RED] 绿色 [GREEN] 蓝色 [BLUE]",
+      "arguments": {
+        "RED": {
+          "type": "number",
+          "defaultValue": 255
+        },
+        "GREEN": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "BLUE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rgb.setRGB(0,{RED},{GREEN},{BLUE})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "rgb = Hiwonder.RGB()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "rgb_module_breath_one",
+      "blockType": "command",
+      "text": "设置RGB彩灯呼吸灯模式 颜色 [COLOR] 变化周期(0.5~20) [CYCLE] 秒",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "lightColors",
+          "literal": true
+        },
+        "CYCLE": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rgb.set_Breathing({COLOR},{CYCLE})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "rgb = Hiwonder.RGB()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "rgb_module_breath",
+      "blockType": "command",
+      "text": "设置RGB彩灯炫彩模式",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "rgb.setRGBBreathingValue(5,10,15)",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "rgb = Hiwonder.RGB()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "close_led",
+      "blockType": "command",
+      "text": "关闭RGB彩灯",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "rgb.setRGB(0,0,0,0)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "print_str",
+      "blockType": "command",
+      "text": "输出打印字符 [STR]",
+      "arguments": {
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hello"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print({STR})\ntime.sleep(0.05)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "print_number",
+      "blockType": "command",
+      "text": "输出打印数字 [NUM]",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "print({NUM})\ntime.sleep(0.05)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "when_key_click_thread",
+      "blockType": "hat",
+      "text": "当 [KEYS] 键短按时",
+      "arguments": {
+        "KEYS": {
+          "type": "string",
+          "defaultValue": "A",
+          "menu": "keys",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "button{KEYS} = Hiwonder.Button('{KEYS}')"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "def on_button{KEYS}_clicked():",
+          "entryFooter": "button{KEYS}.Clicked(on_button{KEYS}_clicked)",
+          "launcher": "",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "when_key_longclick_thread",
+      "blockType": "hat",
+      "text": "当 [KEYS] 键长按时",
+      "arguments": {
+        "KEYS": {
+          "type": "string",
+          "defaultValue": "A",
+          "menu": "keys",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder",
+            "import time",
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "button{KEYS} = Hiwonder.Button('{KEYS}')"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "def on_button{KEYS}_longpressed():",
+          "entryFooter": "button{KEYS}.Longpressed(on_button{KEYS}_longpressed)",
+          "launcher": "",
+          "section": "main"
+        }
+      }
+    },
+    {
+      "opcode": "key_is_pressed",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "[KEYS] 键被按下",
+      "arguments": {
+        "KEYS": {
+          "type": "string",
+          "defaultValue": "A",
+          "menu": "keys",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "button{KEYS}.read()",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "button{KEYS} = Hiwonder.Button('{KEYS}')"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "motor_speed_set",
+      "blockType": "command",
+      "text": "设置小车以 [SPEED] 转/分钟的转速 [ORIENTION]",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "oriention2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.run_rpm({SPEED}*{ORIENTION})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_run_distance",
+      "blockType": "command",
+      "text": "设置小车以 [SPEED] 转/分钟的转速 [ORIENTION] [DISTANCE] 厘米",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "oriention2",
+          "literal": true
+        },
+        "DISTANCE": {
+          "type": "number",
+          "defaultValue": 100
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.run_distance({DISTANCE}*{ORIENTION},{SPEED})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_run_oriention_angle",
+      "blockType": "command",
+      "text": "设置小车以 [SPEED] 转/分钟的转速 [TURN] [ANGLE] 度",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "TURN": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "orientionTurn",
+          "literal": true
+        },
+        "ANGLE": {
+          "type": "number",
+          "defaultValue": 90
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.turn_angle({ANGLE}*{TURN},{SPEED})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_run_speed",
+      "blockType": "command",
+      "text": "设置 [WHEEL] 以 [SPEED] 转/分钟的转速启动",
+      "arguments": {
+        "WHEEL": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "wheel",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.motor_run_rpm({WHEEL},{SPEED})",
+          "templateSelector": {
+            "argument": "WHEEL",
+            "cases": {
+              "0": "motor.motors_run_rpm({SPEED},{SPEED})"
+            }
+          },
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_run_angle",
+      "blockType": "command",
+      "text": "设置 [WHEEL] 以 [SPEED] 转/分钟的转速运行 [ANGLE] 度",
+      "arguments": {
+        "WHEEL": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "wheel",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "ANGLE": {
+          "type": "number",
+          "defaultValue": 180
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.motor_run_angle({WHEEL},{ANGLE},{SPEED})",
+          "templateSelector": {
+            "argument": "WHEEL",
+            "cases": {
+              "0": "motor.motor_run_angle(1,{ANGLE},{SPEED})\nmotor.motor_run_angle(2,{ANGLE},{SPEED})"
+            }
+          },
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_run_two_wheel",
+      "blockType": "command",
+      "text": "设置左轮(EM1)转速 [SPEED] 转/分钟 右轮(EM2)转速 [SPEED2] 转/分钟",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "SPEED2": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.motors_run_rpm({SPEED},{SPEED2})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_run_two_wheel_percent",
+      "blockType": "command",
+      "text": "设置左轮(EM1)动力 [SPEED] % 右轮(EM2)动力 [SPEED2] %",
+      "arguments": {
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 25
+        },
+        "SPEED2": {
+          "type": "number",
+          "defaultValue": 25
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.motors_run_rpm({SPEED}*1.5,{SPEED2}*1.5)",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_motor_stop",
+      "blockType": "command",
+      "text": "停止编码电机 [WHEEL] 运行",
+      "arguments": {
+        "WHEEL": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "wheel",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.stop({WHEEL})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_servo_run_angle",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取 [WHEEL] 转过的度数",
+      "arguments": {
+        "WHEEL": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "wheel2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.get_motor_angle({WHEEL})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "reset_run_angle",
+      "blockType": "command",
+      "text": "重置 [WHEEL] 转过的度数",
+      "arguments": {
+        "WHEEL": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "wheel",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.reset_motor_angle({WHEEL})",
+          "templateSelector": {
+            "argument": "WHEEL",
+            "cases": {
+              "0": "motor.reset_motor_angle(1)\nmotor.reset_motor_angle(2)"
+            }
+          },
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "pd_set_pd_line",
+      "blockType": "command",
+      "text": "设置小车进行PD调节巡线 偏差值 [OFFSET] 基础速度 [SPEED] 最大速度 [MAXSPEED] Kp值 [KP] Kd值 [KD]",
+      "arguments": {
+        "OFFSET": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 50
+        },
+        "MAXSPEED": {
+          "type": "number",
+          "defaultValue": 150
+        },
+        "KP": {
+          "type": "number",
+          "defaultValue": 20
+        },
+        "KD": {
+          "type": "number",
+          "defaultValue": 10
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "motor.pd_set_speed({OFFSET},{SPEED},{MAXSPEED},{KP},{KD})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "motor = Hiwonder.Car()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "imu_init",
+      "blockType": "command",
+      "text": "初始化IMU传感器",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "imu = Hiwonder.IMU()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "imu_cali",
+      "blockType": "command",
+      "text": "校准IMU传感器",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "buttonA = Hiwonder.Button('A')",
+            "def is_stop_3091ratyxq():\n  return buttonA.read()"
+          ],
+          "forcedVariables": [
+            {
+              "name": "imu",
+              "code": "imu = Hiwonder.IMU(True, is_stop_3091ratyxq)"
+            }
+          ],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_euler_angle_element_value",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取设备 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "eulerElement",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "imu.get_angle()[{VALUE}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_ble_mode",
+      "blockType": "command",
+      "text": "设置蓝牙模式 [MODE] 名称 [NAME]",
+      "arguments": {
+        "MODE": {
+          "type": "string",
+          "defaultValue": "BLE.MODE_BLE_SLAVE",
+          "menu": "bleMode",
+          "literal": true
+        },
+        "NAME": {
+          "type": "string",
+          "defaultValue": "aimech"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "from Hiwonder_BLE import BLE"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ble = BLE({MODE},{NAME})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ble_is_connected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "蓝牙是否已连接",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "ble.is_connected()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_ble_mac",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取蓝牙MAC地址",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "ble.get_mac()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ble_wait_end",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "蓝牙收到的数据是否包含 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "CMD"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ble.contains_data({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "read_ble_data",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "读取蓝牙数据",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "ble.read_uart_cmd()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_ble_cmd",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "解析蓝牙数据 [DATA] 获取命令",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "0"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ble.parse_uart_cmd({DATA})[0]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_ble_args",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "解析蓝牙数据 [DATA] 获取参数 [NUM]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "0"
+        },
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ble.parse_uart_cmd({DATA})[{NUM}]",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ble_write",
+      "blockType": "command",
+      "text": "蓝牙发送数据 [DATA]",
+      "arguments": {
+        "DATA": {
+          "type": "string",
+          "defaultValue": "CMD"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ble.send_data({DATA})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "package": {
+    "fileName": "aimech-1.0.0.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

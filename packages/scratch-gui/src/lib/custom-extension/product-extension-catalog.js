@@ -1,3 +1,4 @@
+// modules 按卡片的 sourceExtension 分组，只描述硬件兼容性，不表示模块包已经迁移或发布。
 const productExtensionCatalog = [
     {
         id: 'robots',
@@ -10,10 +11,15 @@ const productExtensionCatalog = [
                 modules: {
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
-                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
+                        'infrared-sensor', 'touch-sensor', 'button-module',
                         'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
-                        'imu-sensor', 'led-ultrasonic'
-                    ]
+                        'imu-sensor', 'led-ultrasonic', 'wonder-echo', 'wonder-lens', 'wonder-mind',
+                        'k230-vision'
+                    ],
+                    actuator: ['bus-servo', 'iic-pwm', 'fan'],
+                    xarm: ['xarm', 'xarm-series', 'xarm-linkage'],
+                    display: ['dot-matrix', 'rgb-module'],
+                    communication: ['communication']
                 },
                 version: '0.0.0',
                 latestVersion: '1.0.0',
@@ -26,10 +32,14 @@ const productExtensionCatalog = [
                 modules: {
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
-                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
-                        'color-sensor', 'temperature-humidity', 'line-4', 'line-4-rotary', 'imu-sensor',
-                        'led-ultrasonic'
-                    ]
+                        'infrared-sensor', 'touch-sensor', 'button-module',
+                        'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary', 'imu-sensor',
+                        'led-ultrasonic', 'wonder-echo', 'wonder-lens', 'wonder-mind', 'k230-vision'
+                    ],
+                    actuator: ['bus-servo', 'iic-pwm', 'fan'],
+                    xarm: ['xarm-series', 'xarm-linkage'],
+                    display: ['dot-matrix', 'rgb-module'],
+                    communication: ['communication']
                 },
                 version: '0.2.3',
                 latestVersion: '0.2.3',
@@ -42,10 +52,15 @@ const productExtensionCatalog = [
                 modules: {
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
-                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
+                        'infrared-sensor', 'touch-sensor', 'button-module',
                         'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
-                        'imu-sensor', 'led-ultrasonic'
-                    ]
+                        'imu-sensor', 'led-ultrasonic', 'wonder-echo', 'wonder-lens', 'wonder-mind',
+                        'k230-vision'
+                    ],
+                    actuator: ['bus-servo', 'iic-pwm', 'fan'],
+                    xarm: ['xarm-series', 'xarm-linkage'],
+                    display: ['dot-matrix', 'rgb-module'],
+                    communication: ['communication']
                 },
                 version: '1.0.0',
                 latestVersion: '1.0.0',
@@ -58,10 +73,15 @@ const productExtensionCatalog = [
                 modules: {
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
-                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
+                        'infrared-sensor', 'touch-sensor', 'button-module',
                         'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
-                        'imu-sensor', 'led-ultrasonic'
-                    ]
+                        'imu-sensor', 'led-ultrasonic', 'wonder-echo', 'wonder-lens', 'wonder-mind',
+                        'k230-vision'
+                    ],
+                    actuator: ['bus-servo', 'iic-pwm', 'fan'],
+                    xarm: ['xarm-series', 'xarm-linkage'],
+                    display: ['dot-matrix', 'rgb-module'],
+                    communication: ['communication']
                 },
                 version: '1.0.0',
                 latestVersion: '1.0.0',
@@ -74,10 +94,15 @@ const productExtensionCatalog = [
                 modules: {
                     sensor: [
                         'knob', 'light-sensor', 'rain-sensor', 'soil-sensor', 'sound-sensor',
-                        'infrared-sensor', 'touch-sensor', 'button-module', 'ultrasonic',
+                        'infrared-sensor', 'touch-sensor', 'button-module',
                         'color-sensor', 'temperature-humidity', 'line-6', 'line-4', 'line-4-rotary',
-                        'imu-sensor', 'led-ultrasonic'
-                    ]
+                        'imu-sensor', 'led-ultrasonic', 'wonder-echo', 'wonder-lens', 'wonder-mind',
+                        'k230-vision'
+                    ],
+                    actuator: ['bus-servo', 'iic-pwm', 'fan'],
+                    xarm: ['xarm-series', 'xarm-linkage'],
+                    display: ['dot-matrix', 'rgb-module'],
+                    communication: ['communication']
                 },
                 version: '1.0.0',
                 latestVersion: '1.0.0',
@@ -88,7 +113,7 @@ const productExtensionCatalog = [
                 name: 'miniHexa',
                 sourceExtension: 'minihexa',
                 modules: {
-                    sensor: ['ultrasonic']
+                    sensor: ['infrared-sensor', 'led-ultrasonic', 'wonder-echo', 'wonder-lens']
                 },
                 version: '0.1.1',
                 latestVersion: '0.1.1',
@@ -99,7 +124,11 @@ const productExtensionCatalog = [
                 name: 'AiDoggy',
                 sourceExtension: 'aidoggy',
                 modules: {
-                    sensor: ['ultrasonic']
+                    sensor: ['temperature-humidity', 'led-ultrasonic'],
+                    actuator: ['bus-servo', 'iic-pwm', 'fan'],
+                    xarm: ['xarm-series', 'xarm-linkage'],
+                    display: ['dot-matrix'],
+                    communication: ['communication']
                 },
                 version: '0.1.0',
                 latestVersion: '0.1.0',
@@ -146,7 +175,7 @@ const productExtensionCatalog = [
             {
                 id: 'wonder-echo',
                 name: 'WonderEcho语音模块',
-                sourceExtension: 'communication',
+                sourceExtension: 'sensor',
                 version: '0.0.0',
                 latestVersion: '1.0.0',
                 status: 'planned'
@@ -384,14 +413,6 @@ const productExtensionCatalog = [
                 version: '0.0.0',
                 latestVersion: '1.0.0',
                 status: 'planned'
-            },
-            {
-                id: 'company-http',
-                name: 'HTTP / DeepSeek',
-                extensionId: 'companyHttp',
-                version: '0.1.0',
-                latestVersion: '0.1.0',
-                status: 'available'
             }
         ]
     },
@@ -399,14 +420,6 @@ const productExtensionCatalog = [
         id: 'function',
         label: '功能模块',
         children: [
-            {
-                id: 'python-native',
-                name: 'Python基础积木',
-                extensionId: 'pythonNative',
-                version: '0.1.0',
-                latestVersion: '0.1.0',
-                status: 'available'
-            },
             {
                 id: 'aiblocks',
                 name: 'AI Blocks',

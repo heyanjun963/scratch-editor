@@ -72,6 +72,42 @@ test('custom main template can collect imports variables globals and launcher', 
     t.end();
 });
 
+test('custom template formats static MCP metadata and Python identifiers', t => {
+    const main = new TestBlock('company_start');
+    const setting = new TestBlock('company_mcp_setting', {}, {
+        NAME: new TestBlock('text', {TEXT: 'turn left'}),
+        COMMAND: new TestBlock('text', {TEXT: ' move forward '})
+    });
+    main.next = setting;
+
+    const templates = {
+        company_start: {
+            blockType: 'hat',
+            section: 'main',
+            template: ''
+        },
+        company_mcp_setting: {
+            blockType: 'command',
+            arguments: {
+                NAME: {defaultValue: ''},
+                COMMAND: {defaultValue: ''}
+            },
+            variables: [
+                '_mcp_k230_{NAME.identifier}={"name":{NAME.jsonValue},' +
+                '"description":{COMMAND.compactJson}}'
+            ],
+            template: ''
+        }
+    };
+
+    const code = generatePythonCode(createWorkspace([main]), {
+        getPythonCodegenTemplate: blockType => templates[blockType]
+    });
+
+    t.match(code, /_mcp_k230_turn_left=\{"name":"turn left","description":"\\"moveforward\\""\}/);
+    t.end();
+});
+
 test('forced custom variables replace normal initialization by name', t => {
     const templates = {
         aimech_start: {

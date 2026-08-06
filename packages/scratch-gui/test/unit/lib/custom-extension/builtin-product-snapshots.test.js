@@ -34,6 +34,12 @@ describe('built-in Mind+ product snapshots', () => {
                 sha256: 'c5cbbdc546cc6cc215bbc774b66a98606ae7a6b1a91ed356333046788cc937be'
             },
             {
+                packageId: 'aimech',
+                version: '1.0.0',
+                asset: 'aimech-1.0.0.mpext',
+                sha256: '0d1b95ea60a647e2e664d432d72f418a7c71a72bae9ce4d3004fa498e37a76b1'
+            },
+            {
                 packageId: 'aiquadruped',
                 version: '1.0.0',
                 asset: 'aiquadruped-1.0.0.mpext',
@@ -53,9 +59,9 @@ describe('built-in Mind+ product snapshots', () => {
             },
             {
                 packageId: 'sensor',
-                version: '1.5.0',
-                asset: 'sensor-1.5.0.mpext',
-                sha256: '3a4f4279fec5d7245bd5c379323942602a0bd0ba8663101864e82abe8877a6ae'
+                version: '1.20.0',
+                asset: 'sensor-1.20.0.mpext',
+                sha256: 'e8e1750bdfdb90f224ff366c6b49a07388cc1e8bd1fb69a857049c91cb6d02f4'
             }
         ]);
         for (const item of index.packages) {
@@ -79,6 +85,15 @@ describe('built-in Mind+ product snapshots', () => {
         expect(manifest.blocks).toHaveLength(38);
         expect(manifest.categories).toHaveLength(8);
         expect(Object.keys(manifest.menus)).toHaveLength(10);
+        expect(manifest.blocks.filter(block => block.blockType === 'hat')).toHaveLength(4);
+    });
+
+    test('bundles the complete AI mech product manifest', () => {
+        const manifest = builtinProductManifests.aimech;
+
+        expect(manifest.blocks).toHaveLength(40);
+        expect(manifest.categories).toHaveLength(8);
+        expect(Object.keys(manifest.menus)).toHaveLength(11);
         expect(manifest.blocks.filter(block => block.blockType === 'hat')).toHaveLength(4);
     });
 

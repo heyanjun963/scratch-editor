@@ -38,8 +38,7 @@
 .tabButton,
 .toolbarButton,
 .sortButton,
-.cardMenuButton,
-.downloadButton {
+.cardMenuButton {
     border: 0;
     font: inherit;
     cursor: pointer;
@@ -300,22 +299,6 @@
     background: transparent;
     color: #ff9f1a;
     font-size: 1rem;
-}
-
-.downloadButton {
-    position: absolute;
-    top: .45rem;
-    right: .45rem;
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    width: 1.55rem;
-    height: 1.55rem;
-    border: 1px solid #ffad22;
-    border-radius: .35rem;
-    background: #fff;
-    color: #ff9f1a;
-    font-weight: 900;
 }
 
 .userCardActions {

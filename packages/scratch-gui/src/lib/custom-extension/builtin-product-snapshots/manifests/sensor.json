@@ -2,7 +2,7 @@
   "formatVersion": 2,
   "id": "sensor",
   "name": "输入模块",
-  "version": "1.5.0",
+  "version": "1.20.0",
   "description": "适用于 Hiwonder Python 产品的基础输入传感器积木包。",
   "color1": "#2e8b57",
   "color2": "#267348",
@@ -162,6 +162,155 @@
         "aimech_close_led_ultrasonic",
         "aimech_set_led_ultrasonic_breath",
         "aimech_set_led_ultrasonic_random"
+      ]
+    },
+    {
+      "id": "wonder-echo",
+      "name": "WonderEcho语音模块",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_wonderecho_init",
+        "wonderecho_get_results",
+        "wonderecho_results",
+        "wonderecho_get_result_num",
+        "wonderecho_speech_cmd",
+        "wonderecho_speech_cmd_number",
+        "wonderecho_speech_play",
+        "wonderecho_speech_play_number"
+      ]
+    },
+    {
+      "id": "k230-vision",
+      "name": "K230视觉模块",
+      "hideLabel": false,
+      "blocks": [
+        "k230_aimech_init",
+        "k230_set_mode",
+        "k230_set_run",
+        "k230_set_volumn",
+        "k230_set_wifi",
+        "k230_update_detect_result",
+        "k230_mcp_action_setting",
+        "k230_mcp_move_setting",
+        "k230_mcp_setting",
+        "k230_result_exists",
+        "k230_get_result",
+        "k230_send_mcp_result",
+        "k230_aimecanum_set_mcp_default",
+        "k230_aiquadruped_set_mcp_default",
+        "k230_aiquadrupedpro_set_mcp_default",
+        "k230_aihexa_set_mcp_default",
+        "k230_get_default_mcp_name",
+        "k230_get_buzzer_params",
+        "k230_get_rgb_light_params",
+        "k230_get_sonar_rgb_params",
+        "k230_get_arm_claw_params",
+        "k230_get_robot_set_pose_params",
+        "k230_get_robot_move_params",
+        "k230_get_robot_runAction_params",
+        "k230_motor_speed_params",
+        "k230_get_move_distance_params",
+        "k230_get_arm_move_to_yz_params",
+        "k230_face_detected",
+        "k230_face_count",
+        "k230_face_exists",
+        "k230_face_recognition_get_arg_by_name",
+        "k230_face2_detected",
+        "k230_face2_count",
+        "k230_result_face_pose_get_oriention",
+        "k230_face2_near_center",
+        "k230_face3_detected",
+        "k230_face3_count",
+        "k230_facial_detect",
+        "k230_get_facial_args",
+        "k230_gaze_detected",
+        "k230_gaze_count",
+        "k230_gaze_near_center_result",
+        "k230_gaze_near_center",
+        "k230_person_detected",
+        "k230_person_count",
+        "k230_person_near_center",
+        "k230_person_point_detected",
+        "k230_person2_count",
+        "k230_person_keypoint_detect_name",
+        "k230_result_person_keypoint_get_arg",
+        "k230_person_keypoint_near_center",
+        "k230_hand_detected",
+        "k230_hand_count",
+        "k230_hand_detected_posture",
+        "k230_result_hand_keypoint_get_arg",
+        "k230_hand_near_center",
+        "k230_gesture_detected",
+        "k230_gesture_count",
+        "k230_result_hand_gesture_get_arg",
+        "k230_result_hand_gesture_get_pos_arg_by_name",
+        "k230_result_hand_gesture_get_pos_arg",
+        "k230_fall_detected",
+        "k230_fall_count",
+        "k230_fall_near_center_result",
+        "k230_fall_near_center",
+        "k230_target_detected",
+        "k230_target_near_center",
+        "k230_dynamic_gesture_detected",
+        "k230_result_dynamic_gesture_get_arg",
+        "k230_result_self_learn_get_arg",
+        "k230_result_self_learn_get_pos_arg",
+        "k230_set_single_color",
+        "k230_set_single_color_arg",
+        "k230_single_color_detected",
+        "k230_result_single_color_get_pos_arg",
+        "k230_set_multi_color_arg",
+        "k230_color_detected",
+        "k230_color_count",
+        "k230_color_near_center_name",
+        "k230_color_near_center",
+        "k230_result_multi_color_get_pos_arg",
+        "k230_set_line_color",
+        "k230_set_line_color_arg",
+        "k230_line_detected",
+        "k230_result_line_detect_get_arg",
+        "k230_ocr_detected",
+        "k230_ocr_count",
+        "k230_result_ocr_get_arg",
+        "k230_result_ocr_get_pos_arg",
+        "k230_license_plate_detected",
+        "k230_license_plate_count",
+        "k230_result_lpr_get_arg",
+        "k230_result_lpr_get_pos_arg",
+        "k230_object_detected",
+        "k230_object_count",
+        "k230_object_classify_parameter",
+        "k230_object_named_detected",
+        "k230_object_parameter",
+        "k230_trash_detected",
+        "k230_trash_count",
+        "k230_result_garbage_get_name_arg",
+        "k230_trash_near_center",
+        "k230_result_garbage_get_pos_arg",
+        "k230_traffic_sign_detected",
+        "k230_traffic_sign_count",
+        "k230_result_traffic_get_name_arg",
+        "k230_traffic_sign_near_center",
+        "k230_april_tag_detected",
+        "k230_april_tag_count",
+        "k230_result_apriltag_get_name_arg",
+        "k230_april_tag_near_center",
+        "k230_result_apriltag_get_pos_arg",
+        "k230_dm_code_detected",
+        "k230_dm_code_count",
+        "k230_result_dmcode_get_name_arg",
+        "k230_dm_code_near_center",
+        "k230_result_dmcode_get_pos_arg",
+        "k230_qr_code_detected",
+        "k230_qr_code_count",
+        "k230_result_orcode_get_arg",
+        "k230_qr_code_near_center",
+        "k230_result_orcode_get_pos_arg",
+        "k230_barcode_detected",
+        "k230_barcode_count",
+        "k230_result_barcode_get_arg",
+        "k230_barcode_near_center",
+        "k230_result_barcode_get_pos_arg"
       ]
     }
   ],
@@ -403,6 +552,2098 @@
         {
           "text": "蓝",
           "value": "3"
+        }
+      ]
+    },
+    "mechdog_word": {
+      "items": [
+        {
+          "text": "前进",
+          "value": "1"
+        },
+        {
+          "text": "后退",
+          "value": "2"
+        },
+        {
+          "text": "左转",
+          "value": "3"
+        },
+        {
+          "text": "右转",
+          "value": "4"
+        },
+        {
+          "text": "身体前倾",
+          "value": "5"
+        },
+        {
+          "text": "身体后仰",
+          "value": "6"
+        },
+        {
+          "text": "身体左倾",
+          "value": "7"
+        },
+        {
+          "text": "身体右倾",
+          "value": "8"
+        },
+        {
+          "text": "停止",
+          "value": "9"
+        },
+        {
+          "text": "立正",
+          "value": "0xA"
+        },
+        {
+          "text": "趴下",
+          "value": "0xB"
+        },
+        {
+          "text": "坐下",
+          "value": "0xC"
+        },
+        {
+          "text": "加速",
+          "value": "0xD"
+        },
+        {
+          "text": "减速",
+          "value": "0xE"
+        },
+        {
+          "text": "抬高身体",
+          "value": "0xF"
+        },
+        {
+          "text": "降低身体",
+          "value": "0x10"
+        },
+        {
+          "text": "发出声音",
+          "value": "0x11"
+        },
+        {
+          "text": "开灯",
+          "value": "0x12"
+        },
+        {
+          "text": "关灯",
+          "value": "0x13"
+        },
+        {
+          "text": "开门",
+          "value": "0x14"
+        },
+        {
+          "text": "关门",
+          "value": "0x15"
+        },
+        {
+          "text": "打开水泵",
+          "value": "0x16"
+        },
+        {
+          "text": "关闭水泵",
+          "value": "0x17"
+        },
+        {
+          "text": "展开晾衣架",
+          "value": "0x18"
+        },
+        {
+          "text": "收起晾衣架",
+          "value": "0x19"
+        },
+        {
+          "text": "你好",
+          "value": "0x1A"
+        },
+        {
+          "text": "自我介绍",
+          "value": "0x1B"
+        },
+        {
+          "text": "展示技能",
+          "value": "0x1C"
+        },
+        {
+          "text": "原地踏步",
+          "value": "0x1D"
+        },
+        {
+          "text": "摇头",
+          "value": "0x1E"
+        },
+        {
+          "text": "向前扑",
+          "value": "0x1F"
+        },
+        {
+          "text": "向后扑",
+          "value": "0x20"
+        },
+        {
+          "text": "战斗模式",
+          "value": "0x21"
+        },
+        {
+          "text": "蹲下",
+          "value": "0x22"
+        },
+        {
+          "text": "抖一抖",
+          "value": "0x23"
+        },
+        {
+          "text": "打开风扇",
+          "value": "0x24"
+        },
+        {
+          "text": "关闭风扇",
+          "value": "0x25"
+        },
+        {
+          "text": "转动舵机",
+          "value": "0x26"
+        },
+        {
+          "text": "亮红灯",
+          "value": "0x27"
+        },
+        {
+          "text": "亮绿灯",
+          "value": "0x28"
+        },
+        {
+          "text": "亮蓝灯",
+          "value": "0x29"
+        },
+        {
+          "text": "显示笑脸",
+          "value": "0x2A"
+        },
+        {
+          "text": "显示哭脸",
+          "value": "0x2B"
+        },
+        {
+          "text": "开始人脸识别",
+          "value": "0x62"
+        },
+        {
+          "text": "开始标签识别",
+          "value": "0x63"
+        },
+        {
+          "text": "开始垃圾分类",
+          "value": "0x64"
+        },
+        {
+          "text": "开始颜色识别",
+          "value": "0x65"
+        },
+        {
+          "text": "开始巡线",
+          "value": "0x66"
+        },
+        {
+          "text": "开始颜色追踪",
+          "value": "0x67"
+        },
+        {
+          "text": "开始避障",
+          "value": "0x68"
+        },
+        {
+          "text": "分拣红色",
+          "value": "0x69"
+        },
+        {
+          "text": "分拣绿色",
+          "value": "0x6A"
+        },
+        {
+          "text": "分拣蓝色",
+          "value": "0x6B"
+        },
+        {
+          "text": "跳舞",
+          "value": "0x6C"
+        },
+        {
+          "text": "俯卧撑",
+          "value": "0x6D"
+        },
+        {
+          "text": "左脚射门",
+          "value": "0x6E"
+        },
+        {
+          "text": "右脚射门",
+          "value": "0x6F"
+        },
+        {
+          "text": "扭动身体",
+          "value": "0x71"
+        },
+        {
+          "text": "仰卧起坐",
+          "value": "0x72"
+        },
+        {
+          "text": "鞠躬",
+          "value": "0x73"
+        },
+        {
+          "text": "摊手",
+          "value": "0x74"
+        },
+        {
+          "text": "挥手",
+          "value": "0x75"
+        },
+        {
+          "text": "原地踏步",
+          "value": "0x76"
+        },
+        {
+          "text": "跌倒后站起",
+          "value": "0x77"
+        },
+        {
+          "text": "昂首阔步",
+          "value": "0x78"
+        },
+        {
+          "text": "左勾拳",
+          "value": "0x79"
+        },
+        {
+          "text": "右勾拳",
+          "value": "0x7A"
+        },
+        {
+          "text": "检测到关闭播放",
+          "value": "0x7B"
+        },
+        {
+          "text": "分拣黄色",
+          "value": "0x7C"
+        }
+      ]
+    },
+    "mechdog_speech_cmd_word": {
+      "items": [
+        {
+          "text": "正在前进",
+          "value": "1"
+        },
+        {
+          "text": "正在后退",
+          "value": "2"
+        },
+        {
+          "text": "正在左转",
+          "value": "3"
+        },
+        {
+          "text": "正在右转",
+          "value": "4"
+        },
+        {
+          "text": "身体前倾",
+          "value": "5"
+        },
+        {
+          "text": "身体后仰",
+          "value": "6"
+        },
+        {
+          "text": "身体左倾",
+          "value": "7"
+        },
+        {
+          "text": "身体右倾",
+          "value": "8"
+        },
+        {
+          "text": "收到",
+          "value": "9"
+        },
+        {
+          "text": "收到",
+          "value": "0xd"
+        },
+        {
+          "text": "收到",
+          "value": "0xe"
+        },
+        {
+          "text": "正在开灯",
+          "value": "0x12"
+        },
+        {
+          "text": "正在关灯",
+          "value": "0x13"
+        },
+        {
+          "text": "门已打开",
+          "value": "0x14"
+        },
+        {
+          "text": "门已关闭",
+          "value": "0x15"
+        },
+        {
+          "text": "正在打开水泵",
+          "value": "0x16"
+        },
+        {
+          "text": "正在关闭水泵",
+          "value": "0x17"
+        },
+        {
+          "text": "收到",
+          "value": "0x18"
+        },
+        {
+          "text": "收到",
+          "value": "0x19"
+        },
+        {
+          "text": "你好",
+          "value": "0x1A"
+        },
+        {
+          "text": "你好，我是幻尔，我会说话和跳舞。",
+          "value": "0x1B"
+        },
+        {
+          "text": "看好了",
+          "value": "0x1C"
+        },
+        {
+          "text": "收到",
+          "value": "0x62"
+        }
+      ]
+    },
+    "mechdog_speech_play_word": {
+      "items": [
+        {
+          "text": "可回收物",
+          "value": "1"
+        },
+        {
+          "text": "厨余垃圾",
+          "value": "2"
+        },
+        {
+          "text": "有害垃圾",
+          "value": "3"
+        },
+        {
+          "text": "其他垃圾",
+          "value": "4"
+        },
+        {
+          "text": "前方有障碍物",
+          "value": "5"
+        },
+        {
+          "text": "停车完成",
+          "value": "6"
+        },
+        {
+          "text": "重新出发",
+          "value": "7"
+        },
+        {
+          "text": "检测到左转",
+          "value": "8"
+        },
+        {
+          "text": "检测到右转",
+          "value": "9"
+        },
+        {
+          "text": "检测到停车",
+          "value": "0xA"
+        },
+        {
+          "text": "检测到红灯",
+          "value": "0xB"
+        },
+        {
+          "text": "检测到绿灯",
+          "value": "0xC"
+        },
+        {
+          "text": "检测到掉头",
+          "value": "0xD"
+        },
+        {
+          "text": "检测到转弯",
+          "value": "0xE"
+        },
+        {
+          "text": "欢迎光临",
+          "value": "0xF"
+        },
+        {
+          "text": "检测到前方物体，正在抓取",
+          "value": "0x10"
+        },
+        {
+          "text": "检测到前方物体超出范围，无法抓取",
+          "value": "0x11"
+        },
+        {
+          "text": "抓取结束",
+          "value": "0x12"
+        }
+      ]
+    },
+    "k230_mode": {
+      "items": [
+        {
+          "text": "空模式",
+          "value": "0"
+        },
+        {
+          "text": "在线大模型",
+          "value": "13"
+        },
+        {
+          "text": "人脸识别",
+          "value": "1"
+        },
+        {
+          "text": "人脸姿态",
+          "value": "2"
+        },
+        {
+          "text": "表情识别",
+          "value": "3"
+        },
+        {
+          "text": "注视方向",
+          "value": "4"
+        },
+        {
+          "text": "人体检测",
+          "value": "5"
+        },
+        {
+          "text": "人体关键点",
+          "value": "6"
+        },
+        {
+          "text": "手部关键点",
+          "value": "7"
+        },
+        {
+          "text": "手势识别",
+          "value": "8"
+        },
+        {
+          "text": "跌倒检测",
+          "value": "9"
+        },
+        {
+          "text": "目标跟踪",
+          "value": "10"
+        },
+        {
+          "text": "动态手势",
+          "value": "11"
+        },
+        {
+          "text": "自学习",
+          "value": "12"
+        },
+        {
+          "text": "单颜色检测",
+          "value": "14"
+        },
+        {
+          "text": "多颜色检测",
+          "value": "15"
+        },
+        {
+          "text": "线检测",
+          "value": "16"
+        },
+        {
+          "text": "文字识别",
+          "value": "18"
+        },
+        {
+          "text": "车牌识别",
+          "value": "19"
+        },
+        {
+          "text": "物体分类",
+          "value": "20"
+        },
+        {
+          "text": "物体检测",
+          "value": "21"
+        },
+        {
+          "text": "垃圾分类",
+          "value": "22"
+        },
+        {
+          "text": "交通检测",
+          "value": "23"
+        },
+        {
+          "text": "AprilTag识别",
+          "value": "24"
+        },
+        {
+          "text": "DM码识别",
+          "value": "25"
+        },
+        {
+          "text": "二维码识别",
+          "value": "26"
+        },
+        {
+          "text": "条形码识别",
+          "value": "27"
+        }
+      ]
+    },
+    "k230_start": {
+      "items": [
+        {
+          "text": "启动",
+          "value": "True"
+        },
+        {
+          "text": "停止",
+          "value": "False"
+        }
+      ]
+    },
+    "face_args2": {
+      "items": [
+        {
+          "text": "置信度",
+          "value": "1"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "face2_args": {
+      "items": [
+        {
+          "text": "姿态",
+          "value": "0"
+        },
+        {
+          "text": "置信度",
+          "value": "1"
+        },
+        {
+          "text": "翻滚角(roll)",
+          "value": "2"
+        },
+        {
+          "text": "俯仰角(pitch)",
+          "value": "3"
+        },
+        {
+          "text": "偏航角(yaw)",
+          "value": "4"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "face_pos_oriention": {
+      "items": [
+        {
+          "text": "前",
+          "value": "Forward"
+        },
+        {
+          "text": "下",
+          "value": "Down"
+        },
+        {
+          "text": "左",
+          "value": "Left"
+        },
+        {
+          "text": "右",
+          "value": "Right"
+        },
+        {
+          "text": "未知",
+          "value": "unknown"
+        }
+      ]
+    },
+    "gaze_name": {
+      "items": [
+        {
+          "text": "上",
+          "value": "Up"
+        },
+        {
+          "text": "下",
+          "value": "Down"
+        },
+        {
+          "text": "左",
+          "value": "Left"
+        },
+        {
+          "text": "右",
+          "value": "Right"
+        },
+        {
+          "text": "未知",
+          "value": "unknow"
+        }
+      ]
+    },
+    "gaze_result": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "0"
+        },
+        {
+          "text": "置信度",
+          "value": "1"
+        },
+        {
+          "text": "眼睛中心X坐标",
+          "value": "2"
+        },
+        {
+          "text": "眼睛中心Y坐标",
+          "value": "3"
+        },
+        {
+          "text": "目标中心X坐标",
+          "value": "4"
+        },
+        {
+          "text": "目标中心Y坐标",
+          "value": "5"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "facial_result": {
+      "items": [
+        {
+          "text": "高兴",
+          "value": "Happiness"
+        },
+        {
+          "text": "愤怒",
+          "value": "Angry"
+        },
+        {
+          "text": "厌恶",
+          "value": "Disgust"
+        },
+        {
+          "text": "恐惧",
+          "value": "Fear"
+        },
+        {
+          "text": "中性",
+          "value": "Neutral"
+        },
+        {
+          "text": "伤心",
+          "value": "Sadness"
+        },
+        {
+          "text": "惊讶",
+          "value": "Surprise"
+        }
+      ]
+    },
+    "face_args": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "0"
+        },
+        {
+          "text": "置信度",
+          "value": "1"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "axis_result": {
+      "items": [
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "person_keypoint_detect": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "id"
+        },
+        {
+          "text": "置信度",
+          "value": "score"
+        },
+        {
+          "text": "鼻子X坐标",
+          "value": "0"
+        },
+        {
+          "text": "鼻子Y坐标",
+          "value": "1"
+        },
+        {
+          "text": "左眼X坐标",
+          "value": "2"
+        },
+        {
+          "text": "左眼Y坐标",
+          "value": "3"
+        },
+        {
+          "text": "右眼X坐标",
+          "value": "4"
+        },
+        {
+          "text": "右眼Y坐标",
+          "value": "5"
+        },
+        {
+          "text": "左耳X坐标",
+          "value": "6"
+        },
+        {
+          "text": "左耳Y坐标",
+          "value": "7"
+        },
+        {
+          "text": "右耳X坐标",
+          "value": "8"
+        },
+        {
+          "text": "右耳Y坐标",
+          "value": "9"
+        },
+        {
+          "text": "左肩X坐标",
+          "value": "10"
+        },
+        {
+          "text": "左肩Y坐标",
+          "value": "11"
+        },
+        {
+          "text": "右肩X坐标",
+          "value": "12"
+        },
+        {
+          "text": "右肩Y坐标",
+          "value": "13"
+        },
+        {
+          "text": "左肘X坐标",
+          "value": "14"
+        },
+        {
+          "text": "左肘Y坐标",
+          "value": "15"
+        },
+        {
+          "text": "右肘X坐标",
+          "value": "16"
+        },
+        {
+          "text": "右肘Y坐标",
+          "value": "17"
+        },
+        {
+          "text": "左腕X坐标",
+          "value": "18"
+        },
+        {
+          "text": "左腕Y坐标",
+          "value": "19"
+        },
+        {
+          "text": "右腕X坐标",
+          "value": "20"
+        },
+        {
+          "text": "右腕Y坐标",
+          "value": "21"
+        },
+        {
+          "text": "左髋X坐标",
+          "value": "22"
+        },
+        {
+          "text": "左髋Y坐标",
+          "value": "23"
+        },
+        {
+          "text": "右髋X坐标",
+          "value": "24"
+        },
+        {
+          "text": "右髋Y坐标",
+          "value": "25"
+        },
+        {
+          "text": "左膝X坐标",
+          "value": "26"
+        },
+        {
+          "text": "左膝Y坐标",
+          "value": "27"
+        },
+        {
+          "text": "右膝X坐标",
+          "value": "28"
+        },
+        {
+          "text": "右膝Y坐标",
+          "value": "29"
+        },
+        {
+          "text": "左踝X坐标",
+          "value": "30"
+        },
+        {
+          "text": "左踝Y坐标",
+          "value": "31"
+        },
+        {
+          "text": "右踝X坐标",
+          "value": "32"
+        },
+        {
+          "text": "右踝Y坐标",
+          "value": "33"
+        }
+      ]
+    },
+    "hand_menu": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "id"
+        },
+        {
+          "text": "置信度",
+          "value": "score"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        },
+        {
+          "text": "手腕X坐标",
+          "value": "0"
+        },
+        {
+          "text": "手腕Y坐标",
+          "value": "1"
+        },
+        {
+          "text": "拇指点1X坐标",
+          "value": "2"
+        },
+        {
+          "text": "拇指点1Y坐标",
+          "value": "3"
+        },
+        {
+          "text": "拇指点2X坐标",
+          "value": "4"
+        },
+        {
+          "text": "拇指点2Y坐标",
+          "value": "5"
+        },
+        {
+          "text": "拇指点3X坐标",
+          "value": "6"
+        },
+        {
+          "text": "拇指点3Y坐标",
+          "value": "7"
+        },
+        {
+          "text": "拇指点4X坐标",
+          "value": "8"
+        },
+        {
+          "text": "拇指点4Y坐标",
+          "value": "9"
+        },
+        {
+          "text": "食指点1X坐标",
+          "value": "10"
+        },
+        {
+          "text": "食指点1Y坐标",
+          "value": "11"
+        },
+        {
+          "text": "食指点2X坐标",
+          "value": "12"
+        },
+        {
+          "text": "食指点2Y坐标",
+          "value": "13"
+        },
+        {
+          "text": "食指点3X坐标",
+          "value": "14"
+        },
+        {
+          "text": "食指点3Y坐标",
+          "value": "15"
+        },
+        {
+          "text": "食指点4X坐标",
+          "value": "16"
+        },
+        {
+          "text": "食指点4Y坐标",
+          "value": "17"
+        },
+        {
+          "text": "中指点1X坐标",
+          "value": "18"
+        },
+        {
+          "text": "中指点1Y坐标",
+          "value": "19"
+        },
+        {
+          "text": "中指点2X坐标",
+          "value": "20"
+        },
+        {
+          "text": "中指点2Y坐标",
+          "value": "21"
+        },
+        {
+          "text": "中指点3X坐标",
+          "value": "22"
+        },
+        {
+          "text": "中指点3Y坐标",
+          "value": "23"
+        },
+        {
+          "text": "中指点4X坐标",
+          "value": "24"
+        },
+        {
+          "text": "中指点4Y坐标",
+          "value": "25"
+        },
+        {
+          "text": "无名指点1X坐标",
+          "value": "26"
+        },
+        {
+          "text": "无名指点1Y坐标",
+          "value": "27"
+        },
+        {
+          "text": "无名指点2X坐标",
+          "value": "28"
+        },
+        {
+          "text": "无名指点2Y坐标",
+          "value": "29"
+        },
+        {
+          "text": "无名指点3X坐标",
+          "value": "30"
+        },
+        {
+          "text": "无名指点3Y坐标",
+          "value": "31"
+        },
+        {
+          "text": "无名指点4X坐标",
+          "value": "32"
+        },
+        {
+          "text": "无名指点4Y坐标",
+          "value": "33"
+        },
+        {
+          "text": "小指点1X坐标",
+          "value": "34"
+        },
+        {
+          "text": "小指点1Y坐标",
+          "value": "35"
+        },
+        {
+          "text": "小指点2X坐标",
+          "value": "36"
+        },
+        {
+          "text": "小指点2Y坐标",
+          "value": "37"
+        },
+        {
+          "text": "小指点3X坐标",
+          "value": "38"
+        },
+        {
+          "text": "小指点3Y坐标",
+          "value": "39"
+        },
+        {
+          "text": "小指点4X坐标",
+          "value": "40"
+        },
+        {
+          "text": "小指点4Y坐标",
+          "value": "41"
+        }
+      ]
+    },
+    "hand_gesture": {
+      "items": [
+        {
+          "text": "OK手势",
+          "value": "ok"
+        },
+        {
+          "text": "拳头",
+          "value": "fist"
+        },
+        {
+          "text": "数字5",
+          "value": "five"
+        },
+        {
+          "text": "手枪",
+          "value": "gun"
+        },
+        {
+          "text": "比心",
+          "value": "love"
+        },
+        {
+          "text": "数字1",
+          "value": "one"
+        },
+        {
+          "text": "数字6",
+          "value": "six"
+        },
+        {
+          "text": "数字3",
+          "value": "three"
+        },
+        {
+          "text": "点赞",
+          "value": "thumbUp"
+        },
+        {
+          "text": "胜利",
+          "value": "yeah"
+        }
+      ]
+    },
+    "face_args3": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "0"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "color_li": {
+      "items": [
+        {
+          "text": "红",
+          "value": "red"
+        },
+        {
+          "text": "绿",
+          "value": "green"
+        },
+        {
+          "text": "蓝",
+          "value": "blue"
+        },
+        {
+          "text": "黑",
+          "value": "black"
+        },
+        {
+          "text": "白",
+          "value": "white"
+        }
+      ]
+    },
+    "color_angle_axis_result": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "color"
+        },
+        {
+          "text": "角度",
+          "value": "angle"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "cx"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "cy"
+        },
+        {
+          "text": "宽度",
+          "value": "w"
+        },
+        {
+          "text": "高度",
+          "value": "h"
+        }
+      ]
+    },
+    "line_result": {
+      "items": [
+        {
+          "text": "中心X坐标",
+          "value": "center_pos"
+        },
+        {
+          "text": "角度",
+          "value": "angle"
+        },
+        {
+          "text": "颜色",
+          "value": "color"
+        }
+      ]
+    },
+    "ocr_point": {
+      "items": [
+        {
+          "text": "左上X",
+          "value": "0"
+        },
+        {
+          "text": "左上Y",
+          "value": "1"
+        },
+        {
+          "text": "右上X",
+          "value": "2"
+        },
+        {
+          "text": "右上Y",
+          "value": "3"
+        },
+        {
+          "text": "右下X",
+          "value": "4"
+        },
+        {
+          "text": "右下Y",
+          "value": "5"
+        },
+        {
+          "text": "左下X",
+          "value": "6"
+        },
+        {
+          "text": "左下Y",
+          "value": "7"
+        }
+      ]
+    },
+    "obj_menu": {
+      "items": [
+        {
+          "text": "名称",
+          "value": "0"
+        },
+        {
+          "text": "中心X坐标",
+          "value": "x"
+        },
+        {
+          "text": "中心Y坐标",
+          "value": "y"
+        }
+      ]
+    },
+    "objs": {
+      "items": [
+        {
+          "text": "人",
+          "value": "person"
+        },
+        {
+          "text": "自行车",
+          "value": "bicycle"
+        },
+        {
+          "text": "小汽车",
+          "value": "car"
+        },
+        {
+          "text": "摩托车",
+          "value": "motorcycle"
+        },
+        {
+          "text": "飞机",
+          "value": "airplane"
+        },
+        {
+          "text": "公交车",
+          "value": "bus"
+        },
+        {
+          "text": "火车",
+          "value": "train"
+        },
+        {
+          "text": "卡车",
+          "value": "truck"
+        },
+        {
+          "text": "船",
+          "value": "boat"
+        },
+        {
+          "text": "交通信号灯",
+          "value": "traffic light"
+        },
+        {
+          "text": "消防栓",
+          "value": "fire hydrant"
+        },
+        {
+          "text": "停车牌",
+          "value": "stop sign"
+        },
+        {
+          "text": "停车收费系统",
+          "value": "parking meter"
+        },
+        {
+          "text": "长椅",
+          "value": "bench"
+        },
+        {
+          "text": "鸟",
+          "value": "bird"
+        },
+        {
+          "text": "猫",
+          "value": "cat"
+        },
+        {
+          "text": "狗",
+          "value": "dog"
+        },
+        {
+          "text": "马",
+          "value": "horse"
+        },
+        {
+          "text": "羊",
+          "value": "sheep"
+        },
+        {
+          "text": "牛",
+          "value": "cow"
+        },
+        {
+          "text": "大象",
+          "value": "elephant"
+        },
+        {
+          "text": "熊",
+          "value": "bear"
+        },
+        {
+          "text": "斑马",
+          "value": "zebra"
+        },
+        {
+          "text": "长颈鹿",
+          "value": "giraffe"
+        },
+        {
+          "text": "背包",
+          "value": "backpack"
+        },
+        {
+          "text": "雨伞",
+          "value": "umbrella"
+        },
+        {
+          "text": "手提包",
+          "value": "handbag"
+        },
+        {
+          "text": "领带",
+          "value": "tie"
+        },
+        {
+          "text": "行李箱",
+          "value": "suitcase"
+        },
+        {
+          "text": "飞盘",
+          "value": "frisbee"
+        },
+        {
+          "text": "滑雪板",
+          "value": "skis"
+        },
+        {
+          "text": "雪板",
+          "value": "snowboard"
+        },
+        {
+          "text": "运动球",
+          "value": "sports ball"
+        },
+        {
+          "text": "风筝",
+          "value": "kite"
+        },
+        {
+          "text": "棒球棒",
+          "value": "baseball bat"
+        },
+        {
+          "text": "棒球手套",
+          "value": "baseball glove"
+        },
+        {
+          "text": "滑板",
+          "value": "skateboard"
+        },
+        {
+          "text": "冲浪板",
+          "value": "surfboard"
+        },
+        {
+          "text": "网球拍",
+          "value": "tennis racket"
+        },
+        {
+          "text": "瓶子",
+          "value": "bottle"
+        },
+        {
+          "text": "酒杯",
+          "value": "wine glass"
+        },
+        {
+          "text": "杯子",
+          "value": "cup"
+        },
+        {
+          "text": "叉子",
+          "value": "fork"
+        },
+        {
+          "text": "刀",
+          "value": "knife"
+        },
+        {
+          "text": "勺子",
+          "value": "spoon"
+        },
+        {
+          "text": "碗",
+          "value": "bowl"
+        },
+        {
+          "text": "香蕉",
+          "value": "banana"
+        },
+        {
+          "text": "苹果",
+          "value": "apple"
+        },
+        {
+          "text": "三明治",
+          "value": "sandwich"
+        },
+        {
+          "text": "橙子",
+          "value": "orange"
+        },
+        {
+          "text": "西兰花",
+          "value": "broccoli"
+        },
+        {
+          "text": "胡萝卜",
+          "value": "carrot"
+        },
+        {
+          "text": "热狗",
+          "value": "hot dog"
+        },
+        {
+          "text": "披萨",
+          "value": "pizza"
+        },
+        {
+          "text": "甜甜圈",
+          "value": "donut"
+        },
+        {
+          "text": "蛋糕",
+          "value": "cake"
+        },
+        {
+          "text": "椅子",
+          "value": "chair"
+        },
+        {
+          "text": "沙发",
+          "value": "couch"
+        },
+        {
+          "text": "盆栽",
+          "value": "potted plant"
+        },
+        {
+          "text": "床",
+          "value": "bed"
+        },
+        {
+          "text": "餐桌",
+          "value": "dining table"
+        },
+        {
+          "text": "马桶",
+          "value": "toilet"
+        },
+        {
+          "text": "电视",
+          "value": "tv"
+        },
+        {
+          "text": "笔记本电脑",
+          "value": "laptop"
+        },
+        {
+          "text": "鼠标",
+          "value": "mouse"
+        },
+        {
+          "text": "遥控器",
+          "value": "remote"
+        },
+        {
+          "text": "键盘",
+          "value": "keyboard"
+        },
+        {
+          "text": "手机",
+          "value": "cell phone"
+        },
+        {
+          "text": "微波炉",
+          "value": "microwave"
+        },
+        {
+          "text": "烤箱",
+          "value": "oven"
+        },
+        {
+          "text": "烤面包机",
+          "value": "toaster"
+        },
+        {
+          "text": "水槽",
+          "value": "sink"
+        },
+        {
+          "text": "冰箱",
+          "value": "refrigerator"
+        },
+        {
+          "text": "书",
+          "value": "book"
+        },
+        {
+          "text": "时钟",
+          "value": "clock"
+        },
+        {
+          "text": "花瓶",
+          "value": "vase"
+        },
+        {
+          "text": "剪刀",
+          "value": "scissors"
+        },
+        {
+          "text": "泰迪熊",
+          "value": "teddy bear"
+        },
+        {
+          "text": "吹风机",
+          "value": "hair drier"
+        },
+        {
+          "text": "牙刷",
+          "value": "toothbrush"
+        }
+      ]
+    },
+    "garbage": {
+      "items": [
+        {
+          "text": "香蕉皮",
+          "value": "BananaPeel"
+        },
+        {
+          "text": "碎骨头",
+          "value": "BrokenBones"
+        },
+        {
+          "text": "烟头",
+          "value": "CigaretteEnd"
+        },
+        {
+          "text": "一次性筷子",
+          "value": "DisposableChopsticks"
+        },
+        {
+          "text": "番茄酱",
+          "value": "Ketchup"
+        },
+        {
+          "text": "记号笔",
+          "value": "Marker"
+        },
+        {
+          "text": "口服液瓶",
+          "value": "OralLiquidBottle"
+        },
+        {
+          "text": "盘子",
+          "value": "Plate"
+        },
+        {
+          "text": "塑料瓶",
+          "value": "PlasticBottle"
+        },
+        {
+          "text": "蓄电池",
+          "value": "StorageBattery"
+        },
+        {
+          "text": "牙刷",
+          "value": "Toothbrush"
+        },
+        {
+          "text": "雨伞",
+          "value": "Umbrella"
+        }
+      ]
+    },
+    "traffic_sign": {
+      "items": [
+        {
+          "text": "前进",
+          "value": "go"
+        },
+        {
+          "text": "后退",
+          "value": "back"
+        },
+        {
+          "text": "左转",
+          "value": "Left"
+        },
+        {
+          "text": "右转",
+          "value": "Right"
+        },
+        {
+          "text": "停止",
+          "value": "stop"
+        }
+      ]
+    },
+    "buzzer_params": {
+      "items": [
+        {
+          "text": "蜂鸣器频率",
+          "value": "freq"
+        },
+        {
+          "text": "鸣响时间(ms)",
+          "value": "time_count"
+        }
+      ]
+    },
+    "rgb_light_params": {
+      "items": [
+        {
+          "text": "红色",
+          "value": "red"
+        },
+        {
+          "text": "绿色",
+          "value": "green"
+        },
+        {
+          "text": "蓝色",
+          "value": "blue"
+        }
+      ]
+    },
+    "arm_claw_params": {
+      "items": [
+        {
+          "text": "角度",
+          "value": "angle"
+        }
+      ]
+    },
+    "mcp_names": {
+      "items": [
+        {
+          "text": "电池电压",
+          "value": "Bat_Battery_power"
+        },
+        {
+          "text": "蜂鸣器播放",
+          "value": "Buzzer_playTone"
+        },
+        {
+          "text": "设置RGB灯",
+          "value": "RGB_setRGB"
+        },
+        {
+          "text": "机器人移动",
+          "value": "robot_move"
+        },
+        {
+          "text": "机器人姿态",
+          "value": "robot_set_pose"
+        },
+        {
+          "text": "机械臂运动",
+          "value": "arm_move_to_yz"
+        },
+        {
+          "text": "机械爪控制",
+          "value": "arm_claw"
+        },
+        {
+          "text": "发光超声波测距",
+          "value": "sonar_getDistance"
+        },
+        {
+          "text": "发光超声波颜色设置",
+          "value": "sonar_setRGB"
+        },
+        {
+          "text": "动作组运行",
+          "value": "robot_runAction"
+        }
+      ]
+    },
+    "mcp_names2": {
+      "items": [
+        {
+          "text": "电池电压",
+          "value": "Bat_Battery_power"
+        },
+        {
+          "text": "蜂鸣器播放",
+          "value": "Buzzer_playTone"
+        },
+        {
+          "text": "设置RGB灯",
+          "value": "RGB_setRGB"
+        },
+        {
+          "text": "机器人移动",
+          "value": "robot_move"
+        },
+        {
+          "text": "机械臂运动",
+          "value": "arm_move_to_yz"
+        },
+        {
+          "text": "机械爪控制",
+          "value": "arm_claw"
+        },
+        {
+          "text": "发光超声波测距",
+          "value": "sonar_getDistance"
+        },
+        {
+          "text": "发光超声波颜色设置",
+          "value": "sonar_setRGB"
+        },
+        {
+          "text": "动作组运行",
+          "value": "robot_runAction"
+        }
+      ]
+    },
+    "mcp_names3": {
+      "items": [
+        {
+          "text": "电池电压",
+          "value": "Bat_Battery_power"
+        },
+        {
+          "text": "蜂鸣器播放",
+          "value": "Buzzer_playTone"
+        },
+        {
+          "text": "设置RGB灯",
+          "value": "RGB_setRGB"
+        },
+        {
+          "text": "电机速度",
+          "value": "mcar_set_motors_speed"
+        },
+        {
+          "text": "移动距离",
+          "value": "mcar_move_distance"
+        },
+        {
+          "text": "机械臂运动",
+          "value": "arm_move_to_yz"
+        },
+        {
+          "text": "机械爪控制",
+          "value": "arm_claw"
+        },
+        {
+          "text": "发光超声波测距",
+          "value": "sonar_getDistance"
+        },
+        {
+          "text": "发光超声波颜色设置",
+          "value": "sonar_setRGB"
+        }
+      ]
+    },
+    "robot_move_params": {
+      "items": [
+        {
+          "text": "X轴方向速度",
+          "value": "x"
+        },
+        {
+          "text": "Y轴方向速度",
+          "value": "y"
+        },
+        {
+          "text": "中心旋转速度",
+          "value": "z"
+        },
+        {
+          "text": "抬腿高度",
+          "value": "height"
+        },
+        {
+          "text": "每一步运动周期(ms)",
+          "value": "period"
+        },
+        {
+          "text": "步数",
+          "value": "step"
+        }
+      ]
+    },
+    "robot_move_params2": {
+      "items": [
+        {
+          "text": "方向",
+          "value": "state"
+        },
+        {
+          "text": "步数",
+          "value": "steps"
+        },
+        {
+          "text": "每一步运动时间",
+          "value": "time"
+        },
+        {
+          "text": "大腿移动幅度",
+          "value": "leg1"
+        },
+        {
+          "text": "小腿外翻幅度",
+          "value": "leg2"
+        },
+        {
+          "text": "偏差角",
+          "value": "turn_offset"
+        }
+      ]
+    },
+    "robot_set_pose_params": {
+      "items": [
+        {
+          "text": "X轴方向偏移",
+          "value": "x_offset"
+        },
+        {
+          "text": "Y轴方向偏移",
+          "value": "y_offset"
+        },
+        {
+          "text": "身体抬升降低",
+          "value": "z_offset"
+        },
+        {
+          "text": "pitch",
+          "value": "pitch"
+        },
+        {
+          "text": "roll",
+          "value": "roll"
+        },
+        {
+          "text": "yaw",
+          "value": "yaw"
+        },
+        {
+          "text": "变化时间(ms)",
+          "value": "run_time"
+        }
+      ]
+    },
+    "arm_move_to_yz_params": {
+      "items": [
+        {
+          "text": "机械臂末端Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "机械臂末端Z坐标",
+          "value": "z"
+        },
+        {
+          "text": "机械臂末端的倾角",
+          "value": "angle"
+        },
+        {
+          "text": "运动时间(ms)",
+          "value": "timeout"
+        }
+      ]
+    },
+    "arm_move_to_yz_params2": {
+      "items": [
+        {
+          "text": "机械臂末端Y坐标",
+          "value": "y"
+        },
+        {
+          "text": "机械臂末端Z坐标",
+          "value": "z"
+        },
+        {
+          "text": "运动时间(ms)",
+          "value": "timeout"
+        }
+      ]
+    },
+    "robot_runAction_params": {
+      "items": [
+        {
+          "text": "动作编号",
+          "value": "num"
+        },
+        {
+          "text": "动作执行次数",
+          "value": "count"
+        }
+      ]
+    },
+    "motor_speed_params": {
+      "items": [
+        {
+          "text": "右后轮电机速度",
+          "value": "right_back"
+        },
+        {
+          "text": "右前轮电机速度",
+          "value": "right_front"
+        },
+        {
+          "text": "左后轮电机速度",
+          "value": "left_back"
+        },
+        {
+          "text": "左前轮电机速度",
+          "value": "left_front"
+        },
+        {
+          "text": "持续时间(ms)",
+          "value": "time_count"
+        }
+      ]
+    },
+    "move_distance_params": {
+      "items": [
+        {
+          "text": "移动距离(cm)",
+          "value": "distance_cm"
+        },
+        {
+          "text": "移动方向",
+          "value": "angle_deg"
+        },
+        {
+          "text": "转动速度(rpm)",
+          "value": "rpm"
+        }
+      ]
+    },
+    "name_confidence": {
+      "items": [
+        {
+          "text": "文本",
+          "value": "0"
+        },
+        {
+          "text": "置信度",
+          "value": "1"
         }
       ]
     }
@@ -1642,10 +3883,3810 @@
           "section": ""
         }
       }
+    },
+    {
+      "opcode": "aimech_wonderecho_init",
+      "blockType": "command",
+      "text": "初始化WonderEcho语音模块接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "asr2 = Hiwonder_DEV.DEV_ASR(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_get_results",
+      "blockType": "command",
+      "text": "更新并获取WonderEcho识别结果",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "wonderecho_result = asr2.getResult()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_results",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "WonderEcho语音模块识别到 [WORD]",
+      "arguments": {
+        "WORD": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "mechdog_word",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "(wonderecho_result == {WORD})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_get_result_num",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取WonderEcho语音模块识别词ID",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "wonderecho_result",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_speech_cmd",
+      "blockType": "command",
+      "text": "WonderEcho语音模块播放命令词 [WORD]",
+      "arguments": {
+        "WORD": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "mechdog_speech_cmd_word",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "asr2.speak(asr2.ASR_CMDMAND, {WORD})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_speech_cmd_number",
+      "blockType": "command",
+      "text": "WonderEcho语音模块播放命令词编号 [NUM]",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "asr2.speak(asr2.ASR_CMDMAND, {NUM})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_speech_play",
+      "blockType": "command",
+      "text": "WonderEcho语音模块播放播报词 [WORD]",
+      "arguments": {
+        "WORD": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "mechdog_speech_play_word",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "asr2.speak(asr2.ASR_ANNOUNCER, {WORD})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wonderecho_speech_play_number",
+      "blockType": "command",
+      "text": "WonderEcho语音模块播放播报词编号 [NUM]",
+      "arguments": {
+        "NUM": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "asr2.speak(asr2.ASR_ANNOUNCER, {NUM})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_aimech_init",
+      "blockType": "command",
+      "text": "初始化K230视觉模块接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "k230 = Hiwonder_DEV.DEV_K230(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_mode",
+      "blockType": "command",
+      "text": "设置K230运行模式 [MODE]",
+      "arguments": {
+        "MODE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "k230_mode",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_mode({MODE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_run",
+      "blockType": "command",
+      "text": "K230 [MODE] 运行检测",
+      "arguments": {
+        "MODE": {
+          "type": "string",
+          "defaultValue": "True",
+          "menu": "k230_start",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_run_enabled({MODE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_volumn",
+      "blockType": "command",
+      "text": "设置K230音量 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 60
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_volumn({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_wifi",
+      "blockType": "command",
+      "text": "设置K230连接的WIFI名 [VALUE1] 密码 [VALUE2]",
+      "arguments": {
+        "VALUE1": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE2": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_wifi({VALUE1},{VALUE2})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_update_detect_result",
+      "blockType": "command",
+      "text": "更新并保存K230结果数据",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.update_result()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_mcp_action_setting",
+      "blockType": "command",
+      "text": "设置动作组MCP工具参数 工具描述 [COMMAND] 阻塞超时时长 [BLOCK]",
+      "arguments": {
+        "COMMAND": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "BLOCK": {
+          "type": "number",
+          "defaultValue": 5
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_run_action={\"type\":\"function\",\"function\":{\"name\":\"run_action\",\"description\":{COMMAND.compactJson},\"parameters\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"description\":\"要求执行的动作名称\"}},\"required\":[\"name\"]}},\"block\":{BLOCK}}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_mcp_move_setting",
+      "blockType": "command",
+      "text": "设置运动MCP工具参数 工具描述 [COMMAND] 阻塞超时时长 [BLOCK]",
+      "arguments": {
+        "COMMAND": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "BLOCK": {
+          "type": "number",
+          "defaultValue": 5
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_move={\"type\":\"function\",\"function\":{\"name\":\"move\",\"description\":{COMMAND.compactJson},\"parameters\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"string\",\"description\":\"x方向前进的距离, 单位m\"},\"y\":{\"type\":\"string\",\"description\":\"y方向前进的距离,单位m\"}},\"required\":[\"x\",\"y\"]}},\"block\":{BLOCK}}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_mcp_setting",
+      "blockType": "command",
+      "text": "设置MCP工具参数 工具名称 [NAME] 工具描述 [COMMAND] 返回参数 [PARAMS] 阻塞超时时长 [BLOCK]",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "tool"
+        },
+        "COMMAND": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "PARAMS": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "BLOCK": {
+          "type": "number",
+          "defaultValue": 5
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_{NAME.identifier}={\"type\":\"function\",\"function\":{\"name\":{NAME.jsonValue},\"description\":{COMMAND.compactJson},\"parameters\":{\"type\":\"object\",\"properties\":{\"params\":{PARAMS.compactJson}}}},\"block\":{BLOCK}}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_exists",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230识别结果存在?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_result",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230识别结果",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_get()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_send_mcp_result",
+      "blockType": "command",
+      "text": "K230发送响应结果 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.send_mcp_result({VALUE})\ntime.sleep(0.05)",
+          "imports": [
+            "import time"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_aimecanum_set_mcp_default",
+      "blockType": "command",
+      "text": "设置K230默认MCP工具",
+      "products": [
+        "aimecanum"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_Bat_Battery_power = {\"type\":\"function\",\"function\":{\"name\":\"Bat_Battery_power\",\"description\":\"查询电量时调用，会返回电池电量，单位mV,一般在3100-4200mV之间，电量越低数值越小，低于3400mV请及时充电\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_Buzzer_playTone = {\"type\":\"function\",\"function\":{\"name\":\"Buzzer_playTone\",\"description\":\"蜂鸣器鸣响\",\"parameters\":{\"type\":\"object\",\"properties\":{\"freq\":{\"type\":\"integer\",\"description\":\"蜂鸣器频率，范围200-3000Hz,默认为1500Hz\"},\"time_count\":{\"type\":\"integer\",\"description\":\"鸣响时间，单位ms，默认为100ms\"}},\"required\":[\"freq\",\"time_count\"]}},\"block\":3}",
+            "_mcp_k230_RGB_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"RGB_setRGB\",\"description\":\"设置RGB灯时调用，值的范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_mcar_move_distance = {\"type\":\"function\",\"function\":{\"name\":\"mcar_move_distance\",\"description\":\"需要平移运动时调用\",\"parameters\":{\"type\":\"object\",\"properties\":{\"distance_cm\":{\"type\":\"integer\",\"description\":\"运动距离，单位cm，一般不超过200cm，且距离为0时是不动的\"},\"angle_deg\":{\"type\":\"integer\",\"description\":\"平移运动的方向，0度为正前方，左边为正，是逆时针；右边为负，是顺时针\"},\"rpm\":{\"type\":\"integer\",\"description\":\"转动速度，单位rpm，在20-100rpm之间选择\"}},\"required\":[\"distance_cm\",\"angle_deg\",\"rpm\"]}},\"block\":10}",
+            "_mcp_k230_mcar_set_motors_speed = {\"type\":\"function\",\"function\":{\"name\":\"mcar_set_motors_speed\",\"description\":\"设置4个电机的速度，单位rpm，范围在-100到100之间，所有轮子正数为向前旋转，负数为向后旋转。比如边走边左转就可以设置左边2个轮子为40rpm，右边2个为60rpm；以50rpm的速度原地旋转5秒，差不多是一圈\",\"parameters\":{\"type\":\"object\",\"properties\":{\"right_back\":{\"type\":\"integer\",\"description\":\"右后轮电机速度\"},\"right_front\":{\"type\":\"integer\",\"description\":\"右前轮电机速度\"},\"left_back\":{\"type\":\"integer\",\"description\":\"左后轮电机速度\"},\"left_front\":{\"type\":\"integer\",\"description\":\"左前轮电机速度\"},\"time_count\":{\"type\":\"integer\",\"description\":\"持续时间，单位ms，根据运动距离和速度自动计算，通常在500-5000ms，不能超过5000ms，默认为1000ms\"}},\"required\":[\"right_back\",\"right_front\",\"left_back\",\"left_front\",\"time_count\"]}},\"block\":10}",
+            "_mcp_k230_arm_move_to_yz = {\"type\":\"function\",\"function\":{\"name\":\"arm_move_to_yz\",\"description\":\"控制机械臂运动时调用，默认机械臂末端保持水平，默认为move_to_yz(83,83, 600)\",\"parameters\":{\"type\":\"object\",\"properties\":{\"y\":{\"type\":\"integer\",\"description\":\"机械臂末端Y坐标，单位mm，上前越大，向后越小\"},\"z\":{\"type\":\"integer\",\"description\":\"机械臂末端Z坐标，单位mm，往上越大，往下越小\"},\"timeout\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在500-2000ms，不能超过5000ms，默认为1000ms\"}},\"required\":[\"y\",\"z\",\"timeout\"]}},\"block\":10}",
+            "_mcp_k230_arm_claw = {\"type\":\"function\",\"function\":{\"name\":\"arm_claw\",\"description\":\"控制机械臂夹爪的打开和闭合\",\"parameters\":{\"type\":\"object\",\"properties\":{\"angle\":{\"type\":\"integer\",\"description\":\"夹爪的开合角度，范围在500-1000，默认为500闭合，1000完全张开\"},\"time_count\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在100-1000ms，不能超过1000ms，默认为100ms\"}},\"required\":[\"angle\"]}},\"block\":5}",
+            "_mcp_k230_sonar_getDistance = {\"type\":\"function\",\"function\":{\"name\":\"sonar_getDistance\",\"description\":\"超声波测距时调用，返回值为测量到的距离，单位cm，一般在2-400cm之间\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_sonar_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"sonar_setRGB\",\"description\":\"设置超声波模块上的RGB灯颜色，参数范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_aiquadruped_set_mcp_default",
+      "blockType": "command",
+      "text": "设置K230默认MCP工具",
+      "products": [
+        "aiquadruped"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_Bat_Battery_power = {\"type\":\"function\",\"function\":{\"name\":\"Bat_Battery_power\",\"description\":\"查询电量时调用，会返回电池电量，单位mV,一般在3100-4200mV之间，电量越低数值越小，低于3400mV请及时充电\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_Buzzer_playTone = {\"type\":\"function\",\"function\":{\"name\":\"Buzzer_playTone\",\"description\":\"蜂鸣器鸣响\",\"parameters\":{\"type\":\"object\",\"properties\":{\"freq\":{\"type\":\"integer\",\"description\":\"蜂鸣器频率，范围200-3000Hz,默认为1500Hz\"},\"time_count\":{\"type\":\"integer\",\"description\":\"鸣响时间，单位ms，默认为100ms\"}},\"required\":[\"freq\",\"time_count\"]}},\"block\":3}",
+            "_mcp_k230_RGB_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"RGB_setRGB\",\"description\":\"设置RGB灯时调用，值的范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_robot_move = {\"type\":\"function\",\"function\":{\"name\":\"robot_move\",\"description\":\"控制四足底盘运动时调用，控制运动几步\",\"parameters\":{\"type\":\"object\",\"properties\":{\"state\":{\"type\":\"integer\",\"description\":\"运动控制：0-前进，1-后退，2-左平移，3-右平移，4-原地左转，5-原地右转。只能选择这几个值\"},\"steps\":{\"type\":\"integer\",\"description\":\"运动步数，范围[1,127]\"},\"time\":{\"type\":\"integer\",\"description\":\"每一步的运动时间，单位ms，默认为500ms，范围为[500ms,2000ms]\"},\"leg1\":{\"type\":\"integer\",\"description\":\"大腿移动幅度，范围[1,25]，默认为25。数值越大，跨的步子越大\"},\"leg2\":{\"type\":\"integer\",\"description\":\"小腿外翻幅度，范围[1,10]，默认为10。数值越大，小腿外翻的幅度越大\"},\"turn_offset\":{\"type\":\"integer\",\"description\":\"转向偏移，范围[-10,10]，负为左转，正为右转。注意：这个只在前进/后退状态时才会生效\"}},\"required\":[\"state\",\"steps\",\"time\",\"leg1\",\"leg2\",\"turn_offset\"]}},\"block\":10}",
+            "_mcp_k230_2dof_arm_move_to_yz = {\"type\":\"function\",\"function\":{\"name\":\"arm_move_to_yz\",\"description\":\"控制机械臂运动时调用，默认机械臂末端保持水平，默认为arm_move_to_yz(196,82,0,1000)，当机器返回limit时，代表已经到限位了，若返回ok，则已到达位置\",\"parameters\":{\"type\":\"object\",\"properties\":{\"y\":{\"type\":\"integer\",\"description\":\"机械臂末端Y坐标，单位mm，上前越大，向后越小\"},\"z\":{\"type\":\"integer\",\"description\":\"机械臂末端Z坐标，单位mm，往上越大，往下越小\"},\"angle\":{\"type\":\"integer\",\"description\":\"机械臂末端的倾角，0为水平，往下为负\"},\"timeout\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在500-2000ms，不能超过5000ms，默认为1000ms\"}},\"required\":[\"y\",\"z\",\"angle\",\"timeout\"]}},\"block\":10}",
+            "_mcp_k230_arm_claw = {\"type\":\"function\",\"function\":{\"name\":\"arm_claw\",\"description\":\"控制机械臂夹爪的打开和闭合\",\"parameters\":{\"type\":\"object\",\"properties\":{\"angle\":{\"type\":\"integer\",\"description\":\"夹爪的开合角度，范围在500-1000，默认为500闭合，1000完全张开\"},\"time_count\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在100-1000ms，不能超过1000ms，默认为100ms\"}},\"required\":[\"angle\"]}},\"block\":5}",
+            "_mcp_k230_sonar_getDistance = {\"type\":\"function\",\"function\":{\"name\":\"sonar_getDistance\",\"description\":\"超声波测距时调用，返回值为测量到的距离，单位cm，一般在2-400cm之间\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_sonar_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"sonar_setRGB\",\"description\":\"设置超声波模块上的RGB灯颜色，参数范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_robot_runAction = {\"type\":\"function\",\"function\":{\"name\":\"robot_runAction\",\"description\":\"控制机器人执行动作，动作组开始执行时就会回复，时长未知，所以只需说动作已执行\",\"parameters\":{\"type\":\"object\",\"properties\":{\"num\":{\"type\":\"string\",\"description\":\"动作编号\"},\"count\":{\"type\":\"integer\",\"description\":\"动作执行的次数，默认为1，最大为10，超过10会被当做10执行\"}},\"required\":[\"num\",\"count\"]}},\"block\":10}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_aiquadrupedpro_set_mcp_default",
+      "blockType": "command",
+      "text": "设置K230默认MCP工具",
+      "products": [
+        "aiquadrupedpro"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_Bat_Battery_power = {\"type\":\"function\",\"function\":{\"name\":\"Bat_Battery_power\",\"description\":\"查询电量时调用，会返回电池电量，单位mV,一般在3100-4200mV之间，电量越低数值越小，低于3400mV请及时充电\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_Buzzer_playTone = {\"type\":\"function\",\"function\":{\"name\":\"Buzzer_playTone\",\"description\":\"蜂鸣器鸣响\",\"parameters\":{\"type\":\"object\",\"properties\":{\"freq\":{\"type\":\"integer\",\"description\":\"蜂鸣器频率，范围200-3000Hz,默认为1500Hz\"},\"time_count\":{\"type\":\"integer\",\"description\":\"鸣响时间，单位ms，默认为100ms\"}},\"required\":[\"freq\",\"time_count\"]}},\"block\":3}",
+            "_mcp_k230_RGB_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"RGB_setRGB\",\"description\":\"设置RGB灯时调用，值的范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_robot_move = {\"type\":\"function\",\"function\":{\"name\":\"robot_move\",\"description\":\"控制四足底盘运动时调用，控制运动几步\",\"parameters\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\",\"description\":\"x轴方向速度，正整数为右平移，负整数为左平移，默认为20，范围[-20,20]\"},\"y\":{\"type\":\"integer\",\"description\":\"y轴方向速度，正整数为前进，负整数为后退，默认为20，范围[-20,20]\"},\"z\":{\"type\":\"integer\",\"description\":\"中心旋转速度，左转逆时针为正，右转顺时针为负，默认为15，范围[-15,15]\"},\"height\":{\"type\":\"integer\",\"description\":\"抬腿高度，单位mm，默认为15\"},\"period\":{\"type\":\"integer\",\"description\":\"每一步运动周期，单位ms，默认500ms，范围[500,2000]\"},\"step\":{\"type\":\"integer\",\"description\":\"步数，默认5步，范围[0,15]\"}},\"required\":[\"x\",\"y\",\"z\",\"height\",\"period\",\"step\"]}},\"block\":10}",
+            "_mcp_k230_2dof_arm_move_to_yz = {\"type\":\"function\",\"function\":{\"name\":\"arm_move_to_yz\",\"description\":\"控制机械臂运动时调用，默认机械臂末端保持水平，默认为arm_move_to_yz(196,82,0,1000)，当机器返回limit时，代表已经到限位了，若返回ok，则已到达位置\",\"parameters\":{\"type\":\"object\",\"properties\":{\"y\":{\"type\":\"integer\",\"description\":\"机械臂末端Y坐标，单位mm，上前越大，向后越小\"},\"z\":{\"type\":\"integer\",\"description\":\"机械臂末端Z坐标，单位mm，往上越大，往下越小\"},\"angle\":{\"type\":\"integer\",\"description\":\"机械臂末端的倾角，0为水平，往下为负\"},\"timeout\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在500-2000ms，不能超过5000ms，默认为1000ms\"}},\"required\":[\"y\",\"z\",\"angle\",\"timeout\"]}},\"block\":10}",
+            "_mcp_k230_arm_claw = {\"type\":\"function\",\"function\":{\"name\":\"arm_claw\",\"description\":\"控制机械臂夹爪的打开和闭合\",\"parameters\":{\"type\":\"object\",\"properties\":{\"angle\":{\"type\":\"integer\",\"description\":\"夹爪的开合角度，范围在500-1000，默认为500闭合，1000完全张开\"},\"time_count\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在100-1000ms，不能超过1000ms，默认为100ms\"}},\"required\":[\"angle\"]}},\"block\":5}",
+            "_mcp_k230_sonar_getDistance = {\"type\":\"function\",\"function\":{\"name\":\"sonar_getDistance\",\"description\":\"超声波测距时调用，返回值为测量到的距离，单位cm，一般在2-400cm之间\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_sonar_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"sonar_setRGB\",\"description\":\"设置超声波模块上的RGB灯颜色，参数范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_robot_runAction = {\"type\":\"function\",\"function\":{\"name\":\"robot_runAction\",\"description\":\"控制机器人执行动作，动作组开始执行时就会回复，时长未知，所以只需说动作已执行\",\"parameters\":{\"type\":\"object\",\"properties\":{\"num\":{\"type\":\"string\",\"description\":\"动作编号\"},\"count\":{\"type\":\"integer\",\"description\":\"动作执行的次数，默认为1，最大为10，超过10会被当做10执行\"}},\"required\":[\"num\",\"count\"]}},\"block\":10}",
+            "_mcp_k230_robot_set_pose = {\"type\":\"function\",\"function\":{\"name\":\"robot_set_pose\",\"description\":\"控制身体姿态时调用\",\"parameters\":{\"type\":\"object\",\"properties\":{\"x_offset\":{\"type\":\"integer\",\"description\":\"x轴方向偏移，正整数为右平移，负整数为左平移，默认为10，范围[-20,20]\"},\"y_offset\":{\"type\":\"integer\",\"description\":\"y轴方向偏移，正整数为向前平移，负整数为向后平移，默认为10，范围[-20,20]\"},\"z_offset\":{\"type\":\"integer\",\"description\":\"身体抬升降低，正为抬升，默认为10，范围[-15,20]\"},\"pitch\":{\"type\":\"integer\",\"description\":\"pitch角度偏转，范围[-20,20]\"},\"roll\":{\"type\":\"integer\",\"description\":\"roll角度偏转，范围[-20,20]\"},\"yaw\":{\"type\":\"integer\",\"description\":\"yaw角度偏转，范围[-20,20]\"},\"run_time\":{\"type\":\"integer\",\"description\":\"变化时间，单位ms，默认500ms\"}},\"required\":[\"x_offset\",\"y_offset\",\"z_offset\",\"pitch\",\"roll\",\"yaw\",\"run_time\"]}},\"block\":10}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_aihexa_set_mcp_default",
+      "blockType": "command",
+      "text": "设置K230默认MCP工具",
+      "products": [
+        "aihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "_mcp_k230_Bat_Battery_power = {\"type\":\"function\",\"function\":{\"name\":\"Bat_Battery_power\",\"description\":\"查询电量时调用，会返回电池电量，单位mV,一般在3100-4200mV之间，电量越低数值越小，低于3400mV请及时充电\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_Buzzer_playTone = {\"type\":\"function\",\"function\":{\"name\":\"Buzzer_playTone\",\"description\":\"蜂鸣器鸣响\",\"parameters\":{\"type\":\"object\",\"properties\":{\"freq\":{\"type\":\"integer\",\"description\":\"蜂鸣器频率，范围200-3000Hz,默认为1500Hz\"},\"time_count\":{\"type\":\"integer\",\"description\":\"鸣响时间，单位ms，默认为100ms\"}},\"required\":[\"freq\",\"time_count\"]}},\"block\":3}",
+            "_mcp_k230_RGB_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"RGB_setRGB\",\"description\":\"设置RGB灯时调用，值的范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_robot_move = {\"type\":\"function\",\"function\":{\"name\":\"robot_move\",\"description\":\"控制六足底盘运动时调用，控制运动几步\",\"parameters\":{\"type\":\"object\",\"properties\":{\"x\":{\"type\":\"integer\",\"description\":\"x轴方向速度，正整数为右平移，负整数为左平移，默认为20，范围[-20,20]\"},\"y\":{\"type\":\"integer\",\"description\":\"y轴方向速度，正整数为前进，负整数为后退，默认为20，范围[-20,20]\"},\"z\":{\"type\":\"integer\",\"description\":\"中心旋转速度，左转逆时针为正，右转顺时针为负，默认为15，范围[-15,15]\"},\"height\":{\"type\":\"integer\",\"description\":\"抬腿高度，单位mm，默认为15\"},\"period\":{\"type\":\"integer\",\"description\":\"每一步运动周期，单位ms，默认500ms，范围[500,2000]\"},\"step\":{\"type\":\"integer\",\"description\":\"步数，默认5步，范围[0,15]\"}},\"required\":[\"x\",\"y\",\"z\",\"height\",\"period\",\"step\"]}},\"block\":10}",
+            "_mcp_k230_2dof_arm_move_to_yz = {\"type\":\"function\",\"function\":{\"name\":\"arm_move_to_yz\",\"description\":\"控制机械臂运动时调用，默认机械臂末端保持水平，默认为arm_move_to_yz(196,82,0,1000)，当机器返回limit时，代表已经到限位了，若返回ok，则已到达位置\",\"parameters\":{\"type\":\"object\",\"properties\":{\"y\":{\"type\":\"integer\",\"description\":\"机械臂末端Y坐标，单位mm，上前越大，向后越小\"},\"z\":{\"type\":\"integer\",\"description\":\"机械臂末端Z坐标，单位mm，往上越大，往下越小\"},\"angle\":{\"type\":\"integer\",\"description\":\"机械臂末端的倾角，0为水平，往下为负\"},\"timeout\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在500-2000ms，不能超过5000ms，默认为1000ms\"}},\"required\":[\"y\",\"z\",\"angle\",\"timeout\"]}},\"block\":10}",
+            "_mcp_k230_arm_claw = {\"type\":\"function\",\"function\":{\"name\":\"arm_claw\",\"description\":\"控制机械臂夹爪的打开和闭合\",\"parameters\":{\"type\":\"object\",\"properties\":{\"angle\":{\"type\":\"integer\",\"description\":\"夹爪的开合角度，范围在500-1000，默认为500闭合，1000完全张开\"},\"time_count\":{\"type\":\"integer\",\"description\":\"运动时间，单位ms，根据运动距离和速度自动计算，通常在100-1000ms，不能超过1000ms，默认为100ms\"}},\"required\":[\"angle\"]}},\"block\":5}",
+            "_mcp_k230_sonar_getDistance = {\"type\":\"function\",\"function\":{\"name\":\"sonar_getDistance\",\"description\":\"超声波测距时调用，返回值为测量到的距离，单位cm，一般在2-400cm之间\",\"parameters\":{\"type\":\"object\",\"properties\":{}}},\"block\":3}",
+            "_mcp_k230_sonar_setRGB = {\"type\":\"function\",\"function\":{\"name\":\"sonar_setRGB\",\"description\":\"设置超声波模块上的RGB灯颜色，参数范围都是0-255\",\"parameters\":{\"type\":\"object\",\"properties\":{\"red\":{\"type\":\"integer\"},\"green\":{\"type\":\"integer\"},\"blue\":{\"type\":\"integer\"}},\"required\":[\"red\",\"green\",\"blue\"]}},\"block\":3}",
+            "_mcp_k230_robot_runAction = {\"type\":\"function\",\"function\":{\"name\":\"robot_runAction\",\"description\":\"控制机器人执行动作，动作组开始执行时就会回复，时长未知，所以只需说动作已执行\",\"parameters\":{\"type\":\"object\",\"properties\":{\"num\":{\"type\":\"string\",\"description\":\"动作编号\"},\"count\":{\"type\":\"integer\",\"description\":\"动作执行的次数，默认为1，最大为10，超过10会被当做10执行\"}},\"required\":[\"num\",\"count\"]}},\"block\":10}",
+            "_mcp_k230_robot_set_pose = {\"type\":\"function\",\"function\":{\"name\":\"robot_set_pose\",\"description\":\"控制身体姿态时调用\",\"parameters\":{\"type\":\"object\",\"properties\":{\"x_offset\":{\"type\":\"integer\",\"description\":\"x轴方向偏移，正整数为右平移，负整数为左平移，默认为10，范围[-20,20]\"},\"y_offset\":{\"type\":\"integer\",\"description\":\"y轴方向偏移，正整数为向前平移，负整数为向后平移，默认为10，范围[-20,20]\"},\"z_offset\":{\"type\":\"integer\",\"description\":\"身体抬升降低，正为抬升，默认为10，范围[-15,20]\"},\"pitch\":{\"type\":\"integer\",\"description\":\"pitch角度偏转，范围[-20,20]\"},\"roll\":{\"type\":\"integer\",\"description\":\"roll角度偏转，范围[-20,20]\"},\"yaw\":{\"type\":\"integer\",\"description\":\"yaw角度偏转，范围[-20,20]\"},\"run_time\":{\"type\":\"integer\",\"description\":\"变化时间，单位ms，默认500ms\"}},\"required\":[\"x_offset\",\"y_offset\",\"z_offset\",\"pitch\",\"roll\",\"yaw\",\"run_time\"]}},\"block\":10}"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_default_mcp_name",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "[RESULT] 是否存在默认MCP工具名称 [VALUE]?",
+      "products": [
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "productArguments": {
+        "aimecanum": {
+          "VALUE": {
+            "menu": "mcp_names3"
+          }
+        },
+        "aiquadruped": {
+          "VALUE": {
+            "menu": "mcp_names2"
+          }
+        }
+      },
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "Bat_Battery_power",
+          "menu": "mcp_names",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "'{VALUE}' in {RESULT}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_buzzer_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取蜂鸣器返回参数 [VALUE] 值",
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "freq",
+          "menu": "buzzer_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['Buzzer_playTone']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_rgb_light_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取RGB彩灯返回参数 [VALUE] 值",
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "red",
+          "menu": "rgb_light_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['RGB_setRGB']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_sonar_rgb_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取发光超声波RGB彩灯返回参数 [VALUE] 值",
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "red",
+          "menu": "rgb_light_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['sonar_setRGB']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_arm_claw_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取机械臂夹爪返回参数 [VALUE] 值",
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "angle",
+          "menu": "arm_claw_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['arm_claw']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_robot_set_pose_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取姿态设置返回参数 [VALUE] 值",
+      "products": [
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "x_offset",
+          "menu": "robot_set_pose_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['robot_set_pose']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_robot_move_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取机器人运动返回参数 [VALUE] 值",
+      "products": [
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "productArguments": {
+        "aiquadruped": {
+          "VALUE": {
+            "menu": "robot_move_params2"
+          }
+        }
+      },
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "x",
+          "menu": "robot_move_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['robot_move']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_robot_runAction_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取机器人动作组返回参数 [VALUE] 值",
+      "products": [
+        "aimech",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "num",
+          "menu": "robot_runAction_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['robot_runAction']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_motor_speed_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取电机速度设置返回参数 [VALUE] 值",
+      "products": [
+        "aimecanum"
+      ],
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "right_back",
+          "menu": "motor_speed_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['mcar_set_motors_speed']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_move_distance_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取移动距离设置返回参数 [VALUE] 值",
+      "products": [
+        "aimecanum"
+      ],
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "distance_cm",
+          "menu": "move_distance_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['mcar_move_distance']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_arm_move_to_yz_params",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "[RESULT] 获取机械臂运动返回参数 [VALUE] 值",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "productArguments": {
+        "aimecanum": {
+          "VALUE": {
+            "menu": "arm_move_to_yz_params2"
+          }
+        }
+      },
+      "arguments": {
+        "RESULT": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "y",
+          "menu": "arm_move_to_yz_params",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{RESULT}['arm_move_to_yz']['{VALUE}']",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到人脸?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的人脸数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face_exists",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230存在名称为 [VALUE] 的人脸?",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.find_result('extra',{VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face_recognition_get_arg_by_name",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230人脸 [VALUE] 的 [POS]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "POS": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "face_args2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.get_key_result('extra',{VALUE},'{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "1": "k230.get_key_result('extra',{VALUE},'extra',1)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face2_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230人脸姿态检测到人脸?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face2_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230人脸姿态检测到的人脸数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_face_pose_get_oriention",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的人脸姿态朝向 [ORIENTION]",
+      "arguments": {
+        "ORIENTION": {
+          "type": "string",
+          "defaultValue": "Forward",
+          "menu": "face_pos_oriention",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == '{ORIENTION}'",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face2_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230靠近中心的人脸姿态 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "face2_args",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{VALUE}')",
+          "templateSelector": {
+            "argument": "VALUE",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)",
+              "1": "k230.near_center_result('extra',1)",
+              "2": "k230.near_center_result('extra',2)",
+              "3": "k230.near_center_result('extra',3)",
+              "4": "k230.near_center_result('extra',4)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face3_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230表情识别检测到人脸?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_face3_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230表情识别检测到的人脸数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_facial_detect",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的人脸表情为 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "Happiness",
+          "menu": "facial_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == '{VALUE}'",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_get_facial_args",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心人脸表情的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "face_args",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)",
+              "1": "k230.near_center_result('extra',1)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_gaze_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到注视方向?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_gaze_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的注视方向数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_gaze_near_center_result",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的注视方向为 [NAME]",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "Up",
+          "menu": "gaze_name",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == '{NAME}'",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_gaze_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230靠近中心的注视方向 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "gaze_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{VALUE}')",
+          "templateSelector": {
+            "argument": "VALUE",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)",
+              "1": "k230.near_center_result('extra',1)",
+              "2": "k230.near_center_result('extra',2)",
+              "3": "k230.near_center_result('extra',3)",
+              "4": "k230.near_center_result('extra',4)",
+              "5": "k230.near_center_result('extra',5)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到人体?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的人体数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230靠近中心的人体 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "x",
+          "menu": "axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{VALUE}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person_point_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到人体姿态?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person2_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的人体姿态数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person_keypoint_detect_name",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到人体姿态 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.find_result('id',{NAME})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_person_keypoint_get_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230人体姿态 [NAME] 的 [POS] 参数",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "POS": {
+          "type": "string",
+          "defaultValue": "id",
+          "menu": "person_keypoint_detect",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.get_key_result('id',{NAME},'{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.get_key_result('id',{NAME},'keypoints',0)",
+              "1": "k230.get_key_result('id',{NAME},'keypoints',1)",
+              "2": "k230.get_key_result('id',{NAME},'keypoints',2)",
+              "3": "k230.get_key_result('id',{NAME},'keypoints',3)",
+              "4": "k230.get_key_result('id',{NAME},'keypoints',4)",
+              "5": "k230.get_key_result('id',{NAME},'keypoints',5)",
+              "6": "k230.get_key_result('id',{NAME},'keypoints',6)",
+              "7": "k230.get_key_result('id',{NAME},'keypoints',7)",
+              "8": "k230.get_key_result('id',{NAME},'keypoints',8)",
+              "9": "k230.get_key_result('id',{NAME},'keypoints',9)",
+              "10": "k230.get_key_result('id',{NAME},'keypoints',10)",
+              "11": "k230.get_key_result('id',{NAME},'keypoints',11)",
+              "12": "k230.get_key_result('id',{NAME},'keypoints',12)",
+              "13": "k230.get_key_result('id',{NAME},'keypoints',13)",
+              "14": "k230.get_key_result('id',{NAME},'keypoints',14)",
+              "15": "k230.get_key_result('id',{NAME},'keypoints',15)",
+              "16": "k230.get_key_result('id',{NAME},'keypoints',16)",
+              "17": "k230.get_key_result('id',{NAME},'keypoints',17)",
+              "18": "k230.get_key_result('id',{NAME},'keypoints',18)",
+              "19": "k230.get_key_result('id',{NAME},'keypoints',19)",
+              "20": "k230.get_key_result('id',{NAME},'keypoints',20)",
+              "21": "k230.get_key_result('id',{NAME},'keypoints',21)",
+              "22": "k230.get_key_result('id',{NAME},'keypoints',22)",
+              "23": "k230.get_key_result('id',{NAME},'keypoints',23)",
+              "24": "k230.get_key_result('id',{NAME},'keypoints',24)",
+              "25": "k230.get_key_result('id',{NAME},'keypoints',25)",
+              "26": "k230.get_key_result('id',{NAME},'keypoints',26)",
+              "27": "k230.get_key_result('id',{NAME},'keypoints',27)",
+              "28": "k230.get_key_result('id',{NAME},'keypoints',28)",
+              "29": "k230.get_key_result('id',{NAME},'keypoints',29)",
+              "30": "k230.get_key_result('id',{NAME},'keypoints',30)",
+              "31": "k230.get_key_result('id',{NAME},'keypoints',31)",
+              "32": "k230.get_key_result('id',{NAME},'keypoints',32)",
+              "33": "k230.get_key_result('id',{NAME},'keypoints',33)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_person_keypoint_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心的人体关键点 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "id",
+          "menu": "person_keypoint_detect",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.near_center_result('keypoints',0)",
+              "1": "k230.near_center_result('keypoints',1)",
+              "2": "k230.near_center_result('keypoints',2)",
+              "3": "k230.near_center_result('keypoints',3)",
+              "4": "k230.near_center_result('keypoints',4)",
+              "5": "k230.near_center_result('keypoints',5)",
+              "6": "k230.near_center_result('keypoints',6)",
+              "7": "k230.near_center_result('keypoints',7)",
+              "8": "k230.near_center_result('keypoints',8)",
+              "9": "k230.near_center_result('keypoints',9)",
+              "10": "k230.near_center_result('keypoints',10)",
+              "11": "k230.near_center_result('keypoints',11)",
+              "12": "k230.near_center_result('keypoints',12)",
+              "13": "k230.near_center_result('keypoints',13)",
+              "14": "k230.near_center_result('keypoints',14)",
+              "15": "k230.near_center_result('keypoints',15)",
+              "16": "k230.near_center_result('keypoints',16)",
+              "17": "k230.near_center_result('keypoints',17)",
+              "18": "k230.near_center_result('keypoints',18)",
+              "19": "k230.near_center_result('keypoints',19)",
+              "20": "k230.near_center_result('keypoints',20)",
+              "21": "k230.near_center_result('keypoints',21)",
+              "22": "k230.near_center_result('keypoints',22)",
+              "23": "k230.near_center_result('keypoints',23)",
+              "24": "k230.near_center_result('keypoints',24)",
+              "25": "k230.near_center_result('keypoints',25)",
+              "26": "k230.near_center_result('keypoints',26)",
+              "27": "k230.near_center_result('keypoints',27)",
+              "28": "k230.near_center_result('keypoints',28)",
+              "29": "k230.near_center_result('keypoints',29)",
+              "30": "k230.near_center_result('keypoints',30)",
+              "31": "k230.near_center_result('keypoints',31)",
+              "32": "k230.near_center_result('keypoints',32)",
+              "33": "k230.near_center_result('keypoints',33)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_hand_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到手掌?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_hand_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的手掌数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_hand_detected_posture",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到手掌姿态 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.find_result('id',{NAME})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_hand_keypoint_get_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230手掌姿态 [NAME] 的 [POS] 参数",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "POS": {
+          "type": "string",
+          "defaultValue": "id",
+          "menu": "hand_menu",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.get_key_result('id',{NAME},'{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.get_key_result('id',{NAME},'keypoints',0)",
+              "1": "k230.get_key_result('id',{NAME},'keypoints',1)",
+              "2": "k230.get_key_result('id',{NAME},'keypoints',2)",
+              "3": "k230.get_key_result('id',{NAME},'keypoints',3)",
+              "4": "k230.get_key_result('id',{NAME},'keypoints',4)",
+              "5": "k230.get_key_result('id',{NAME},'keypoints',5)",
+              "6": "k230.get_key_result('id',{NAME},'keypoints',6)",
+              "7": "k230.get_key_result('id',{NAME},'keypoints',7)",
+              "8": "k230.get_key_result('id',{NAME},'keypoints',8)",
+              "9": "k230.get_key_result('id',{NAME},'keypoints',9)",
+              "10": "k230.get_key_result('id',{NAME},'keypoints',10)",
+              "11": "k230.get_key_result('id',{NAME},'keypoints',11)",
+              "12": "k230.get_key_result('id',{NAME},'keypoints',12)",
+              "13": "k230.get_key_result('id',{NAME},'keypoints',13)",
+              "14": "k230.get_key_result('id',{NAME},'keypoints',14)",
+              "15": "k230.get_key_result('id',{NAME},'keypoints',15)",
+              "16": "k230.get_key_result('id',{NAME},'keypoints',16)",
+              "17": "k230.get_key_result('id',{NAME},'keypoints',17)",
+              "18": "k230.get_key_result('id',{NAME},'keypoints',18)",
+              "19": "k230.get_key_result('id',{NAME},'keypoints',19)",
+              "20": "k230.get_key_result('id',{NAME},'keypoints',20)",
+              "21": "k230.get_key_result('id',{NAME},'keypoints',21)",
+              "22": "k230.get_key_result('id',{NAME},'keypoints',22)",
+              "23": "k230.get_key_result('id',{NAME},'keypoints',23)",
+              "24": "k230.get_key_result('id',{NAME},'keypoints',24)",
+              "25": "k230.get_key_result('id',{NAME},'keypoints',25)",
+              "26": "k230.get_key_result('id',{NAME},'keypoints',26)",
+              "27": "k230.get_key_result('id',{NAME},'keypoints',27)",
+              "28": "k230.get_key_result('id',{NAME},'keypoints',28)",
+              "29": "k230.get_key_result('id',{NAME},'keypoints',29)",
+              "30": "k230.get_key_result('id',{NAME},'keypoints',30)",
+              "31": "k230.get_key_result('id',{NAME},'keypoints',31)",
+              "32": "k230.get_key_result('id',{NAME},'keypoints',32)",
+              "33": "k230.get_key_result('id',{NAME},'keypoints',33)",
+              "34": "k230.get_key_result('id',{NAME},'keypoints',34)",
+              "35": "k230.get_key_result('id',{NAME},'keypoints',35)",
+              "36": "k230.get_key_result('id',{NAME},'keypoints',36)",
+              "37": "k230.get_key_result('id',{NAME},'keypoints',37)",
+              "38": "k230.get_key_result('id',{NAME},'keypoints',38)",
+              "39": "k230.get_key_result('id',{NAME},'keypoints',39)",
+              "40": "k230.get_key_result('id',{NAME},'keypoints',40)",
+              "41": "k230.get_key_result('id',{NAME},'keypoints',41)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_hand_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心的手掌 [VALUE] 参数",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "id",
+          "menu": "hand_menu",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{VALUE}')",
+          "templateSelector": {
+            "argument": "VALUE",
+            "cases": {
+              "0": "k230.near_center_result('keypoints',0)",
+              "1": "k230.near_center_result('keypoints',1)",
+              "2": "k230.near_center_result('keypoints',2)",
+              "3": "k230.near_center_result('keypoints',3)",
+              "4": "k230.near_center_result('keypoints',4)",
+              "5": "k230.near_center_result('keypoints',5)",
+              "6": "k230.near_center_result('keypoints',6)",
+              "7": "k230.near_center_result('keypoints',7)",
+              "8": "k230.near_center_result('keypoints',8)",
+              "9": "k230.near_center_result('keypoints',9)",
+              "10": "k230.near_center_result('keypoints',10)",
+              "11": "k230.near_center_result('keypoints',11)",
+              "12": "k230.near_center_result('keypoints',12)",
+              "13": "k230.near_center_result('keypoints',13)",
+              "14": "k230.near_center_result('keypoints',14)",
+              "15": "k230.near_center_result('keypoints',15)",
+              "16": "k230.near_center_result('keypoints',16)",
+              "17": "k230.near_center_result('keypoints',17)",
+              "18": "k230.near_center_result('keypoints',18)",
+              "19": "k230.near_center_result('keypoints',19)",
+              "20": "k230.near_center_result('keypoints',20)",
+              "21": "k230.near_center_result('keypoints',21)",
+              "22": "k230.near_center_result('keypoints',22)",
+              "23": "k230.near_center_result('keypoints',23)",
+              "24": "k230.near_center_result('keypoints',24)",
+              "25": "k230.near_center_result('keypoints',25)",
+              "26": "k230.near_center_result('keypoints',26)",
+              "27": "k230.near_center_result('keypoints',27)",
+              "28": "k230.near_center_result('keypoints',28)",
+              "29": "k230.near_center_result('keypoints',29)",
+              "30": "k230.near_center_result('keypoints',30)",
+              "31": "k230.near_center_result('keypoints',31)",
+              "32": "k230.near_center_result('keypoints',32)",
+              "33": "k230.near_center_result('keypoints',33)",
+              "34": "k230.near_center_result('keypoints',34)",
+              "35": "k230.near_center_result('keypoints',35)",
+              "36": "k230.near_center_result('keypoints',36)",
+              "37": "k230.near_center_result('keypoints',37)",
+              "38": "k230.near_center_result('keypoints',38)",
+              "39": "k230.near_center_result('keypoints',39)",
+              "40": "k230.near_center_result('keypoints',40)",
+              "41": "k230.near_center_result('keypoints',41)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_gesture_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到手势?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_gesture_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的手势数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_hand_gesture_get_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的手势为 [VALUE]?",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "ok",
+          "menu": "hand_gesture",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == '{VALUE}'",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_hand_gesture_get_pos_arg_by_name",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230 [NAME] 手势的 [POS] 参数",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "ok",
+          "menu": "hand_gesture",
+          "literal": true
+        },
+        "POS": {
+          "type": "string",
+          "defaultValue": "x",
+          "menu": "axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.get_key_result('extra','{NAME}','{POS}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_hand_gesture_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心手势识别结果的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "face_args3",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_fall_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到跌倒?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_fall_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的跌倒数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_fall_near_center_result",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的目标处于跌倒状态?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == 1",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_fall_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心跌倒检测的 [VALUE] 参数",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "face_args2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{VALUE}')",
+          "templateSelector": {
+            "argument": "VALUE",
+            "cases": {
+              "1": "k230.near_center_result('extra',1)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_target_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到追踪目标?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_target_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心追踪目标的 [VALUE] 参数",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "x",
+          "menu": "axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{VALUE}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_dynamic_gesture_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到动态手势?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_dynamic_gesture_get_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230动态手势为 [GESTURE]?",
+      "arguments": {
+        "GESTURE": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('value') == {GESTURE}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_self_learn_get_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230识别到自学习 [NAME] 画面?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.find_result('extra',{NAME})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_self_learn_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230自学习 [NAME] 的 [POS] 参数",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "POS": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "face_args2",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.get_key_result('extra',{NAME},'{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "1": "k230.get_key_result('extra',{NAME},'extra',1)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_single_color",
+      "blockType": "command",
+      "text": "设置K230单颜色检测目标为 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "red",
+          "menu": "color_li",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_color_target('{COLOR}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_single_color_arg",
+      "blockType": "command",
+      "text": "设置K230单颜色检测目标为 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_color_target({COLOR.colorName})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_single_color_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230单颜色检测到颜色?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_single_color_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230单颜色检测的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "color",
+          "menu": "color_angle_axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('blobs',0,'{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "color": "k230.near_center_result('color')"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_multi_color_arg",
+      "blockType": "command",
+      "text": "设置K230多颜色检测列表 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_multi_color_list({COLOR})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_color_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230多颜色检测到颜色?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_color_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的颜色数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_color_near_center_name",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到颜色 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.find_result('color',{NAME.colorName})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_color_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心颜色的 [VALUE] 参数",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "color",
+          "menu": "color_angle_axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('blobs',0,'{VALUE}')",
+          "templateSelector": {
+            "argument": "VALUE",
+            "cases": {
+              "color": "k230.near_center_result('color')"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_multi_color_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230颜色 [NAME] 检测结果的 [POS] 参数",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        },
+        "POS": {
+          "type": "string",
+          "defaultValue": "color",
+          "menu": "color_angle_axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.get_key_result('color',{NAME.colorName},'blobs',0,'{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "color": "k230.get_key_result('color',{NAME.colorName},'color')"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_line_color",
+      "blockType": "command",
+      "text": "设置K230线检测颜色为 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": "red",
+          "menu": "color_li",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_color_target('{COLOR}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_set_line_color_arg",
+      "blockType": "command",
+      "text": "设置K230线检测颜色为 [COLOR]",
+      "arguments": {
+        "COLOR": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.set_color_target({COLOR})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_line_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到线?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_line_detect_get_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230线检测结果 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "center_pos",
+          "menu": "line_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.result_get(0,'{VALUE}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_ocr_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到文字?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_ocr_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的文字数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_ocr_get_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230文字识别结果",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('text')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_ocr_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230文字识别结果的 [POINT] 参数",
+      "arguments": {
+        "POINT": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "ocr_point",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('points',{POINT})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_license_plate_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到车牌?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_license_plate_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的车牌数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_lpr_get_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230车牌识别结果",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('text')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_lpr_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230车牌识别结果的 [POINT] 参数",
+      "arguments": {
+        "POINT": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "ocr_point",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('points',{POINT})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_object_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到物体?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_object_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的物体数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_object_classify_parameter",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230物体分类结果的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "obj_menu",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_object_named_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "person",
+          "menu": "objs",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.find_result('extra','{NAME}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_object_parameter",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230物体检测结果的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "face_args",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)",
+              "1": "k230.near_center_result('extra',1)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_trash_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到垃圾?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_trash_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的垃圾数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_garbage_get_name_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的垃圾名称为 [VALUE]?",
+      "arguments": {
+        "VALUE": {
+          "type": "string",
+          "defaultValue": "BananaPeel",
+          "menu": "garbage",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == '{VALUE}'",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_trash_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心垃圾的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "name_confidence",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',{POS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_garbage_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心垃圾的 [POS] 坐标",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "ocr_point",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('points',{POS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_traffic_sign_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到交通标志?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_traffic_sign_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的交通标志数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_traffic_get_name_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的交通检测结果名称为 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": "go",
+          "menu": "traffic_sign",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == '{NAME}'",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_traffic_sign_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心交通标志的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "face_args",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "templateSelector": {
+            "argument": "POS",
+            "cases": {
+              "0": "k230.near_center_result('extra',0)",
+              "1": "k230.near_center_result('extra',1)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_april_tag_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到AprilTag?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_april_tag_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的AprilTag数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_apriltag_get_name_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的AprilTag文本为 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == {NAME}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_april_tag_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心AprilTag的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "name_confidence",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',{POS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_apriltag_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心AprilTag的 [POS] 坐标",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "ocr_point",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('points',{POS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_dm_code_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到DM码?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_dm_code_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的DM码数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_dmcode_get_name_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的DM码文本为 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == {NAME}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_dm_code_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心DM码的文本",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_dmcode_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心DM码的 [POS] 坐标",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "ocr_point",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('points',{POS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_qr_code_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到二维码?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_qr_code_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的二维码数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_orcode_get_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的二维码文本为 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == {NAME}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_qr_code_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心二维码的文本",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_orcode_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心二维码的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "x",
+          "menu": "axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_barcode_detected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230检测到条形码?",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_available()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_barcode_count",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "K230检测到的条形码数量",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.result_len()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_barcode_get_arg",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "K230靠近中心的条形码文本为 [NAME]?",
+      "arguments": {
+        "NAME": {
+          "type": "string",
+          "defaultValue": " "
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0) == {NAME}",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_barcode_near_center",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心条形码的文本",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('extra',0)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "k230_result_barcode_get_pos_arg",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取K230靠近中心条形码的 [POS] 参数",
+      "arguments": {
+        "POS": {
+          "type": "string",
+          "defaultValue": "x",
+          "menu": "axis_result",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "k230.near_center_result('{POS}')",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
     }
   ],
   "package": {
-    "fileName": "sensor-1.5.0.mpext",
+    "fileName": "sensor-1.20.0.mpext",
     "structure": "mindplus-python-package-v1"
   }
 }

@@ -137,9 +137,14 @@ const messages = defineMessages({
         id: 'gui.productExtensionLibrary.functionModule'
     },
     loaded: {
-        defaultMessage: '已加载',
-        description: 'Loaded extension status in the product extension library',
+        defaultMessage: '已添加',
+        description: 'Added extension status in the product extension library',
         id: 'gui.productExtensionLibrary.loaded'
+    },
+    removeModule: {
+        defaultMessage: '移除{name}',
+        description: 'Remove an added product module',
+        id: 'gui.productExtensionLibrary.removeModule'
     },
     checkVersion: {
         defaultMessage: '检查版本',
@@ -262,12 +267,17 @@ const messages = defineMessages({
         id: 'gui.productExtensionLibrary.downloadableDescription'
     },
     placeholderDescription: {
-        defaultMessage: '占位展示，等待后台发布积木包。',
+        defaultMessage: '待发布',
         description: 'Description for placeholder extensions',
         id: 'gui.productExtensionLibrary.placeholderDescription'
     },
+    selectProductDescription: {
+        defaultMessage: '请先加载主产品。',
+        description: 'Description for modules before a main product is loaded',
+        id: 'gui.productExtensionLibrary.selectProductDescription'
+    },
     unsupportedProductDescription: {
-        defaultMessage: '请先加载支持该模块的主产品。',
+        defaultMessage: '当前主控不支持该模块。',
         description: 'Description for modules unavailable for the current main product',
         id: 'gui.productExtensionLibrary.unsupportedProductDescription'
     },
@@ -329,7 +339,7 @@ const messages = defineMessages({
 });
 
 const mainCategoryIds = ['robots'];
-const loadedExtensionIds = ['python-native', 'company-http'];
+const moduleCategoryIds = new Set(['input', 'power', 'output', 'communication', 'function']);
 const categoryFilters = {
     main: [
         {id: 'robots', message: messages.boards}
@@ -366,6 +376,8 @@ const isSharedProductModuleItem = item => Boolean(
     item.categoryId !== 'robots' &&
     item.manifest.categories.some(category => category.id === item.id)
 );
+
+const isCatalogProductModuleItem = item => moduleCategoryIds.has(item.categoryId);
 
 const getFlatItems = (activeTab, remoteCatalog = [], cachedRemotePackages = []) => (
     activeTab === 'user' ? [] : productExtensionCatalog
@@ -617,6 +629,37 @@ const ProductExtensionLibraryComponent = ({
             .then(() => addedPromise);
     };
 
+    // 从共享包移除单个模块；最后一个模块移除后同时卸载共享 extension。
+    const removeSharedProductModule = item => {
+        const state = getProductModuleState(vm, item.sourceExtension);
+        const nextEnabledModuleIds = state.enabledModuleIds.filter(moduleId => moduleId !== item.id);
+        unregisterPythonCodegenManifest(state.manifest || item.manifest);
+
+        if (!nextEnabledModuleIds.length) {
+            const extensionManager = vm.extensionManager;
+            const unloadPromise = extensionManager.isExtensionLoaded(item.sourceExtension) &&
+                extensionManager.unregisterExtensionObject ?
+                extensionManager.unregisterExtensionObject(item.sourceExtension) :
+                Promise.resolve();
+            return unloadPromise.then(() => {
+                clearProductModuleState(vm, item.sourceExtension);
+                vm.emitWorkspaceUpdate();
+                setExtensionStateVersion(version => version + 1);
+            });
+        }
+
+        const nextManifest = composeProductModuleManifest(
+            item.manifest,
+            nextEnabledModuleIds,
+            getLoadedMainProductId(vm)
+        );
+        return installBuiltinProductManifest(nextManifest).then(() => {
+            setProductModuleState(vm, item.sourceExtension, nextEnabledModuleIds, nextManifest);
+            vm.emitWorkspaceUpdate();
+            setExtensionStateVersion(version => version + 1);
+        });
+    };
+
     // 主控/机器人一次只允许加载一个，切换前用它判断是否需要确认清理。
     const getLoadedMainItem = nextItem => getAvailableMainItems(
         remoteCatalog,
@@ -769,13 +812,21 @@ const ProductExtensionLibraryComponent = ({
 
     // 卡片点击根据来源分流：用户包按需加载，产品包优先远程版本并保留内置兜底。
     const handleItemClick = (item, options = {}) => {
-        if (isSharedProductModuleItem(item)) {
+        if (isCatalogProductModuleItem(item)) {
             const productId = getLoadedMainProductId(vm);
-            if (!isProductModuleSupported(productId, item.sourceExtension, item.id)) {
+            if (!productId) {
                 // eslint-disable-next-line no-alert
-                alert(intl.formatMessage(messages.unavailableNotice, {name: item.name}));
+                alert(intl.formatMessage(messages.selectProductDescription));
                 return;
             }
+            if (!isProductModuleSupported(productId, item.sourceExtension, item.id)) {
+                // eslint-disable-next-line no-alert
+                alert(intl.formatMessage(messages.unsupportedProductDescription));
+                return;
+            }
+        }
+        if (isSharedProductModuleItem(item)) {
+            const productId = getLoadedMainProductId(vm);
             const enabledModuleIds = getEnabledProductModuleIds(vm, item.sourceExtension);
             if (enabledModuleIds.includes(item.id)) {
                 selectExtensionCategory(item.sourceExtension);
@@ -783,7 +834,8 @@ const ProductExtensionLibraryComponent = ({
             }
             const previousManifest = getProductModuleState(vm, item.sourceExtension).manifest;
             const nextEnabledModuleIds = enabledModuleIds.concat(item.id);
-            const nextManifest = composeProductModuleManifest(item.manifest, nextEnabledModuleIds);
+            // 同一共享包中的产品专用积木必须按当前主产品裁剪后再注册到 VM。
+            const nextManifest = composeProductModuleManifest(item.manifest, nextEnabledModuleIds, productId);
             unregisterPythonCodegenManifest(previousManifest || item.manifest);
             installBuiltinProductManifest(nextManifest).then(() => {
                 setProductModuleState(vm, item.sourceExtension, nextEnabledModuleIds, nextManifest);
@@ -1047,8 +1099,10 @@ const ProductExtensionLibraryComponent = ({
                     <div className={styles.cardGrid}>
                         {items.map(item => {
                             const isSharedModule = isSharedProductModuleItem(item);
-                            const isSupportedModule = !isSharedModule || isProductModuleSupported(
-                                getLoadedMainProductId(vm),
+                            const isProductModule = isCatalogProductModuleItem(item);
+                            const loadedProductId = getLoadedMainProductId(vm);
+                            const isSupportedModule = !isProductModule || isProductModuleSupported(
+                                loadedProductId,
                                 item.sourceExtension,
                                 item.id
                             );
@@ -1057,15 +1111,21 @@ const ProductExtensionLibraryComponent = ({
                             const isInstallable = (isAvailable || isDownloadable) && isSupportedModule;
                             const isLoaded = isSharedModule ?
                                 getEnabledProductModuleIds(vm, item.sourceExtension).includes(item.id) :
-                                (loadedExtensionIds.includes(item.id) ||
-                                    vm.extensionManager.isExtensionLoaded(item.id));
+                                vm.extensionManager.isExtensionLoaded(item.id);
                             const isUser = item.source === LIBRARY_SOURCE_TYPES.USER_LOCAL;
-                            const descriptionMessage = !isSupportedModule ?
-                                messages.unsupportedProductDescription :
-                                (isAvailable ?
-                                    (isUser ? messages.localDescription : messages.availableDescription) :
-                                    (isDownloadable ?
-                                        messages.downloadableDescription : messages.placeholderDescription));
+                            let descriptionMessage = messages.placeholderDescription;
+                            let unavailableMessage = messages.unavailableNotice;
+                            if (isProductModule && !loadedProductId) {
+                                descriptionMessage = messages.selectProductDescription;
+                                unavailableMessage = messages.selectProductDescription;
+                            } else if (!isSupportedModule) {
+                                descriptionMessage = messages.unsupportedProductDescription;
+                                unavailableMessage = messages.unsupportedProductDescription;
+                            } else if (isAvailable) {
+                                descriptionMessage = isUser ? messages.localDescription : messages.availableDescription;
+                            } else if (isDownloadable) {
+                                descriptionMessage = messages.downloadableDescription;
+                            }
                             const sourceMessage = isUser ? messages.userSource :
                                 ([
                                     LIBRARY_SOURCE_TYPES.REMOTE_CACHE,
@@ -1082,7 +1142,7 @@ const ProductExtensionLibraryComponent = ({
                                     role="button"
                                     tabIndex={0}
                                     title={isInstallable ? item.name :
-                                        intl.formatMessage(messages.unavailableNotice, {
+                                        intl.formatMessage(unavailableMessage, {
                                             name: item.name
                                         })}
                                     onClick={event => {
@@ -1129,27 +1189,26 @@ const ProductExtensionLibraryComponent = ({
                                         </div>
                                     ) : isLoaded ? (
                                         <button
+                                            aria-label={isSharedModule ? intl.formatMessage(messages.removeModule, {
+                                                name: item.name
+                                            }) : undefined}
                                             className={styles.removeBadge}
+                                            title={isSharedModule ? intl.formatMessage(messages.removeModule, {
+                                                name: item.name
+                                            }) : undefined}
                                             type="button"
                                             onClick={event => {
                                                 event.stopPropagation();
-                                                handleItemClick(item);
+                                                if (isSharedModule) {
+                                                    removeSharedProductModule(item);
+                                                } else {
+                                                    handleItemClick(item);
+                                                }
                                             }}
                                         >
                                             {intl.formatMessage(messages.loaded)}
                                         </button>
-                                    ) : (
-                                        <button
-                                            className={styles.downloadButton}
-                                            type="button"
-                                            onClick={event => {
-                                                event.stopPropagation();
-                                                handleItemClick(item);
-                                            }}
-                                        >
-                                            ↓
-                                        </button>
-                                    )}
+                                    ) : null}
                                     <div className={styles.cardVisual}>
                                         <div className={styles.cardIcon}>
                                             {getInitials(item.name)}

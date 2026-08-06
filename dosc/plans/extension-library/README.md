@@ -41,7 +41,25 @@
 | [35 2026-08-05 开发日志](./35-2026-08-05-development-log.md) | 汇总输入传感器第二至第四批迁移、巡线字段实现、验收排障和后续事项 |
 | [36 输入传感器第五批迁移与评审记录](./36-sensor-fifth-batch-migration-progress.md) | 记录外接 IMU 4 个积木、欧拉角菜单、产品支持边界和 sensor 1.4.0 内置快照 |
 | [37 输入传感器第六批迁移与评审记录](./37-sensor-sixth-batch-migration-progress.md) | 记录 LED 超声波 7 个积木、颜色参数适配、Python RGB 通道转换和 sensor 1.5.0 内置快照 |
+| [38 输入传感器第七批迁移与评审记录](./38-sensor-seventh-batch-migration-progress.md) | 记录 WonderEcho 8 个积木、三组语音菜单、产品支持边界和 sensor 1.6.0 内置快照 |
+| [39 输入传感器第八批迁移与评审记录](./39-sensor-eighth-batch-migration-progress.md) | 记录 K230 首批 9 个基础积木、运行模式菜单、产品支持边界和 sensor 1.7.0 内置快照 |
+| [40 输入传感器第九批迁移与评审记录](./40-sensor-ninth-batch-migration-progress.md) | 记录 K230 人脸识别、人脸姿态、注视方向 12 个积木和 sensor 1.8.0 内置快照 |
+| [41 输入传感器第十批迁移与评审记录](./41-sensor-tenth-batch-migration-progress.md) | 记录 K230 表情识别、人体检测、人体关键点 12 个积木和 sensor 1.9.0 内置快照 |
+| [42 输入传感器第十一批迁移与评审记录](./42-sensor-eleventh-batch-migration-progress.md) | 记录 K230 手掌关键点、手势识别 10 个积木和 sensor 1.10.0 内置快照 |
+| [43 输入传感器第十二批迁移与评审记录](./43-sensor-twelfth-batch-migration-progress.md) | 记录 K230 跌倒检测、目标追踪、动态手势、自学习 10 个积木和 sensor 1.11.0 内置快照 |
+| [44 输入传感器第十三批迁移与评审记录](./44-sensor-thirteenth-batch-migration-progress.md) | 记录 K230 单颜色、多颜色检测 10 个积木、中文颜色转换和 sensor 1.12.0 内置快照 |
+| [45 输入传感器第十四批迁移与评审记录](./45-sensor-fourteenth-batch-migration-progress.md) | 记录 K230 线检测、文字识别、车牌识别 12 个积木和 sensor 1.13.0 内置快照 |
+| [46 输入传感器第十五批迁移与评审记录](./46-sensor-fifteenth-batch-migration-progress.md) | 记录 K230 物体分类、物体检测、垃圾分类 10 个唯一积木和 sensor 1.14.0 内置快照 |
+| [47 输入传感器第十六批迁移与评审记录](./47-sensor-sixteenth-batch-migration-progress.md) | 记录 K230 交通检测、AprilTag 识别 9 个积木和 sensor 1.15.0 内置快照 |
+| [48 输入传感器第十七批迁移与评审记录](./48-sensor-seventeenth-batch-migration-progress.md) | 记录 K230 DM 码、二维码识别 10 个积木和 sensor 1.16.0 内置快照 |
+| [49 输入传感器第十八批迁移与评审记录](./49-sensor-eighteenth-batch-migration-progress.md) | 记录 K230 条形码识别、通用 MCP 返回参数 9 个积木和 sensor 1.17.0 内置快照 |
+| [50 输入传感器第十九批迁移与评审记录](./50-sensor-nineteenth-batch-migration-progress.md) | 记录 K230 三个通用 MCP 工具设置积木、静态 JSON formatter 和 sensor 1.18.0 内置快照 |
+| [51 输入传感器第二十批迁移与评审记录](./51-sensor-twentieth-batch-migration-progress.md) | 记录 K230 七个产品条件 MCP 返回积木、产品级过滤和 sensor 1.19.0 内置快照 |
+| [52 输入传感器第二十一批迁移与评审记录](./52-sensor-twenty-first-batch-migration-progress.md) | 记录 K230 四个产品默认 MCP 配置积木、静态变量集合和 sensor 1.20.0 内置快照 |
+| [53 模块卡片状态与 aimech 内置快照评审记录](./53-product-module-card-and-aimech-builtin-progress.md) | 记录模块兼容状态、移除交互、调试卡清理和 aimech 1.0.0 内置快照 |
+| [54 旧产品模块兼容矩阵复核记录](./54-old-product-module-compatibility-audit.md) | 从 WonderLab 发布包还原七款产品的输入、动力、输出和通信模块支持关系 |
+| [55 2026-08-06 开发日志](./55-2026-08-06-development-log.md) | 汇总开发端口治理、输入模块 1.20.0、K230、模块库交互、兼容矩阵复核和待迁移范围 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已迁移到独立产品仓库的 Mind+ Python 作者源；AI机甲四足机器人、四足竞赛版、六足机器人和六批共 16 类输入传感器已作为内置包开放本地测试。Arduino C 继续延后处理。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数、中文颜色名称转换、静态 MCP JSON formatter、产品级积木过滤和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已有 editor 内置快照；输入模块已更新到 `sensor-1.20.0`。WonderLens、WonderMind 仍为支持但待发布模块；动力、输出和通信模块目前只有目录卡片及兼容声明，尚未迁移积木包。

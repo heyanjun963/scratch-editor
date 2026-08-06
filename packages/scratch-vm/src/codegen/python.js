@@ -243,6 +243,34 @@ const getRgbChannelArgumentValue = (block, inputName, fallback) => {
         .join(',');
 };
 
+// K230 颜色接口使用英文名称；自由文本中的旧版中文颜色名在生成阶段转换。
+const getColorNameArgumentValue = value => {
+    const colorNames = [
+        ['红', 'red'], ['绿', 'green'], ['蓝', 'blue'], ['黄', 'yellow'],
+        ['紫', 'purple'], ['青', 'cyan'], ['白', 'white'], ['黑', 'black']
+    ];
+    const match = colorNames.find(([name]) => String(value).includes(name));
+    return match ? `'${match[1]}'` : value;
+};
+
+// 产品配置中的静态名称必须来自字符串积木，避免把运行时表达式拼进 Python 标识符。
+const getStaticStringArgumentValue = (value, inputName) => {
+    try {
+        const parsed = JSON.parse(String(value));
+        if (typeof parsed === 'string') return parsed;
+    } catch (error) {
+        // 统一在下方抛出带参数名的业务错误。
+    }
+    throw new Error(`Python 代码生成参数 ${inputName} 必须是静态字符串`);
+};
+
+const getTemplateArgumentValue = (templateInfo, block, inputName, fallback, imports) => {
+    const argument = templateInfo.arguments && templateInfo.arguments[inputName];
+    return argument && argument.literal ?
+        getLiteralArgumentValue(templateInfo, block, inputName, fallback) :
+        valueToPython(block, inputName, fallback, imports);
+};
+
 // 把 manifest 模板里的 {ARG} 替换为积木当前输入对应的 Python 代码。
 const applyTemplateText = (template, templateInfo, block, imports) => (
     String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)(?:\.([A-Za-z][A-Za-z0-9_]*))?\}/g,
@@ -251,6 +279,22 @@ const applyTemplateText = (template, templateInfo, block, imports) => (
             const fallback = getDefaultArgumentValue(templateInfo, inputName, '');
             if (formatter === 'rgb') {
                 return getRgbChannelArgumentValue(block, inputName, fallback);
+            }
+            if (formatter === 'colorName') {
+                const value = getTemplateArgumentValue(templateInfo, block, inputName, fallback, imports);
+                return getColorNameArgumentValue(value);
+            }
+            if (formatter === 'compactJson') {
+                const value = getTemplateArgumentValue(templateInfo, block, inputName, fallback, imports);
+                return JSON.stringify(String(value).replace(/\s+/g, ''));
+            }
+            if (formatter === 'jsonValue') {
+                const value = getTemplateArgumentValue(templateInfo, block, inputName, fallback, imports);
+                return JSON.stringify(getStaticStringArgumentValue(value, inputName));
+            }
+            if (formatter === 'identifier') {
+                const value = getTemplateArgumentValue(templateInfo, block, inputName, fallback, imports);
+                return normalizePythonName(getStaticStringArgumentValue(value, inputName));
             }
             if (argument && argument.literal) {
                 return getLiteralArgumentValue(templateInfo, block, inputName, fallback);

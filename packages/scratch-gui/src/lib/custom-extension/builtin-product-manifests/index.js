@@ -1,6 +1,7 @@
 import aidoggySnapshot from '../builtin-product-snapshots/manifests/aidoggy.json';
 import aihexaSnapshot from '../builtin-product-snapshots/manifests/aihexa.json';
 import aimecanumSnapshot from '../builtin-product-snapshots/manifests/aimecanum.json';
+import aimechSnapshot from '../builtin-product-snapshots/manifests/aimech.json';
 import aiquadrupedSnapshot from '../builtin-product-snapshots/manifests/aiquadruped.json';
 import aiquadrupedproSnapshot from '../builtin-product-snapshots/manifests/aiquadrupedpro.json';
 import minihexaSnapshot from '../builtin-product-snapshots/manifests/minihexa.json';
@@ -12,6 +13,7 @@ const builtinProductManifests = {
     aidoggy: normalizeCustomExtensionManifest(aidoggySnapshot),
     aihexa: normalizeCustomExtensionManifest(aihexaSnapshot),
     aimecanum: normalizeCustomExtensionManifest(aimecanumSnapshot),
+    aimech: normalizeCustomExtensionManifest(aimechSnapshot),
     aiquadruped: normalizeCustomExtensionManifest(aiquadrupedSnapshot),
     aiquadrupedpro: normalizeCustomExtensionManifest(aiquadrupedproSnapshot),
     minihexa: normalizeCustomExtensionManifest(minihexaSnapshot),

@@ -23,8 +23,23 @@ const isProductModuleSupported = (productId, extensionId, moduleId) => {
     return Array.isArray(supportedModules) && supportedModules.includes(moduleId);
 };
 
+const applyProductArgumentOverrides = (block, productId) => {
+    const overrides = block.productArguments && block.productArguments[productId];
+    if (!overrides) return block;
+    return {
+        ...block,
+        arguments: Object.keys(block.arguments).reduce((argumentsByName, name) => {
+            argumentsByName[name] = {
+                ...block.arguments[name],
+                ...(overrides[name] || {})
+            };
+            return argumentsByName;
+        }, {})
+    };
+};
+
 // 共享模块包只保留已启用分类及其积木、菜单，并按照用户添加顺序显示子分类标签。
-const composeProductModuleManifest = (baseManifest, enabledModuleIds) => {
+const composeProductModuleManifest = (baseManifest, enabledModuleIds, productId = null) => {
     const categoriesById = new Map(baseManifest.categories.map(category => [category.id, category]));
     const categories = enabledModuleIds
         .map(moduleId => categoriesById.get(moduleId))
@@ -32,7 +47,9 @@ const composeProductModuleManifest = (baseManifest, enabledModuleIds) => {
     const blocksByOpcode = new Map(baseManifest.blocks.map(block => [block.opcode, block]));
     const blocks = categories.flatMap(category => (
         category.blocks.map(opcode => blocksByOpcode.get(opcode)).filter(Boolean)
-    ));
+    )).filter(block => (
+        !Array.isArray(block.products) || block.products.length === 0 || block.products.includes(productId)
+    )).map(block => applyProductArgumentOverrides(block, productId));
     const usedMenus = new Set(blocks.flatMap(block => (
         Object.values(block.arguments).map(argument => argument.menu).filter(Boolean)
     )));
