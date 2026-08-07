@@ -59,7 +59,12 @@
 | [53 模块卡片状态与 aimech 内置快照评审记录](./53-product-module-card-and-aimech-builtin-progress.md) | 记录模块兼容状态、移除交互、调试卡清理和 aimech 1.0.0 内置快照 |
 | [54 旧产品模块兼容矩阵复核记录](./54-old-product-module-compatibility-audit.md) | 从 WonderLab 发布包还原七款产品的输入、动力、输出和通信模块支持关系 |
 | [55 2026-08-06 开发日志](./55-2026-08-06-development-log.md) | 汇总开发端口治理、输入模块 1.20.0、K230、模块库交互、兼容矩阵复核和待迁移范围 |
+| [56 动力模块首批迁移与评审记录](./56-actuator-first-batch-migration-progress.md) | 记录总线舵机与 IIC 转 PWM 共 8 个积木、产品兼容边界和 actuator 1.0.0 内置快照 |
+| [57 机械臂模块首批迁移与评审记录](./57-xarm-first-batch-migration-progress.md) | 记录基础机械臂与串联机械臂共 9 个积木、ID 覆盖顺序和 xarm 1.0.0 内置快照 |
+| [58 公共模块第三批迁移与评审记录](./58-module-third-batch-migration-progress.md) | 记录连杆机械臂、风扇和 RGB 模块共 9 个积木及三个内置共享包版本 |
+| [59 通信模块首批迁移与评审记录](./59-communication-first-batch-migration-progress.md) | 记录 PS3 手柄 9 个积木、4 组菜单、兼容边界和 communication 1.0.0 内置快照 |
+| [60 2026-08-07 开发日志](./60-2026-08-07-development-log.md) | 汇总四个公共模块首批内置迁移、快照校验、代码生成和提交前评审结论 |
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数、中文颜色名称转换、静态 MCP JSON formatter、产品级积木过滤和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已有 editor 内置快照；输入模块已更新到 `sensor-1.20.0`。WonderLens、WonderMind 仍为支持但待发布模块；动力、输出和通信模块目前只有目录卡片及兼容声明，尚未迁移积木包。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数、中文颜色名称转换、静态 MCP JSON formatter、产品级积木过滤和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已有 editor 内置快照；输入模块已更新到 `sensor-1.20.0`，动力模块已更新到 `actuator-1.1.0`，机械臂模块已更新到 `xarm-1.1.0`，输出模块已建立 `display-1.0.0` 首批内置快照，通信模块已建立 `communication-1.0.0` PS3 首批快照。WonderLens、WonderMind 仍为支持但待发布模块；点阵屏仍待迁移。

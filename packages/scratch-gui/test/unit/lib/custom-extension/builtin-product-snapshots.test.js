@@ -52,6 +52,24 @@ describe('built-in Mind+ product snapshots', () => {
                 sha256: '7f93e619466d5e4a895942825c60b269042c399c28490f348f2df5ce2cd1a458'
             },
             {
+                packageId: 'actuator',
+                version: '1.1.0',
+                asset: 'actuator-1.1.0.mpext',
+                sha256: '87a40cc6aead1a63a1d81965df988d4cb70c61d51db99c95253b73d37ef9aec7'
+            },
+            {
+                packageId: 'communication',
+                version: '1.0.0',
+                asset: 'communication-1.0.0.mpext',
+                sha256: '8d3a3f7bcbae59238efc18603b59ee0b64b119ac90d26d3b5b19db279f25e2a8'
+            },
+            {
+                packageId: 'display',
+                version: '1.0.0',
+                asset: 'display-1.0.0.mpext',
+                sha256: '9b9316c313a4f14aabc5311131f7ecd4799bd8879a3b85865b95538b802656fa'
+            },
+            {
                 packageId: 'minihexa',
                 version: '0.1.1',
                 asset: 'minihexa-0.1.1.mpext',
@@ -62,6 +80,12 @@ describe('built-in Mind+ product snapshots', () => {
                 version: '1.20.0',
                 asset: 'sensor-1.20.0.mpext',
                 sha256: 'e8e1750bdfdb90f224ff366c6b49a07388cc1e8bd1fb69a857049c91cb6d02f4'
+            },
+            {
+                packageId: 'xarm',
+                version: '1.1.0',
+                asset: 'xarm-1.1.0.mpext',
+                sha256: '068c1b12145596c06a8ee8848074c00896ba317e87ca52434d7376095691c224'
             }
         ]);
         for (const item of index.packages) {

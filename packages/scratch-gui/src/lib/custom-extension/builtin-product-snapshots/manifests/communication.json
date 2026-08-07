@@ -1,0 +1,406 @@
+{
+  "formatVersion": 2,
+  "id": "communication",
+  "name": "通信模块",
+  "version": "1.0.0",
+  "description": "适用于 Hiwonder Python 产品的通信模块积木包。",
+  "color1": "#ee799f",
+  "color2": "#cc6487",
+  "color3": "#a94e6f",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "communication",
+      "name": "PS3手柄",
+      "hideLabel": false,
+      "blocks": [
+        "ps3_init",
+        "ps3_get_address",
+        "ps3_disconnect",
+        "ps3_is_connected",
+        "ps3_set_led",
+        "ps3_set_rumble",
+        "ps3_get_keys",
+        "ps3_get_axis",
+        "ps3_get_sensor"
+      ]
+    }
+  ],
+  "menus": {
+    "ps3_keys": {
+      "items": [
+        {
+          "text": "SELECT",
+          "value": "SELECT"
+        },
+        {
+          "text": "START",
+          "value": "START"
+        },
+        {
+          "text": "PS",
+          "value": "PS"
+        },
+        {
+          "text": "↑",
+          "value": "UP"
+        },
+        {
+          "text": "↓",
+          "value": "DOWN"
+        },
+        {
+          "text": "←",
+          "value": "LEFT"
+        },
+        {
+          "text": "→",
+          "value": "RIGHT"
+        },
+        {
+          "text": "L1",
+          "value": "L1"
+        },
+        {
+          "text": "L2",
+          "value": "L2"
+        },
+        {
+          "text": "L3",
+          "value": "L3"
+        },
+        {
+          "text": "R1",
+          "value": "R1"
+        },
+        {
+          "text": "R2",
+          "value": "R2"
+        },
+        {
+          "text": "R3",
+          "value": "R3"
+        },
+        {
+          "text": "◭",
+          "value": "TRIANGLE"
+        },
+        {
+          "text": "◯",
+          "value": "CIRCLE"
+        },
+        {
+          "text": "╳",
+          "value": "CROSS"
+        },
+        {
+          "text": "▢",
+          "value": "SQUARE"
+        }
+      ]
+    },
+    "ps3_handle_axis": {
+      "items": [
+        {
+          "text": "右舵水平",
+          "value": "RX"
+        },
+        {
+          "text": "右舵垂直",
+          "value": "RY"
+        },
+        {
+          "text": "左舵水平",
+          "value": "LX"
+        },
+        {
+          "text": "左舵垂直",
+          "value": "LY"
+        }
+      ]
+    },
+    "accel": {
+      "items": [
+        {
+          "text": "X轴角度",
+          "value": "ACCEL_X"
+        },
+        {
+          "text": "Y轴角度",
+          "value": "ACCEL_Y"
+        }
+      ]
+    },
+    "on_off": {
+      "items": [
+        {
+          "text": "开",
+          "value": "1"
+        },
+        {
+          "text": "关",
+          "value": "0"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "ps3_init",
+      "blockType": "command",
+      "text": "初始化手柄，MAC地址 [STR]",
+      "arguments": {
+        "STR": {
+          "type": "string",
+          "defaultValue": "10:00:00:00:00:00"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "PS3.init({STR})",
+          "imports": [
+            "import PS3"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_get_address",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取mac地址",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "PS3.get_address()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_disconnect",
+      "blockType": "command",
+      "text": "断开连接",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "PS3.deinit()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_is_connected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "是否连接成功？",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "PS3.isconnected()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_set_led",
+      "blockType": "command",
+      "text": "设置LED灯1 [VALUE1] 灯2 [VALUE2] 灯3 [VALUE3] 灯4 [VALUE4]",
+      "arguments": {
+        "VALUE1": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "on_off",
+          "literal": true
+        },
+        "VALUE2": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "on_off",
+          "literal": true
+        },
+        "VALUE3": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "on_off",
+          "literal": true
+        },
+        "VALUE4": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "on_off",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "PS3.setleds([{VALUE1},{VALUE2},{VALUE3},{VALUE4}])",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_set_rumble",
+      "blockType": "command",
+      "text": "设置手柄震动强度 [VALUE1] 和震动时间(最大值5000ms) [VALUE2] ms",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 60
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 3000
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "PS3.set_rumble({VALUE1}, {VALUE2})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_get_keys",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "[PS3_KEYS] 被按下",
+      "arguments": {
+        "PS3_KEYS": {
+          "type": "string",
+          "defaultValue": "SELECT",
+          "menu": "ps3_keys",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "PS3.get_button(PS3.{PS3_KEYS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_get_axis",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取 [HANDLE_AXIS] 值",
+      "arguments": {
+        "HANDLE_AXIS": {
+          "type": "string",
+          "defaultValue": "RX",
+          "menu": "ps3_handle_axis",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "PS3.get_axis(PS3.{HANDLE_AXIS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "ps3_get_sensor",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取imu [ACCEL] 值",
+      "arguments": {
+        "ACCEL": {
+          "type": "string",
+          "defaultValue": "ACCEL_X",
+          "menu": "accel",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "PS3.get_sensor(PS3.{ACCEL})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "package": {
+    "fileName": "communication-1.0.0.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

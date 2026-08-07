@@ -1,0 +1,419 @@
+{
+  "formatVersion": 2,
+  "id": "actuator",
+  "name": "动力模块",
+  "version": "1.1.0",
+  "description": "适用于 Hiwonder Python 产品的动力模块积木包。",
+  "color1": "#d05b33",
+  "color2": "#b84b2a",
+  "color3": "#963d22",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "bus-servo",
+      "name": "总线舵机",
+      "hideLabel": false,
+      "blocks": [
+        "set_bus_servo",
+        "set_bus_servo_motor_speed",
+        "load_bus_servo",
+        "unload_bus_servo",
+        "get_bus_servo_pos"
+      ]
+    },
+    {
+      "id": "iic-pwm",
+      "name": "IIC转PWM控制模块",
+      "hideLabel": false,
+      "blocks": [
+        "aimecha_iicpwm_init",
+        "iicpwm_set_pos",
+        "iicpwm_set_speed"
+      ]
+    },
+    {
+      "id": "fan",
+      "name": "风扇",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_fan_iic_set_module_speed"
+      ]
+    }
+  ],
+  "menus": {
+    "aimech_iicport": {
+      "items": [
+        {
+          "text": "A",
+          "value": "1"
+        },
+        {
+          "text": "B",
+          "value": "2"
+        },
+        {
+          "text": "C",
+          "value": "3"
+        },
+        {
+          "text": "D",
+          "value": "4"
+        },
+        {
+          "text": "E",
+          "value": "5"
+        },
+        {
+          "text": "J",
+          "value": "9"
+        },
+        {
+          "text": "K",
+          "value": "10"
+        }
+      ]
+    },
+    "iic_pwm_port": {
+      "items": [
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        }
+      ]
+    },
+    "aidoggy_iicport": {
+      "items": [
+        {
+          "text": "C",
+          "value": "3"
+        },
+        {
+          "text": "D",
+          "value": "4"
+        },
+        {
+          "text": "E",
+          "value": "5"
+        },
+        {
+          "text": "F",
+          "value": "6"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "set_bus_servo",
+      "blockType": "command",
+      "text": "设置总线舵机编号 [SERVO] 位置 (0~1000) [POS] 运行时间 (ms) [TIME]",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 1
+        },
+        "POS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "TIME": {
+          "type": "number",
+          "defaultValue": 100
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.run({SERVO},{POS},{TIME})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "set_bus_servo_motor_speed",
+      "blockType": "command",
+      "text": "设置总线舵机编号 [SERVO] 电机模式, 转速 [SPEED]",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 1
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 200
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.set_mode({SERVO},1,{SPEED})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "load_bus_servo",
+      "blockType": "command",
+      "text": "设置总线舵机编号 [SERVO] 上电",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.load({SERVO})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "unload_bus_servo",
+      "blockType": "command",
+      "text": "设置总线舵机编号 [SERVO] 掉电",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.unload({SERVO})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "get_bus_servo_pos",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取总线舵机编号 [SERVO] 位置",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.get_position({SERVO})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimecha_iicpwm_init",
+      "blockType": "command",
+      "text": "初始化IIC转PWM模块IIC接口 [PORT]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iicpwm = Hiwonder_DEV.DEV_PWMModule(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "iicpwm_set_pos",
+      "blockType": "command",
+      "text": "设置180°舵机编号 [NUM] 转至 [ANGLE] ° 运行时间(ms) [TIME]",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "iic_pwm_port",
+          "literal": true
+        },
+        "ANGLE": {
+          "type": "number",
+          "defaultValue": 90
+        },
+        "TIME": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "iicpwm.set_angle({NUM},{ANGLE},{TIME},180)",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "iicpwm_set_speed",
+      "blockType": "command",
+      "text": "设置电机编号 [NUM] 速度 [SPEED]",
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "iic_pwm_port",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "iicpwm.set_speed({NUM},{SPEED})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_fan_iic_set_module_speed",
+      "blockType": "command",
+      "text": "设置风扇接口 [PORT] 转速 [SPEED]",
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 80
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "iic_fan_{PORT}.set_speed({SPEED})",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic_fan_{PORT} = Hiwonder_DEV.DEV_FAN(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "package": {
+    "fileName": "actuator-1.1.0.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

@@ -1,0 +1,507 @@
+{
+  "formatVersion": 2,
+  "id": "xarm",
+  "name": "机械臂模块",
+  "version": "1.1.0",
+  "description": "适用于 Hiwonder Python 产品的机械臂积木包。",
+  "color1": "#2d87c9",
+  "color2": "#2473ac",
+  "color3": "#1c5d8c",
+  "target": "python",
+  "source": "mindplus",
+  "categories": [
+    {
+      "id": "xarm",
+      "name": "机械臂",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_set_arm_id",
+        "aimech_set_claw_id",
+        "aimech_servo_enable",
+        "aimech_servo_disable",
+        "aimech_set_servo_pose_time",
+        "aimech_get_angle",
+        "aimech_set_servo_stop"
+      ]
+    },
+    {
+      "id": "xarm-series",
+      "name": "AI机甲串联机械臂",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_3dof_arm_init",
+        "aimech_3dof_arm_move"
+      ]
+    },
+    {
+      "id": "xarm-linkage",
+      "name": "连杆机械臂",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_rod_arm_init",
+        "aimech_rod_reach_detect",
+        "aimech_rod_arm_move"
+      ]
+    }
+  ],
+  "menus": {
+    "arm": {
+      "items": [
+        {
+          "text": "机械臂",
+          "value": "_armId"
+        },
+        {
+          "text": "机械爪",
+          "value": "_clawId"
+        }
+      ]
+    },
+    "arm_3dof": {
+      "items": [
+        {
+          "text": "短机械臂",
+          "value": "0"
+        },
+        {
+          "text": "长机械臂",
+          "value": "1"
+        }
+      ]
+    },
+    "delay_select": {
+      "items": [
+        {
+          "text": "不延时",
+          "value": "False"
+        },
+        {
+          "text": "延时",
+          "value": "True"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "pythonLibraries": [],
+    "pythonDependencies": {},
+    "files": []
+  },
+  "blocks": [
+    {
+      "opcode": "aimech_set_arm_id",
+      "blockType": "command",
+      "text": "将机械臂舵机ID设置为 [SERVO]",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 2
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [
+            "_armId = {SERVO}"
+          ],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_claw_id",
+      "blockType": "command",
+      "text": "将机械爪舵机ID设置为 [SERVO]",
+      "arguments": {
+        "SERVO": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [
+            "_clawId = {SERVO}"
+          ],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_servo_enable",
+      "blockType": "command",
+      "text": "将 [ARM] 舵机上电",
+      "arguments": {
+        "ARM": {
+          "type": "string",
+          "defaultValue": "_armId",
+          "menu": "arm",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.load({ARM})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "_clawId = 1",
+            "_armId = 2",
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_servo_disable",
+      "blockType": "command",
+      "text": "将 [ARM] 舵机掉电",
+      "arguments": {
+        "ARM": {
+          "type": "string",
+          "defaultValue": "_armId",
+          "menu": "arm",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.unload({ARM})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "_clawId = 1",
+            "_armId = 2",
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_servo_pose_time",
+      "blockType": "command",
+      "text": "设置 [ARM] 舵机位置(0~1000) [POS] 运行时间 [TIME] ms",
+      "arguments": {
+        "ARM": {
+          "type": "string",
+          "defaultValue": "_armId",
+          "menu": "arm",
+          "literal": true
+        },
+        "POS": {
+          "type": "number",
+          "defaultValue": 500
+        },
+        "TIME": {
+          "type": "number",
+          "defaultValue": 500
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.run({ARM},{POS},{TIME})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "_clawId = 1",
+            "_armId = 2",
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_get_angle",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "获取 [ARM] 舵机位置",
+      "arguments": {
+        "ARM": {
+          "type": "string",
+          "defaultValue": "_armId",
+          "menu": "arm",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.get_position({ARM})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "_clawId = 1",
+            "_armId = 2",
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_set_servo_stop",
+      "blockType": "command",
+      "text": "停止舵机 [ARM] 运行",
+      "arguments": {
+        "ARM": {
+          "type": "string",
+          "defaultValue": "_armId",
+          "menu": "arm",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "busservos.stop({ARM})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "_clawId = 1",
+            "_armId = 2",
+            "busservos = Hiwonder.BusServo()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_3dof_arm_init",
+      "blockType": "command",
+      "text": "初始化 [ARM] 参数 大臂长度 [VALUE1] 小臂长度 [VALUE2] 小臂偏移 [VALUE3] 末端长度 [VALUE4]",
+      "arguments": {
+        "ARM": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "arm_3dof",
+          "literal": true
+        },
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 55
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 76
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 27
+        },
+        "VALUE4": {
+          "type": "number",
+          "defaultValue": 120
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "dof3Arm = Hiwonder.Arm_3DOF({VALUE1},{VALUE2},{VALUE3},{VALUE4},{ARM})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_3dof_arm_move",
+      "blockType": "command",
+      "text": "控制机械臂运动到 Y轴(前后方向) [VALUE1] 毫米, Z轴(上下方向) [VALUE2] 毫米, 末端的姿态角度(抬头是正, 低头是负) [VALUE3] 度, 运动时长 [VALUE4] 毫秒",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE4": {
+          "type": "number",
+          "defaultValue": 1000
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "dof3Arm.move_to_yz({VALUE1},{VALUE2},{VALUE3},{VALUE4})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_rod_arm_init",
+      "blockType": "command",
+      "text": "初始化连杆机械臂",
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "rodArm = Hiwonder.Arm_Link()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_rod_reach_detect",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "检测坐标Y [VALUE1] 毫米,Z [VALUE2] 毫米是否可以到达",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rodArm.is_s1s2_angle({VALUE1},{VALUE2})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_rod_arm_move",
+      "blockType": "command",
+      "text": "控制机械臂运动到 Y轴(前后方向) [VALUE1] 毫米, Z轴(上下方向) [VALUE2] 毫米, 运动时长 [VALUE3] 毫秒, [VALUE4] 等待",
+      "arguments": {
+        "VALUE1": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE2": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "VALUE3": {
+          "type": "number",
+          "defaultValue": 1000
+        },
+        "VALUE4": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "delay_select",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "rodArm.move_to_yz({VALUE1},{VALUE2},{VALUE3},{VALUE4})",
+          "imports": [
+            "import Hiwonder"
+          ],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    }
+  ],
+  "package": {
+    "fileName": "xarm-1.1.0.mpext",
+    "structure": "mindplus-python-package-v1"
+  }
+}

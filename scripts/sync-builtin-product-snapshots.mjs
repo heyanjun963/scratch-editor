@@ -51,6 +51,27 @@ const PRODUCT_SNAPSHOTS = [
         sha256: '7f93e619466d5e4a895942825c60b269042c399c28490f348f2df5ce2cd1a458'
     },
     {
+        packageId: 'actuator',
+        version: '1.1.0',
+        asset: 'actuator-1.1.0.mpext',
+        sha256: '87a40cc6aead1a63a1d81965df988d4cb70c61d51db99c95253b73d37ef9aec7',
+        source: 'builtin'
+    },
+    {
+        packageId: 'communication',
+        version: '1.0.0',
+        asset: 'communication-1.0.0.mpext',
+        sha256: '8d3a3f7bcbae59238efc18603b59ee0b64b119ac90d26d3b5b19db279f25e2a8',
+        source: 'builtin'
+    },
+    {
+        packageId: 'display',
+        version: '1.0.0',
+        asset: 'display-1.0.0.mpext',
+        sha256: '9b9316c313a4f14aabc5311131f7ecd4799bd8879a3b85865b95538b802656fa',
+        source: 'builtin'
+    },
+    {
         packageId: 'minihexa',
         version: '0.1.1',
         asset: 'minihexa-0.1.1.mpext',
@@ -61,6 +82,13 @@ const PRODUCT_SNAPSHOTS = [
         version: '1.20.0',
         asset: 'sensor-1.20.0.mpext',
         sha256: 'e8e1750bdfdb90f224ff366c6b49a07388cc1e8bd1fb69a857049c91cb6d02f4'
+    },
+    {
+        packageId: 'xarm',
+        version: '1.1.0',
+        asset: 'xarm-1.1.0.mpext',
+        sha256: '068c1b12145596c06a8ee8848074c00896ba317e87ca52434d7376095691c224',
+        source: 'builtin'
     }
 ];
 const editorRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -83,7 +111,10 @@ const writeJson = (filePath, value) => {
 const loadVerifiedSnapshots = async productRepository => {
     return Promise.all(PRODUCT_SNAPSHOTS.map(async entry => {
         const {packageId} = entry;
-        const packagePath = path.join(productRepository, 'dist', entry.asset);
+        // editor 优先迁移的包先复用当前内置资产，独立产品仓库补齐作者源后再切回 dist。
+        const packagePath = entry.source === 'builtin' ?
+            path.join(snapshotRoot, 'packages', entry.asset) :
+            path.join(productRepository, 'dist', entry.asset);
         const data = fs.readFileSync(packagePath);
         const sha256 = createHash('sha256').update(data).digest('hex');
         if (sha256 !== entry.sha256) {
@@ -127,7 +158,8 @@ const writeSnapshots = snapshots => {
         '# 内置产品 Mind+ 快照',
         '',
         '本目录由 `npm run sync:builtin-product-snapshots` 从独立产品仓库的已验证 `.mpext` 生成。',
-        '不要手工修改 manifest 或压缩包；产品源码只在 `scratch-product-extensions/products` 维护。',
+        '标记为 editor 内置来源的迁移批次会先复用当前已验证包，待独立产品仓库补齐作者源后再切换。',
+        '不要手工修改 manifest 或压缩包；应从已验证 MPEXT 重新生成快照。',
         ''
     ].join('\n'));
 };
