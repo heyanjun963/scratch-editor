@@ -26,13 +26,14 @@ const FOURTH_SENSOR_BATCH = ['line-4', 'line-4-rotary'];
 const FIFTH_SENSOR_BATCH = ['imu-sensor'];
 const SIXTH_SENSOR_BATCH = ['led-ultrasonic'];
 const SEVENTH_SENSOR_BATCH = ['wonder-echo'];
-const PLANNED_SENSOR_MODULES = ['wonder-lens', 'wonder-mind'];
+const WONDER_LENS_BATCH = ['wonder-lens'];
+const PLANNED_SENSOR_MODULES = ['wonder-mind'];
 const EIGHTH_SENSOR_BATCH = ['k230-vision'];
 
 const COMMON_AI_MODULES = {
     actuator: ['bus-servo', 'iic-pwm', 'fan'],
     xarm: ['xarm-series', 'xarm-linkage'],
-    display: ['dot-matrix', 'rgb-module'],
+    display: ['dot-matrix', 'rgb-module', 'digit-display', 'oled'],
     communication: ['communication']
 };
 
@@ -52,6 +53,7 @@ describe('product module support', () => {
                     FIFTH_SENSOR_BATCH,
                     SIXTH_SENSOR_BATCH,
                     SEVENTH_SENSOR_BATCH,
+                    WONDER_LENS_BATCH,
                     PLANNED_SENSOR_MODULES,
                     EIGHTH_SENSOR_BATCH
                 ));
@@ -89,6 +91,7 @@ describe('product module support', () => {
         expect(isProductModuleSupported('aihexa', 'sensor', 'imu-sensor')).toBe(true);
         expect(isProductModuleSupported('aihexa', 'sensor', 'led-ultrasonic')).toBe(true);
         expect(isProductModuleSupported('aihexa', 'sensor', 'wonder-echo')).toBe(true);
+        expect(isProductModuleSupported('aihexa', 'sensor', 'wonder-lens')).toBe(true);
         expect(isProductModuleSupported('aihexa', 'sensor', 'k230-vision')).toBe(true);
         expect(isProductModuleSupported('aimecanum', 'sensor', 'line-4-rotary')).toBe(true);
         expect(isProductModuleSupported('aimecanum', 'sensor', 'imu-sensor')).toBe(true);
@@ -108,11 +111,13 @@ describe('product module support', () => {
         expect(isProductModuleSupported('minihexa', 'sensor', 'imu-sensor')).toBe(false);
         expect(isProductModuleSupported('minihexa', 'sensor', 'led-ultrasonic')).toBe(true);
         expect(isProductModuleSupported('minihexa', 'sensor', 'wonder-echo')).toBe(true);
+        expect(isProductModuleSupported('minihexa', 'sensor', 'wonder-lens')).toBe(true);
         expect(isProductModuleSupported('minihexa', 'sensor', 'k230-vision')).toBe(false);
         expect(isProductModuleSupported('minihexa', 'sensor', 'knob')).toBe(false);
         expect(isProductModuleSupported('minihexa', 'sensor', 'ultrasonic')).toBe(false);
         expect(isProductModuleSupported('aidoggy', 'sensor', 'temperature-humidity')).toBe(true);
         expect(isProductModuleSupported('aidoggy', 'sensor', 'led-ultrasonic')).toBe(true);
+        expect(isProductModuleSupported('aidoggy', 'sensor', 'wonder-lens')).toBe(false);
         expect(isProductModuleSupported('aidoggy', 'sensor', 'ultrasonic')).toBe(false);
         expect(isProductModuleSupported(null, 'sensor', 'ultrasonic')).toBe(false);
     });

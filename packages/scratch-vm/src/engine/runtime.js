@@ -96,6 +96,12 @@ const ArgumentTypeMap = (() => {
             fieldName: 'MATRIX'
         }
     };
+    map[ArgumentType.LEDMATRIX] = {
+        shadow: {
+            type: 'led_matrix',
+            fieldName: 'LEDMATRIX'
+        }
+    };
     map[ArgumentType.LINE4] = {
         shadow: {
             type: 'line4',

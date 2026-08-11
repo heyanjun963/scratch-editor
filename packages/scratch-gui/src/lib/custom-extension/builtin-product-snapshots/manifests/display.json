@@ -2,7 +2,7 @@
   "formatVersion": 2,
   "id": "display",
   "name": "输出模块",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "适用于 Hiwonder Python 产品的输出模块积木包。",
   "color1": "#ff6347",
   "color2": "#db5038",
@@ -20,6 +20,88 @@
         "aimech_rgb_module_breath_one",
         "aimech_rgb_module_breath",
         "aimech_rgb_module_close"
+      ]
+    },
+    {
+      "id": "dot-matrix",
+      "name": "点阵屏",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_matrixLed_brightness",
+        "aimech_matrixLed_show_num",
+        "aimech_matrixLed_show_str",
+        "aimech_matrixLed_pos_onoff",
+        "aimech_matrix_led",
+        "aimech_clear_matrix_led",
+        "aiblocksboard_matrixLed_brightness",
+        "aiblocksboard_matrixLed_show_num",
+        "aiblocksboard_matrixLed_show_str",
+        "aiblocksboard_matrixLed_pos_onoff",
+        "aiblocksboard_matrix_led",
+        "aiblocksboard_clear_matrix_led"
+      ]
+    },
+    {
+      "id": "digit-display",
+      "name": "数码管",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_digit_show_num",
+        "aiblocksboard_digit_show_num"
+      ]
+    },
+    {
+      "id": "oled",
+      "name": "OLED-12864",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_oled_init",
+        "aiblocks_oled_init",
+        "oled_draw_ascii",
+        "oled_point",
+        "oled_clear",
+        "oled_draw_hline",
+        "oled_draw_vline",
+        "oled_draw_line",
+        "oled_draw_rect"
+      ]
+    },
+    {
+      "id": "mp3",
+      "name": "MP3 模块",
+      "hideLabel": false,
+      "blocks": [
+        "mp3_init",
+        "mp3_play_song_num",
+        "mp3_play_control",
+        "mp3_play_mode",
+        "mp3_set_volume"
+      ]
+    },
+    {
+      "id": "rgb-light",
+      "name": "RGB 灯带",
+      "hideLabel": false,
+      "blocks": [
+        "rgb_color_set",
+        "led_color_select",
+        "led_close"
+      ]
+    },
+    {
+      "id": "fan",
+      "name": "风扇模块",
+      "hideLabel": false,
+      "blocks": [
+        "fan_module_speed"
+      ]
+    },
+    {
+      "id": "fan-iic",
+      "name": "IIC 风扇",
+      "hideLabel": false,
+      "blocks": [
+        "aiblocks_fan_iic_set_module_speed"
       ]
     }
   ],
@@ -56,6 +138,46 @@
         }
       ]
     },
+    "aiblocks_iicport": {
+      "items": [
+        {
+          "text": "A",
+          "value": "1"
+        },
+        {
+          "text": "B",
+          "value": "2"
+        },
+        {
+          "text": "C",
+          "value": "3"
+        },
+        {
+          "text": "D",
+          "value": "4"
+        }
+      ]
+    },
+    "aidoggy_iicport": {
+      "items": [
+        {
+          "text": "C",
+          "value": "3"
+        },
+        {
+          "text": "D",
+          "value": "4"
+        },
+        {
+          "text": "E",
+          "value": "5"
+        },
+        {
+          "text": "F",
+          "value": "6"
+        }
+      ]
+    },
     "light_colors": {
       "items": [
         {
@@ -87,6 +209,230 @@
           "value": "6"
         }
       ]
+    },
+    "scroll": {
+      "items": [
+        {
+          "text": "不滚动",
+          "value": "False"
+        },
+        {
+          "text": "滚动",
+          "value": "True"
+        }
+      ]
+    },
+    "ledstatus": {
+      "items": [
+        {
+          "text": "点亮",
+          "value": "1"
+        },
+        {
+          "text": "熄灭",
+          "value": "0"
+        }
+      ]
+    },
+    "oledstatus": {
+      "items": [
+        {
+          "text": "点亮",
+          "value": "1"
+        },
+        {
+          "text": "关闭",
+          "value": "0"
+        }
+      ]
+    },
+    "oled_char_row": {
+      "items": [
+        {
+          "text": "0",
+          "value": "0"
+        },
+        {
+          "text": "1",
+          "value": "1"
+        },
+        {
+          "text": "2",
+          "value": "2"
+        },
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "4",
+          "value": "4"
+        },
+        {
+          "text": "5",
+          "value": "5"
+        }
+      ]
+    },
+    "shapetype": {
+      "items": [
+        {
+          "text": "空心",
+          "value": "0"
+        },
+        {
+          "text": "实心",
+          "value": "1"
+        }
+      ]
+    },
+    "mp3_port": {
+      "items": [
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "4",
+          "value": "4"
+        },
+        {
+          "text": "5",
+          "value": "5"
+        },
+        {
+          "text": "6",
+          "value": "6"
+        },
+        {
+          "text": "9",
+          "value": "9"
+        }
+      ]
+    },
+    "play_status": {
+      "items": [
+        {
+          "text": "播放",
+          "value": "0"
+        },
+        {
+          "text": "暂停",
+          "value": "1"
+        },
+        {
+          "text": "上一曲",
+          "value": "2"
+        },
+        {
+          "text": "下一曲",
+          "value": "3"
+        }
+      ]
+    },
+    "play_mode": {
+      "items": [
+        {
+          "text": "单曲循环",
+          "value": "0"
+        },
+        {
+          "text": "取消单曲循环",
+          "value": "1"
+        }
+      ]
+    },
+    "rgbport": {
+      "items": [
+        {
+          "text": "3",
+          "value": "3"
+        },
+        {
+          "text": "8",
+          "value": "8"
+        }
+      ]
+    },
+    "nums": {
+      "items": [
+        {
+          "text": "全部",
+          "value": "15"
+        },
+        {
+          "text": "1",
+          "value": "0"
+        },
+        {
+          "text": "2",
+          "value": "1"
+        },
+        {
+          "text": "3",
+          "value": "2"
+        },
+        {
+          "text": "4",
+          "value": "3"
+        },
+        {
+          "text": "5",
+          "value": "4"
+        },
+        {
+          "text": "6",
+          "value": "5"
+        },
+        {
+          "text": "7",
+          "value": "6"
+        },
+        {
+          "text": "8",
+          "value": "7"
+        },
+        {
+          "text": "9",
+          "value": "8"
+        },
+        {
+          "text": "10",
+          "value": "9"
+        },
+        {
+          "text": "11",
+          "value": "10"
+        },
+        {
+          "text": "12",
+          "value": "11"
+        },
+        {
+          "text": "13",
+          "value": "12"
+        },
+        {
+          "text": "14",
+          "value": "13"
+        },
+        {
+          "text": "15",
+          "value": "14"
+        }
+      ]
+    },
+    "fanport": {
+      "items": [
+        {
+          "text": "6",
+          "value": "6"
+        },
+        {
+          "text": "8",
+          "value": "8"
+        }
+      ]
     }
   },
   "runtime": {
@@ -99,6 +445,13 @@
       "opcode": "aimech_rgb_module_color_set",
       "blockType": "command",
       "text": "设置RGB模块接口 [PORT] 红色值 [RED] 绿色值 [GREEN] 蓝色值 [BLUE]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
       "arguments": {
         "PORT": {
           "type": "string",
@@ -142,6 +495,13 @@
       "opcode": "aimech_rgb_module_color_select",
       "blockType": "command",
       "text": "设置RGB模块接口 [PORT] 颜色 [COLOR]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
       "arguments": {
         "PORT": {
           "type": "string",
@@ -177,6 +537,13 @@
       "opcode": "aimech_rgb_module_breath_one",
       "blockType": "command",
       "text": "设置RGB模块接口 [PORT] 呼吸灯模式,颜色 [COLOR] 变化周期(0.5~20) [CYCLE] 秒",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
       "arguments": {
         "PORT": {
           "type": "string",
@@ -218,6 +585,13 @@
       "opcode": "aimech_rgb_module_breath",
       "blockType": "command",
       "text": "设置RGB模块接口 [PORT] 炫彩模式",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
       "arguments": {
         "PORT": {
           "type": "string",
@@ -249,6 +623,13 @@
       "opcode": "aimech_rgb_module_close",
       "blockType": "command",
       "text": "关闭RGB模块接口 [PORT] 灯",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
       "arguments": {
         "PORT": {
           "type": "string",
@@ -275,10 +656,1407 @@
           "section": ""
         }
       }
+    },
+    {
+      "opcode": "aimech_matrixLed_brightness",
+      "blockType": "command",
+      "text": "设置点阵屏接口 [PORT] 亮度 [BRIGHT] (1-8)",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aidoggy"
+      ],
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "BRIGHT": {
+          "type": "number",
+          "defaultValue": 8
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ledMatrix_{PORT}.setBrightness({BRIGHT})",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ledMatrix_{PORT} = Hiwonder_DEV.DEV_LEDMatrix(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_matrixLed_show_num",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 显示数字 [DATA]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aidoggy"
+      ],
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "DATA": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ledMatrix_{PORT}.showNum({DATA})",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ledMatrix_{PORT} = Hiwonder_DEV.DEV_LEDMatrix(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_matrixLed_show_str",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 位置 x [XPOS] y [YPOS] 显示字符串 [STR] [SCROLL]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aidoggy"
+      ],
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hi"
+        },
+        "SCROLL": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "scroll",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ledMatrix_{PORT}.drawStr({XPOS},{YPOS},{STR},{SCROLL})",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ledMatrix_{PORT} = Hiwonder_DEV.DEV_LEDMatrix(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_matrixLed_pos_onoff",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 位置 x [XPOS] y [YPOS] [LEDSTATUS]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aidoggy"
+      ],
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "LEDSTATUS": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "ledstatus",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ledMatrix_{PORT}.setLedOnOff({XPOS},{YPOS},{LEDSTATUS})",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ledMatrix_{PORT} = Hiwonder_DEV.DEV_LEDMatrix(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_matrix_led",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 绘制 [MATRIX]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aidoggy"
+      ],
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "MATRIX": {
+          "type": "ledmatrix",
+          "defaultValue": "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ledMatrix_{PORT}.drawBitMap(({MATRIX.bitmap}))",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ledMatrix_{PORT} = Hiwonder_DEV.DEV_LEDMatrix(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_clear_matrix_led",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 清空显示",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aidoggy"
+      ],
+      "productArguments": {
+        "aidoggy": {
+          "PORT": {
+            "menu": "aidoggy_iicport",
+            "defaultValue": "3"
+          }
+        }
+      },
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "ledMatrix_{PORT}.clear()",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "ledMatrix_{PORT} = Hiwonder_DEV.DEV_LEDMatrix(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_matrixLed_brightness",
+      "blockType": "command",
+      "text": "设置点阵屏接口 [PORT] 亮度 [BRIGHT] (1-8)",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "BRIGHT": {
+          "type": "number",
+          "defaultValue": 8
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "matrix_{PORT}.setBrightness({BRIGHT})",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "matrix_{PORT} = Hiwonder_IIC.DEV_LEDMatrix(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_matrixLed_show_num",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 显示数字 [DATA]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "DATA": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "matrix_{PORT}.showNum({DATA})",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "matrix_{PORT} = Hiwonder_IIC.DEV_LEDMatrix(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_matrixLed_show_str",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 位置 x [XPOS] y [YPOS] 显示字符串 [STR] [SCROLL]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hi"
+        },
+        "SCROLL": {
+          "type": "string",
+          "defaultValue": "False",
+          "menu": "scroll",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "matrix_{PORT}.drawStr({XPOS},{YPOS},{STR},{SCROLL})",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "matrix_{PORT} = Hiwonder_IIC.DEV_LEDMatrix(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_matrixLed_pos_onoff",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 位置 x [XPOS] y [YPOS] [LEDSTATUS]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "LEDSTATUS": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "ledstatus",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "matrix_{PORT}.setLedOnOff({XPOS},{YPOS},{LEDSTATUS})",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "matrix_{PORT} = Hiwonder_IIC.DEV_LEDMatrix(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_matrix_led",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 绘制 [MATRIX]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "MATRIX": {
+          "type": "ledmatrix",
+          "defaultValue": "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "matrix_{PORT}.drawBitMap(({MATRIX.bitmap}))",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "matrix_{PORT} = Hiwonder_IIC.DEV_LEDMatrix(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_clear_matrix_led",
+      "blockType": "command",
+      "text": "点阵屏接口 [PORT] 清空显示",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "matrix_{PORT}.clear()",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "matrix_{PORT} = Hiwonder_IIC.DEV_LEDMatrix(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_digit_show_num",
+      "blockType": "command",
+      "text": "数码管接口 [PORT] 显示数字 [NUM]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        },
+        "NUM": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "digit_{PORT}.show_int({NUM})",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "digit_{PORT} = Hiwonder_DEV.DEV_NixieTube(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocksboard_digit_show_num",
+      "blockType": "command",
+      "text": "数码管接口 [PORT] 显示数字 [NUM]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "NUM": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "digit_{PORT}.show_int({NUM})",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "digit_{PORT} = Hiwonder_IIC.DEV_NixieTube(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aimech_oled_init",
+      "blockType": "command",
+      "text": "初始化 OLED 接口 [PORT]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "my_oled = Hiwonder_DEV.DEV_OLED(Hiwonder_DEV.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocks_oled_init",
+      "blockType": "command",
+      "text": "初始化 OLED 接口 [PORT]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "my_oled = Hiwonder_IIC.DEV_OLED(iic,{PORT})"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_draw_ascii",
+      "blockType": "command",
+      "text": "OLED 显示字符 [STR] 坐标 X [XPOS] Y [YPOS]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "STR": {
+          "type": "string",
+          "defaultValue": "Hello"
+        },
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "YPOS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "oled_char_row",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "my_oled.text({STR},{XPOS},{YPOS}*10 )",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_point",
+      "blockType": "command",
+      "text": "OLED 在坐标 X [XPOS] Y [YPOS] [STATUS]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "STATUS": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "oledstatus",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "my_oled.pixel({XPOS},{YPOS},{STATUS})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_clear",
+      "blockType": "command",
+      "text": "OLED 清空显示",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "my_oled.fill()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_draw_hline",
+      "blockType": "command",
+      "text": "OLED 画水平线 起点 X [XPOS] Y [YPOS] 长度 [LENGTH]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 10
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 15
+        },
+        "LENGTH": {
+          "type": "number",
+          "defaultValue": 117
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "my_oled.hline({XPOS},{YPOS},{LENGTH})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_draw_vline",
+      "blockType": "command",
+      "text": "OLED 画垂直线 起点 X [XPOS] Y [YPOS] 长度 [LENGTH]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 10
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 15
+        },
+        "LENGTH": {
+          "type": "number",
+          "defaultValue": 48
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "my_oled.vline({XPOS},{YPOS},{LENGTH})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_draw_line",
+      "blockType": "command",
+      "text": "OLED 画直线 起点 X [XPOS] Y [YPOS] 终点 X [XPOS1] Y [YPOS1]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 10
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 15
+        },
+        "XPOS1": {
+          "type": "number",
+          "defaultValue": 117
+        },
+        "YPOS1": {
+          "type": "number",
+          "defaultValue": 15
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "my_oled.line({XPOS},{YPOS},{XPOS1},{YPOS1})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "oled_draw_rect",
+      "blockType": "command",
+      "text": "OLED 画 [SHAPE] 矩形 左上 X [XPOS] Y [YPOS] 右下 X [XPOS1] Y [YPOS1]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "SHAPE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "shapetype",
+          "literal": true
+        },
+        "XPOS": {
+          "type": "number",
+          "defaultValue": 30
+        },
+        "YPOS": {
+          "type": "number",
+          "defaultValue": 5
+        },
+        "XPOS1": {
+          "type": "number",
+          "defaultValue": 98
+        },
+        "YPOS1": {
+          "type": "number",
+          "defaultValue": 31
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "my_oled.rect({XPOS},{YPOS},{XPOS1},{YPOS1})",
+          "templateSelector": {
+            "argument": "SHAPE",
+            "cases": {
+              "0": "my_oled.rect({XPOS},{YPOS},{XPOS1},{YPOS1})",
+              "1": "my_oled.fill_rect({XPOS},{YPOS},{XPOS1},{YPOS1})"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "mp3_init",
+      "blockType": "command",
+      "text": "初始化 MP3 模块接口 [IICPORT]",
+      "arguments": {
+        "IICPORT": {
+          "type": "string",
+          "defaultValue": "3",
+          "menu": "mp3_port",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "from Hiwonder import MP3"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "mp3 = Hiwonder.MP3(Hiwonder.Port({IICPORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "mp3_play_song_num",
+      "blockType": "command",
+      "text": "MP3 模块播放第 [VALUE] 首歌曲",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 1
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "mp3.play({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "mp3_play_control",
+      "blockType": "command",
+      "text": "MP3 模块 [PLAYSTATUS]",
+      "arguments": {
+        "PLAYSTATUS": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "play_status",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "mp3.play()",
+          "templateSelector": {
+            "argument": "PLAYSTATUS",
+            "cases": {
+              "0": "mp3.play()",
+              "1": "mp3.pause()",
+              "2": "mp3.prev()",
+              "3": "mp3.next()"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "mp3_play_mode",
+      "blockType": "command",
+      "text": "设置 MP3 播放模式 [PLAYMODE]",
+      "arguments": {
+        "PLAYMODE": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "play_mode",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "mp3.loop_on()",
+          "templateSelector": {
+            "argument": "PLAYMODE",
+            "cases": {
+              "0": "mp3.loop_on()",
+              "1": "mp3.loop_off()"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "mp3_set_volume",
+      "blockType": "command",
+      "text": "设置 MP3 音量 [VALUE]",
+      "arguments": {
+        "VALUE": {
+          "type": "number",
+          "defaultValue": 30
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "mp3.volume({VALUE})",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "rgb_color_set",
+      "blockType": "command",
+      "text": "设置 RGB 灯带接口 [PORT] 灯 [NUMS] 红 [RED] 绿 [GREEN] 蓝 [BLUE]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "3",
+          "menu": "rgbport",
+          "literal": true
+        },
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "15",
+          "menu": "nums",
+          "literal": true
+        },
+        "RED": {
+          "type": "number",
+          "defaultValue": 255
+        },
+        "GREEN": {
+          "type": "number",
+          "defaultValue": 0
+        },
+        "BLUE": {
+          "type": "number",
+          "defaultValue": 0
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "myrgb_{PORT}.setItem({NUMS},{RED},{GREEN},{BLUE})\nmyrgb_{PORT}.write()",
+          "templateSelector": {
+            "argument": "NUMS",
+            "cases": {
+              "15": "myrgb_{PORT}.fill({RED},{GREEN},{BLUE})\nmyrgb_{PORT}.write()"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "myrgb_{PORT} = Hiwonder.Neopixel(Hiwonder.Port({PORT}),15)"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "led_color_select",
+      "blockType": "command",
+      "text": "设置 RGB 灯带接口 [PORT] 灯 [NUMS] 颜色 [COLOR]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "3",
+          "menu": "rgbport",
+          "literal": true
+        },
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "15",
+          "menu": "nums",
+          "literal": true
+        },
+        "COLOR": {
+          "type": "color",
+          "defaultValue": "#ff0000"
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "myrgb_{PORT}.setItem({NUMS},{COLOR.rgb})\nmyrgb_{PORT}.write()",
+          "templateSelector": {
+            "argument": "NUMS",
+            "cases": {
+              "15": "myrgb_{PORT}.fill({COLOR.rgb})\nmyrgb_{PORT}.write()"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "myrgb_{PORT} = Hiwonder.Neopixel(Hiwonder.Port({PORT}),15)"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "led_close",
+      "blockType": "command",
+      "text": "关闭 RGB 灯带接口 [PORT] 灯 [NUMS]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "3",
+          "menu": "rgbport",
+          "literal": true
+        },
+        "NUMS": {
+          "type": "string",
+          "defaultValue": "15",
+          "menu": "nums",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "myrgb_{PORT}.setItem({NUMS},0x00,0x00,0x00)\nmyrgb_{PORT}.write()",
+          "templateSelector": {
+            "argument": "NUMS",
+            "cases": {
+              "15": "myrgb_{PORT}.clear()"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [
+            "myrgb_{PORT} = Hiwonder.Neopixel(Hiwonder.Port({PORT}),15)"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "fan_module_speed",
+      "blockType": "command",
+      "text": "设置风扇接口 [PORT] 转速 [SPEED]",
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "6",
+          "menu": "fanport",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 80
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "fan_{PORT}.set_speed({SPEED})",
+          "imports": [
+            "import Hiwonder_Fan"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "fan_{PORT} = Hiwonder_Fan.Fan(Hiwonder.Port({PORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "aiblocks_fan_iic_set_module_speed",
+      "blockType": "command",
+      "text": "设置 IIC 风扇接口 [PORT] 转速 [SPEED]",
+      "products": [
+        "aiblocksboard"
+      ],
+      "arguments": {
+        "PORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aiblocks_iicport",
+          "literal": true
+        },
+        "SPEED": {
+          "type": "number",
+          "defaultValue": 80
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "iic_fan_{PORT}.set_speed({SPEED})",
+          "imports": [
+            "import Hiwonder_IIC"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "iic = Hiwonder_IIC.IIC()",
+            "iic_fan_{PORT} = Hiwonder_IIC.DEV_FAN(iic,{PORT},0x58)"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
     }
   ],
   "package": {
-    "fileName": "display-1.0.0.mpext",
+    "fileName": "display-1.4.0.mpext",
     "structure": "mindplus-python-package-v1"
   }
 }

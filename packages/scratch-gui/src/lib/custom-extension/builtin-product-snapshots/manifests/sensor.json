@@ -2,7 +2,7 @@
   "formatVersion": 2,
   "id": "sensor",
   "name": "输入模块",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "description": "适用于 Hiwonder Python 产品的基础输入传感器积木包。",
   "color1": "#2e8b57",
   "color2": "#267348",
@@ -177,6 +177,23 @@
         "wonderecho_speech_cmd_number",
         "wonderecho_speech_play",
         "wonderecho_speech_play_number"
+      ]
+    },
+    {
+      "id": "wonder-lens",
+      "name": "WonderLens视觉模块",
+      "hideLabel": false,
+      "blocks": [
+        "aimech_wondercamInitI2c",
+        "minihexa_wondercamInitI2c",
+        "getFwVersion",
+        "getFuncNumber",
+        "getCurrentFunc",
+        "switchFunc",
+        "setLed",
+        "wondercamUpdateResult",
+        "isAnyFaceDetected",
+        "numOfDetectedFaces"
       ]
     },
     {
@@ -508,6 +525,70 @@
         {
           "text": "Y轴转角",
           "value": "2"
+        }
+      ]
+    },
+    "funcNum": {
+      "items": [
+        {
+          "text": "设置",
+          "value": "0"
+        },
+        {
+          "text": "人脸识别",
+          "value": "1"
+        },
+        {
+          "text": "物体检测",
+          "value": "2"
+        },
+        {
+          "text": "图像分类",
+          "value": "3"
+        },
+        {
+          "text": "特征学习",
+          "value": "4"
+        },
+        {
+          "text": "颜色识别",
+          "value": "5"
+        },
+        {
+          "text": "视觉巡线",
+          "value": "6"
+        },
+        {
+          "text": "AprilTag",
+          "value": "7"
+        },
+        {
+          "text": "二维码",
+          "value": "8"
+        },
+        {
+          "text": "条形码",
+          "value": "9"
+        },
+        {
+          "text": "数字",
+          "value": "10"
+        },
+        {
+          "text": "地标",
+          "value": "11"
+        }
+      ]
+    },
+    "onOff": {
+      "items": [
+        {
+          "text": "开",
+          "value": "1"
+        },
+        {
+          "text": "关",
+          "value": "0"
         }
       ]
     },
@@ -7683,10 +7764,364 @@
           "section": ""
         }
       }
+    },
+    {
+      "opcode": "aimech_wondercamInitI2c",
+      "blockType": "command",
+      "text": "初始化 WonderLens IIC接口 [IICPORT]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa"
+      ],
+      "arguments": {
+        "IICPORT": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "aimech_iicport",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "cam = Hiwonder_DEV.WonderCam(Hiwonder_DEV.Port({IICPORT}))"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "minihexa_wondercamInitI2c",
+      "blockType": "command",
+      "text": "初始化 WonderLens IIC接口",
+      "products": [
+        "minihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "",
+          "imports": [
+            "import Hiwonder_DEV"
+          ],
+          "runtimeFiles": [],
+          "variables": [
+            "cam = Hiwonder_DEV.WonderCam()"
+          ],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "getFwVersion",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "WonderLens 当前固件版本",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "cam.getFwVersion()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "getFuncNumber",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "功能 [NUM]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "funcNum",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "{NUM}",
+          "templateSelector": {
+            "argument": "NUM",
+            "cases": {
+              "0": "cam.FuncNone",
+              "1": "cam.FaceDetect",
+              "2": "cam.ObjectDetect",
+              "3": "cam.Classification",
+              "4": "cam.FeatureLearning",
+              "5": "cam.ColorDetect",
+              "6": "cam.LineFollowing",
+              "7": "cam.AprilTag",
+              "8": "cam.QrCode",
+              "9": "cam.BarCode"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "getCurrentFunc",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "WonderLens 当前功能",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "cam.getCurrentFunc()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "switchFunc",
+      "blockType": "command",
+      "text": "WonderLens 切换至功能 [NUM]",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {
+        "NUM": {
+          "type": "string",
+          "defaultValue": "0",
+          "menu": "funcNum",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "cam.switchFunc({NUM})",
+          "templateSelector": {
+            "argument": "NUM",
+            "cases": {
+              "0": "cam.switchFunc(cam.FuncNone)",
+              "1": "cam.switchFunc(cam.FaceDetect)",
+              "2": "cam.switchFunc(cam.ObjectDetect)",
+              "3": "cam.switchFunc(cam.Classification)",
+              "4": "cam.switchFunc(cam.FeatureLearning)",
+              "5": "cam.switchFunc(cam.ColorDetect)",
+              "6": "cam.switchFunc(cam.LineFollowing)",
+              "7": "cam.switchFunc(cam.AprilTag)",
+              "8": "cam.switchFunc(cam.QrCode)",
+              "9": "cam.switchFunc(cam.BarCode)",
+              "10": "cam.switchFunc(cam.NumberRecognition)",
+              "11": "cam.switchFunc(cam.LandmarkRecognition)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "setLed",
+      "blockType": "command",
+      "text": "[ONOFF] LED",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {
+        "ONOFF": {
+          "type": "string",
+          "defaultValue": "1",
+          "menu": "onOff",
+          "literal": true
+        }
+      },
+      "codegen": {
+        "python": {
+          "template": "cam.setLed({ONOFF})",
+          "templateSelector": {
+            "argument": "ONOFF",
+            "cases": {
+              "0": "cam.setLed(cam.LED_OFF)",
+              "1": "cam.setLed(cam.LED_ON)"
+            }
+          },
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "wondercamUpdateResult",
+      "blockType": "command",
+      "text": "WonderLens 更新并获取结果",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "cam.updateResult()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "isAnyFaceDetected",
+      "blockType": "boolean",
+      "disableMonitor": true,
+      "text": "检测到人脸?",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "cam.isAnyFaceDetected()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
+    },
+    {
+      "opcode": "numOfDetectedFaces",
+      "blockType": "reporter",
+      "disableMonitor": true,
+      "text": "WonderLens 检测到的人脸数量",
+      "products": [
+        "aimech",
+        "aimecanum",
+        "aiquadruped",
+        "aiquadrupedpro",
+        "aihexa",
+        "minihexa"
+      ],
+      "arguments": {},
+      "codegen": {
+        "python": {
+          "template": "cam.numOfDetectedFaces()",
+          "imports": [],
+          "runtimeFiles": [],
+          "variables": [],
+          "forcedVariables": [],
+          "setups": [],
+          "entryTemplate": "",
+          "entryFooter": "",
+          "launcher": "",
+          "section": ""
+        }
+      }
     }
   ],
   "package": {
-    "fileName": "sensor-1.20.0.mpext",
+    "fileName": "sensor-1.21.0.mpext",
     "structure": "mindplus-python-package-v1"
   }
 }

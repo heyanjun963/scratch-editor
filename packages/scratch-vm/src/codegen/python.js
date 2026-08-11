@@ -171,6 +171,8 @@ const expressionFromSelf = (block, imports, fallback = '') => {
     case 'line6':
         // 六路巡线 shadow 字段内部保存十六进制掩码，生成 Python 时直接拼到 0x 后面。
         return getFieldValue(block, ['LINE6'], fallback);
+    case 'led_matrix':
+        return getFieldValue(block, ['LEDMATRIX'], fallback);
     default: {
         const customExpression = customBlockToPythonExpression(block, imports);
         if (customExpression) return customExpression;
@@ -207,6 +209,26 @@ const getDefaultArgumentValue = (templateInfo, inputName, fallback) => {
     const argument = templateInfo.arguments && templateInfo.arguments[inputName];
     if (!argument || typeof argument.defaultValue === 'undefined') return fallback;
     return argument.defaultValue;
+};
+
+// 旧点阵屏按列读取 16×8 字段：同一列的 8 行分别对应一个字节的 bit0-bit7。
+const getLedMatrixBitmapArgumentValue = (block, inputName, fallback) => {
+    const inputBlock = getInputBlock(block, inputName);
+    const rawValue = inputBlock ?
+        getFieldValue(inputBlock, ['LEDMATRIX'], fallback) :
+        getFieldValue(block, [inputName], fallback);
+    const normalized = /^[01]{1,128}$/.test(String(rawValue || '')) ?
+        String(rawValue).padEnd(128, '0') :
+        String(fallback || '').padEnd(128, '0').slice(0, 128);
+    const bytes = [];
+    for (let column = 0; column < 16; column++) {
+        let value = 0;
+        for (let row = 0; row < 8; row++) {
+            if (normalized[column + row * 16] === '1') value += 1 << row;
+        }
+        bytes.push(`0x${value.toString(16)}`);
+    }
+    return bytes.join(',');
 };
 
 const addCustomImports = (templateInfo, imports) => {
@@ -295,6 +317,9 @@ const applyTemplateText = (template, templateInfo, block, imports) => (
             if (formatter === 'identifier') {
                 const value = getTemplateArgumentValue(templateInfo, block, inputName, fallback, imports);
                 return normalizePythonName(getStaticStringArgumentValue(value, inputName));
+            }
+            if (formatter === 'bitmap') {
+                return getLedMatrixBitmapArgumentValue(block, inputName, fallback);
             }
             if (argument && argument.literal) {
                 return getLiteralArgumentValue(templateInfo, block, inputName, fallback);

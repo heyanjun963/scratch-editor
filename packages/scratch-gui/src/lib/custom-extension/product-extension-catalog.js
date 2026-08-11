@@ -18,7 +18,7 @@ const productExtensionCatalog = [
                     ],
                     actuator: ['bus-servo', 'iic-pwm', 'fan'],
                     xarm: ['xarm', 'xarm-series', 'xarm-linkage'],
-                    display: ['dot-matrix', 'rgb-module'],
+                    display: ['dot-matrix', 'rgb-module', 'digit-display', 'oled'],
                     communication: ['communication']
                 },
                 version: '0.0.0',
@@ -38,7 +38,7 @@ const productExtensionCatalog = [
                     ],
                     actuator: ['bus-servo', 'iic-pwm', 'fan'],
                     xarm: ['xarm-series', 'xarm-linkage'],
-                    display: ['dot-matrix', 'rgb-module'],
+                    display: ['dot-matrix', 'rgb-module', 'digit-display', 'oled'],
                     communication: ['communication']
                 },
                 version: '0.2.3',
@@ -59,7 +59,7 @@ const productExtensionCatalog = [
                     ],
                     actuator: ['bus-servo', 'iic-pwm', 'fan'],
                     xarm: ['xarm-series', 'xarm-linkage'],
-                    display: ['dot-matrix', 'rgb-module'],
+                    display: ['dot-matrix', 'rgb-module', 'digit-display', 'oled'],
                     communication: ['communication']
                 },
                 version: '1.0.0',
@@ -80,7 +80,7 @@ const productExtensionCatalog = [
                     ],
                     actuator: ['bus-servo', 'iic-pwm', 'fan'],
                     xarm: ['xarm-series', 'xarm-linkage'],
-                    display: ['dot-matrix', 'rgb-module'],
+                    display: ['dot-matrix', 'rgb-module', 'digit-display', 'oled'],
                     communication: ['communication']
                 },
                 version: '1.0.0',
@@ -101,7 +101,7 @@ const productExtensionCatalog = [
                     ],
                     actuator: ['bus-servo', 'iic-pwm', 'fan'],
                     xarm: ['xarm-series', 'xarm-linkage'],
-                    display: ['dot-matrix', 'rgb-module'],
+                    display: ['dot-matrix', 'rgb-module', 'digit-display', 'oled'],
                     communication: ['communication']
                 },
                 version: '1.0.0',
@@ -277,6 +277,7 @@ const productExtensionCatalog = [
                 status: 'planned'
             },
             {
+                // TODO：WonderLens 目前只迁移 10/54 个积木，剩余 44 个；暂停后续迁移时不得视为完整模块。
                 id: 'wonder-lens',
                 name: 'WonderLens视觉模块',
                 sourceExtension: 'sensor',
@@ -285,6 +286,7 @@ const productExtensionCatalog = [
                 status: 'planned'
             },
             {
+                // TODO：WonderMind 仍有 20 个积木未迁移，仅支持五款大型 AI 机甲。
                 id: 'wonder-mind',
                 name: 'WonderMind',
                 sourceExtension: 'sensor',
@@ -390,6 +392,22 @@ const productExtensionCatalog = [
                 sourceExtension: 'display',
                 version: '0.0.0',
                 latestVersion: '1.0.0',
+                status: 'planned'
+            },
+            {
+                id: 'digit-display',
+                name: '数码管',
+                sourceExtension: 'display',
+                version: '0.0.0',
+                latestVersion: '1.2.0',
+                status: 'planned'
+            },
+            {
+                id: 'oled',
+                name: 'OLED-12864',
+                sourceExtension: 'display',
+                version: '0.0.0',
+                latestVersion: '1.2.0',
                 status: 'planned'
             },
             {

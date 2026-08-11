@@ -181,7 +181,17 @@ const EXPECTED_OPCODES = [
     'k230_barcode_count',
     'k230_result_barcode_get_arg',
     'k230_barcode_near_center',
-    'k230_result_barcode_get_pos_arg'
+    'k230_result_barcode_get_pos_arg',
+    'aimech_wondercamInitI2c',
+    'minihexa_wondercamInitI2c',
+    'getFwVersion',
+    'getFuncNumber',
+    'getCurrentFunc',
+    'switchFunc',
+    'setLed',
+    'wondercamUpdateResult',
+    'isAnyFaceDetected',
+    'numOfDetectedFaces'
 ];
 
 class TestBlock {
@@ -235,17 +245,17 @@ describe('sensor built-in Mind+ snapshot', () => {
         expect(manifest).toMatchObject({
             id: 'sensor',
             name: '输入模块',
-            version: '1.20.0',
+            version: '1.21.0',
             package: {structure: 'mindplus-python-package-v1'}
         });
         expect(manifest.blocks.map(block => block.opcode)).toEqual(EXPECTED_OPCODES);
-        expect(Object.keys(manifest.menus)).toHaveLength(53);
+        expect(Object.keys(manifest.menus)).toHaveLength(55);
         expect(manifest.categories.map(category => category.name)).toEqual([
             '旋钮', '光线传感器', '雨滴传感器', '土壤传感器', '声音传感器',
             '红外检测传感器', '触摸传感器', '按键模块', '超声波传感器',
             '颜色识别模块', '温湿度传感器', '六路巡线传感器',
             '四路巡线传感器', '旋钮四路巡线传感器', 'IMU传感器', 'LED超声波传感器',
-            'WonderEcho语音模块', 'K230视觉模块'
+            'WonderEcho语音模块', 'WonderLens视觉模块', 'K230视觉模块'
         ]);
         expect(extensionBlocks.filter(block => block && block.subCategory).map(block => block.subCategory))
             .toEqual(manifest.categories.map(category => category.name));
@@ -273,6 +283,17 @@ describe('sensor built-in Mind+ snapshot', () => {
         ]);
         expect(manifest.menus.temphumi.items).toEqual([
             {text: '温度', value: '0'}, {text: '湿度', value: '1'}
+        ]);
+        expect(manifest.menus.funcNum.items).toEqual([
+            {text: '设置', value: '0'}, {text: '人脸识别', value: '1'},
+            {text: '物体检测', value: '2'}, {text: '图像分类', value: '3'},
+            {text: '特征学习', value: '4'}, {text: '颜色识别', value: '5'},
+            {text: '视觉巡线', value: '6'}, {text: 'AprilTag', value: '7'},
+            {text: '二维码', value: '8'}, {text: '条形码', value: '9'},
+            {text: '数字', value: '10'}, {text: '地标', value: '11'}
+        ]);
+        expect(manifest.menus.onOff.items).toEqual([
+            {text: '开', value: '1'}, {text: '关', value: '0'}
         ]);
         expect(manifest.menus.linefollows6Mask.items).toEqual([
             {text: '1', value: '1'}, {text: '2', value: '2'}, {text: '3', value: '4'},
@@ -708,6 +729,62 @@ describe('sensor built-in Mind+ snapshot', () => {
             'asr2.speak(asr2.ASR_ANNOUNCER, 0x12)',
             'asr2.speak(asr2.ASR_ANNOUNCER, 18)'
         ].forEach(line => expect(code).toContain(line));
+    });
+
+    test('generates WonderLens initialization, function selection and first face results', () => {
+        const main = new TestBlock('aihexa_start_thread');
+        const blocks = [
+            new TestBlock('sensor_aimech_wondercamInitI2c', {IICPORT: '3'}),
+            new TestBlock('sensor_getFwVersion'),
+            new TestBlock('sensor_getFuncNumber', {NUM: '7'}),
+            new TestBlock('sensor_getCurrentFunc'),
+            new TestBlock('sensor_switchFunc', {NUM: '11'}),
+            new TestBlock('sensor_setLed', {ONOFF: '0'}),
+            new TestBlock('sensor_wondercamUpdateResult'),
+            new TestBlock('sensor_isAnyFaceDetected'),
+            new TestBlock('sensor_numOfDetectedFaces')
+        ];
+        blocks.reduce((previous, block) => {
+            previous.next = block;
+            return block;
+        }, main);
+
+        const code = generatePythonCode(createWorkspace([main]), {getPythonCodegenTemplate: getTemplate});
+        [
+            'cam = Hiwonder_DEV.WonderCam(Hiwonder_DEV.Port(3))',
+            'cam.getFwVersion()',
+            'cam.AprilTag',
+            'cam.getCurrentFunc()',
+            'cam.switchFunc(cam.LandmarkRecognition)',
+            'cam.setLed(cam.LED_OFF)',
+            'cam.updateResult()',
+            'cam.isAnyFaceDetected()',
+            'cam.numOfDetectedFaces()'
+        ].forEach(line => expect(code).toContain(line));
+        expect(code).toContain('import Hiwonder_DEV');
+
+        const miniMain = new TestBlock('aihexa_start_thread');
+        miniMain.next = new TestBlock('sensor_minihexa_wondercamInitI2c');
+        const miniCode = generatePythonCode(createWorkspace([miniMain]), {getPythonCodegenTemplate: getTemplate});
+        expect(miniCode).toContain('cam = Hiwonder_DEV.WonderCam()');
+        expect(miniCode).not.toContain('Hiwonder_DEV.Port(');
+    });
+
+    test('filters the WonderLens initializer to old products that support it', () => {
+        const compose = productId => composeProductModuleManifest(
+            builtinProductManifests.sensor,
+            ['wonder-lens'],
+            productId
+        );
+        const opcodes = productId => compose(productId).blocks.map(block => block.opcode);
+
+        ['aimech', 'aimecanum', 'aiquadruped', 'aiquadrupedpro', 'aihexa'].forEach(productId => {
+            expect(opcodes(productId)).toContain('aimech_wondercamInitI2c');
+            expect(opcodes(productId)).not.toContain('minihexa_wondercamInitI2c');
+        });
+        expect(opcodes('minihexa')).toContain('minihexa_wondercamInitI2c');
+        expect(opcodes('minihexa')).not.toContain('aimech_wondercamInitI2c');
+        expect(opcodes('aidoggy')).toEqual([]);
     });
 
     test('generates the legacy K230 initialization, controls and result communication', () => {

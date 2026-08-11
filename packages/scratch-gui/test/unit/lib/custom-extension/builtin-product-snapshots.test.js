@@ -65,9 +65,9 @@ describe('built-in Mind+ product snapshots', () => {
             },
             {
                 packageId: 'display',
-                version: '1.0.0',
-                asset: 'display-1.0.0.mpext',
-                sha256: '9b9316c313a4f14aabc5311131f7ecd4799bd8879a3b85865b95538b802656fa'
+                version: '1.4.0',
+                asset: 'display-1.4.0.mpext',
+                sha256: '33b92840ad3e950ec57ccb0c915f990c4fbaf8fd109fea16f9885021986c51fc'
             },
             {
                 packageId: 'minihexa',
@@ -77,9 +77,9 @@ describe('built-in Mind+ product snapshots', () => {
             },
             {
                 packageId: 'sensor',
-                version: '1.20.0',
-                asset: 'sensor-1.20.0.mpext',
-                sha256: 'e8e1750bdfdb90f224ff366c6b49a07388cc1e8bd1fb69a857049c91cb6d02f4'
+                version: '1.21.0',
+                asset: 'sensor-1.21.0.mpext',
+                sha256: '0eb856d1ad87a4ca337b83b619c1cc56b4171c7d67cc5b249ed1710322d7ea1f'
             },
             {
                 packageId: 'xarm',

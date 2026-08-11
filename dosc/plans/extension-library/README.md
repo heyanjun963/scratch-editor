@@ -64,7 +64,15 @@
 | [58 公共模块第三批迁移与评审记录](./58-module-third-batch-migration-progress.md) | 记录连杆机械臂、风扇和 RGB 模块共 9 个积木及三个内置共享包版本 |
 | [59 通信模块首批迁移与评审记录](./59-communication-first-batch-migration-progress.md) | 记录 PS3 手柄 9 个积木、4 组菜单、兼容边界和 communication 1.0.0 内置快照 |
 | [60 2026-08-07 开发日志](./60-2026-08-07-development-log.md) | 汇总四个公共模块首批内置迁移、快照校验、代码生成和提交前评审结论 |
+| [61 输出模块点阵屏迁移与评审记录](./61-display-dot-matrix-migration-progress.md) | 记录 6 个点阵屏积木、16×8 遮罩弹框、位图代码生成和 display 1.1.0 内置快照 |
+| [62 输出模块数码管与 OLED 第二批迁移记录](./62-display-digit-oled-migration-progress.md) | 记录数码管 1 个、OLED 8 个积木、旧版兼容边界和 display 1.2.0 内置快照 |
+| [63 输出模块旧外设第三批迁移记录](./63-display-legacy-output-third-batch-progress.md) | 记录 MP3 5 个、RGB 灯带 3 个、风扇 1 个积木、未开放兼容边界和 display 1.3.0 内置快照 |
+| [64 输出模块 AIBlocksBoard 第四批迁移记录](./64-display-aiblocksboard-fourth-batch-progress.md) | 记录控制器侧点阵屏 6 个、数码管 1 个、OLED 初始化 1 个、IIC 风扇 1 个积木和 display 1.4.0 内置快照 |
+| [65 WonderLens 首批迁移记录](./65-wonder-lens-first-batch-progress.md) | 记录 WonderLens 初始化、功能控制、人脸检测共 10 个积木和 sensor 1.21.0 内置快照 |
+| [66 传感器拓展迁移暂停 TODO](./66-sensor-extension-migration-pause-todo.md) | 记录 WonderLens 剩余 44 个、WonderMind 剩余 20 个积木及恢复迁移边界 |
+
+> 最新进度：editor 内置公共模块包累计 68 个积木；输出模块已更新到 `display-1.4.0`。AIBlocksBoard 输出分支已经进入内置包，但控制器产品尚未迁移，因此不向当前七款机器人产品开放。
 
 ## 当前结论
 
-当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数、中文颜色名称转换、静态 MCP JSON formatter、产品级积木过滤和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已有 editor 内置快照；输入模块已更新到 `sensor-1.20.0`，动力模块已更新到 `actuator-1.1.0`，机械臂模块已更新到 `xarm-1.1.0`，输出模块已建立 `display-1.0.0` 首批内置快照，通信模块已建立 `communication-1.0.0` PS3 首批快照。WonderLens、WonderMind 仍为支持但待发布模块；点阵屏仍待迁移。
+当前 MVP 已证明自定义库能注册到 VM、显示积木并生成 Python 代码。Mind+ Python 兼容解析器现已支持 `.mpext`、元数据、积木注释、菜单、多语言、本地库、颜色参数、中文颜色名称转换、静态 MCP JSON formatter、点阵位图 formatter、产品级积木过滤和 Generator 白名单调用。AiDoggy、miniHexa 与五款 AI 机甲产品均已有 editor 内置快照；输入模块已更新到 `sensor-1.21.0`，动力模块已更新到 `actuator-1.1.0`，机械臂模块已更新到 `xarm-1.1.0`，输出模块已更新到 `display-1.4.0`，通信模块已建立 `communication-1.0.0` PS3 内置快照。传感器拓展迁移现已暂停：WonderLens 已迁入首批 10 个，剩余 44 个；WonderMind 剩余 20 个。当前七款产品对应的动力、机械臂、输出和通信公共模块已基本收尾，AIBlocksBoard 点阵屏、数码管、OLED 和 IIC 风扇分支已完成代码迁移，等待控制器产品包接入后开放。

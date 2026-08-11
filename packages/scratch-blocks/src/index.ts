@@ -10,6 +10,7 @@ import './blocks/data'
 import './blocks/event'
 import './blocks/line4'
 import './blocks/line6'
+import './blocks/led_matrix'
 import './blocks/looks'
 import './blocks/math'
 import './blocks/matrix'
@@ -35,6 +36,7 @@ import './events/events_scratch_variable_create'
 import { registerFieldColourSlider, FieldColourSlider } from './fields/field_colour_slider'
 import { registerFieldLine4 } from './fields/field_line4'
 import { registerFieldLine6 } from './fields/field_line6'
+import { registerFieldLedMatrix } from './fields/field_led_matrix'
 import { registerFieldMatrix } from './fields/field_matrix'
 import { registerFieldNote, FieldNote } from './fields/field_note'
 import { registerFieldTextInputRemovable } from './fields/field_textinput_removable'
@@ -100,6 +102,7 @@ export function inject(container: Element, options: ScratchBlocksOptions) {
   registerFieldColourSlider()
   registerFieldLine4()
   registerFieldLine6()
+  registerFieldLedMatrix()
   registerScratchFieldDropdown()
   registerFieldMatrix()
   registerFieldNote()

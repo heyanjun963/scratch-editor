@@ -303,6 +303,16 @@ const normalizeLegacyRgbGeneration = (generation, argumentsByName) => {
     };
 };
 
+// 点阵屏作者源仍使用普通参数占位，导入时补上位图 formatter，由 Python 生成器完成列字节转换。
+const normalizeLedMatrixGeneration = (generation, argumentsByName) => {
+    let template = String(generation.template || '');
+    Object.keys(argumentsByName).forEach(name => {
+        if (argumentsByName[name].type !== 'ledmatrix') return;
+        template = template.replace(new RegExp(`\\{${name}\\}`, 'g'), `{${name}.bitmap}`);
+    });
+    return {...generation, template};
+};
+
 const parseMainAst = source => {
     try {
         return parse(source, {
@@ -383,8 +393,11 @@ const adaptMindPlusPythonPackage = ({
             throw new Error(`Mind+ 帽子积木 ${opcode} 必须通过 scratchEditor.blocks 声明 section`);
         }
 
-        const generation = normalizeLegacyRgbGeneration(
-            parseFunctionGeneration(functionNode, opcode, blockOverride),
+        const generation = normalizeLedMatrixGeneration(
+            normalizeLegacyRgbGeneration(
+                parseFunctionGeneration(functionNode, opcode, blockOverride),
+                argumentsByName
+            ),
             argumentsByName
         );
         blocks.push({

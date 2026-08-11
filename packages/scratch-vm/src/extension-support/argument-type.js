@@ -34,6 +34,11 @@ const ArgumentType = {
     MATRIX: 'matrix',
 
     /**
+     * 16×8 点阵屏编辑器，字段值为 128 位二进制字符串。
+     */
+    LEDMATRIX: 'led_matrix',
+
+    /**
      * 四路巡线传感器状态选择器，字段值使用两位十六进制位掩码。
      */
     LINE4: 'line4',

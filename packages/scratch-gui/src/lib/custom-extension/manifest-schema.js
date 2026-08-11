@@ -3,7 +3,7 @@ const ID_PATTERN = /^[a-z0-9]+$/;
 const OPCODE_PATTERN = /^[a-z][A-Za-z0-9_]*$/;
 const COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 const PYTHON_TEMPLATE_FORMATTERS = new Set([
-    'rgb', 'colorName', 'compactJson', 'jsonValue', 'identifier'
+    'rgb', 'colorName', 'compactJson', 'jsonValue', 'identifier', 'bitmap'
 ]);
 
 const blockTypeMap = {
@@ -18,6 +18,7 @@ const argumentTypeMap = {
     number: 'number',
     boolean: 'Boolean',
     color: 'color',
+    ledmatrix: 'led_matrix',
     // line4/line6 对应 scratch-vm 的专用参数类型，用于巡线传感器位掩码选择器。
     line4: 'line4',
     line6: 'line6'
@@ -89,6 +90,12 @@ const validateArgumentReferences = (block, argumentNames) => {
         String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\.rgb\}/g, (match, name) => {
             if (!block.arguments[name] || block.arguments[name].type !== 'color') {
                 throw new Error(`积木 ${block.opcode} 的 RGB 格式化参数 ${name} 必须是 color 类型`);
+            }
+            return match;
+        });
+        String(template || '').replace(/\{([A-Za-z][A-Za-z0-9_]*)\.bitmap\}/g, (match, name) => {
+            if (!block.arguments[name] || block.arguments[name].type !== 'ledmatrix') {
+                throw new Error(`积木 ${block.opcode} 的位图格式化参数 ${name} 必须是 ledmatrix 类型`);
             }
             return match;
         });
