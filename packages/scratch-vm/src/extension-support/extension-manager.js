@@ -96,6 +96,14 @@ class ExtensionManager {
         this._loadedExtensions = new Map();
 
         /**
+         * Extensions loaded on demand from a project file. These are removed when
+         * the next whole project no longer uses them.
+         * @type {Set.<string>}
+         * @private
+         */
+        this._projectScopedExtensionIds = new Set();
+
+        /**
          * Optional host loader for declarative extensions which are identified by ID in project files.
          * @type {?Function}
          * @private
@@ -186,7 +194,11 @@ class ExtensionManager {
             return Promise.resolve()
                 .then(() => this._extensionIdLoader(extensionURL))
                 .then(loaded => {
-                    if (loaded || this.isExtensionLoaded(extensionURL)) return;
+                    if (loaded || this.isExtensionLoaded(extensionURL)) {
+                        // 项目按 ID 自动恢复的声明式产品只属于当前作品，换作品时需要卸载。
+                        this._projectScopedExtensionIds.add(extensionURL);
+                        return;
+                    }
                     return this._loadExtensionWorker(extensionURL);
                 });
         }
@@ -231,12 +243,25 @@ class ExtensionManager {
      */
     // 卸载产品/本地拓展时同步清 runtime primitives，让工具箱刷新后不再显示旧分类。
     unregisterExtensionObject (extensionId) {
+        this._projectScopedExtensionIds.delete(extensionId);
         if (!this.isExtensionLoaded(extensionId)) {
             return Promise.resolve();
         }
 
         this._loadedExtensions.delete(extensionId);
         return dispatch.call('runtime', '_unregisterExtensionPrimitives', extensionId);
+    }
+
+    /**
+     * Unregister project-scoped extensions which are not used by the next project.
+     * @param {Set.<string>} usedExtensionIds extension IDs referenced by the next project.
+     * @returns {Promise} resolved after unused extension primitives are removed.
+     */
+    // 替换整个作品前清理上一个作品自动挂载的产品，手动启用的全局扩展不受影响。
+    unregisterUnusedProjectExtensions (usedExtensionIds) {
+        const unusedExtensionIds = Array.from(this._projectScopedExtensionIds)
+            .filter(extensionId => !usedExtensionIds.has(extensionId));
+        return Promise.all(unusedExtensionIds.map(extensionId => this.unregisterExtensionObject(extensionId)));
     }
 
     /**

@@ -539,18 +539,23 @@ class VirtualMachine extends EventEmitter {
      * @returns {Promise} resolved once targets have been installed
      */
     installTargets (targets, extensions, wholeProject) {
-        const extensionPromises = [];
-
-        extensions.extensionIDs.forEach(extensionID => {
-            if (!this.extensionManager.isExtensionLoaded(extensionID)) {
-                const extensionURL = extensions.extensionURLs.get(extensionID) || extensionID;
-                extensionPromises.push(this.extensionManager.loadExtensionURL(extensionURL));
-            }
-        });
-
         targets = targets.filter(target => !!target);
 
-        return Promise.all(extensionPromises).then(() => {
+        // 完整替换作品时先卸载旧作品自动恢复的产品，再加载新作品实际使用的扩展。
+        const cleanupPromise = wholeProject ?
+            this.extensionManager.unregisterUnusedProjectExtensions(extensions.extensionIDs) :
+            Promise.resolve();
+
+        return cleanupPromise.then(() => {
+            const extensionPromises = [];
+            extensions.extensionIDs.forEach(extensionID => {
+                if (!this.extensionManager.isExtensionLoaded(extensionID)) {
+                    const extensionURL = extensions.extensionURLs.get(extensionID) || extensionID;
+                    extensionPromises.push(this.extensionManager.loadExtensionURL(extensionURL));
+                }
+            });
+            return Promise.all(extensionPromises);
+        }).then(() => {
             targets.forEach(target => {
                 this.runtime.addTarget(target);
                 (/** @type RenderedTarget */ target).updateAllDrawableProperties();

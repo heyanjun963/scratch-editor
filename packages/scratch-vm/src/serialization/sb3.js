@@ -95,6 +95,33 @@ const primitiveOpcodeInfoMap = {
     data_listcontents: [LIST_PRIMITIVE, 'LIST']
 };
 
+// 旧编辑器把颜色和数值输入保存为自定义影子积木；导入时转为 Scratch 标准原语。
+const legacyShadowOpcodeInfoMap = {
+    square_color: ['colour_picker', 'SQUARECOLOR', 'COLOUR'],
+    slider: ['math_number', 'SLIDER', 'NUM'],
+    slider127: ['math_number', 'SLIDER127', 'NUM'],
+    slider150: ['math_number', 'SLIDER150', 'NUM'],
+    slider150p: ['math_number', 'SLIDER150P', 'NUM'],
+    slider180: ['math_number', 'SLIDER180', 'NUM'],
+    slider255: ['math_number', 'SLIDER255', 'NUM']
+};
+
+/**
+ * 将旧编辑器的自定义影子积木迁移为标准原语，保留原有 ID 和连接关系。
+ * @param {object} block 待反序列化的积木。
+ */
+const migrateLegacyShadowBlock = function (block) {
+    const info = legacyShadowOpcodeInfoMap[block.opcode];
+    if (!info || !block.shadow) return;
+
+    const [opcode, legacyFieldName, fieldName] = info;
+    block.opcode = opcode;
+    if (block.fields && Object.prototype.hasOwnProperty.call(block.fields, legacyFieldName)) {
+        block.fields[fieldName] = block.fields[legacyFieldName];
+        delete block.fields[legacyFieldName];
+    }
+};
+
 /**
  * Build the fields object for a replacement shadow block. Simple primitives
  * (text, numbers, colours) just need {name, value}. Variable, list, and
@@ -916,6 +943,7 @@ const deserializeBlocks = function (blocks) {
             deserializeInputDesc(block, null, false, blocks);
             continue;
         }
+        migrateLegacyShadowBlock(block);
         block.id = blockId; // add id back to block since it wasn't serialized
         block.inputs = deserializeInputs(block.inputs, blockId, blocks);
         block.fields = deserializeFields(block.fields);

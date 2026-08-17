@@ -383,6 +383,104 @@ test('deserializeBlocks clears topLevel on shadow blocks', t => {
     t.end();
 });
 
+test('deserializeBlocks migrates legacy extension shadow blocks', t => {
+    const blocks = {
+        parentBlock: {
+            opcode: 'aiquadruped_set_led_color',
+            next: null,
+            parent: null,
+            inputs: {
+                COLOR: [1, 'legacyColor'],
+                VALUE: [1, 'legacyNumber']
+            },
+            fields: {},
+            shadow: false,
+            topLevel: true,
+            x: 0,
+            y: 0
+        },
+        legacyColor: {
+            opcode: 'square_color',
+            next: null,
+            parent: 'parentBlock',
+            inputs: {},
+            fields: {SQUARECOLOR: ['#fdd000', null]},
+            shadow: true,
+            topLevel: false
+        },
+        legacyNumber: {
+            opcode: 'slider127',
+            next: null,
+            parent: 'parentBlock',
+            inputs: {},
+            fields: {SLIDER127: ['10', null]},
+            shadow: true,
+            topLevel: false
+        },
+        legacyNonShadow: {
+            opcode: 'square_color',
+            next: null,
+            parent: null,
+            inputs: {},
+            fields: {SQUARECOLOR: ['#ffffff', null]},
+            shadow: false,
+            topLevel: true,
+            x: 100,
+            y: 100
+        }
+    };
+
+    sb3.deserializeBlocks(blocks);
+
+    t.equal(blocks.legacyColor.opcode, 'colour_picker');
+    t.same(blocks.legacyColor.fields, {
+        COLOUR: {name: 'COLOUR', value: '#fdd000', id: null}
+    });
+    t.equal(blocks.legacyNumber.opcode, 'math_number');
+    t.same(blocks.legacyNumber.fields, {
+        NUM: {name: 'NUM', value: '10', id: null}
+    });
+    t.equal(blocks.legacyColor.id, 'legacyColor', 'preserves the colour block ID');
+    t.equal(blocks.legacyNumber.parent, 'parentBlock', 'preserves the number block parent');
+    t.equal(blocks.parentBlock.inputs.COLOR.shadow, 'legacyColor', 'preserves the colour input connection');
+    t.equal(blocks.parentBlock.inputs.VALUE.shadow, 'legacyNumber', 'preserves the number input connection');
+    t.equal(blocks.legacyNonShadow.opcode, 'square_color', 'does not migrate a non-shadow extension block');
+    t.end();
+});
+
+test('deserializeBlocks migrates legacy slider shadow blocks', t => {
+    const legacySliders = {
+        slider: 'SLIDER',
+        slider127: 'SLIDER127',
+        slider150: 'SLIDER150',
+        slider150p: 'SLIDER150P',
+        slider180: 'SLIDER180',
+        slider255: 'SLIDER255'
+    };
+    const blocks = Object.fromEntries(Object.entries(legacySliders).map(([opcode, fieldName], index) => [
+        opcode,
+        {
+            opcode,
+            next: null,
+            parent: 'parentBlock',
+            inputs: {},
+            fields: {[fieldName]: [String(index), null]},
+            shadow: true,
+            topLevel: false
+        }
+    ]));
+
+    sb3.deserializeBlocks(blocks);
+
+    Object.keys(legacySliders).forEach((blockId, index) => {
+        t.equal(blocks[blockId].opcode, 'math_number', `${blockId} uses the standard number primitive`);
+        t.same(blocks[blockId].fields, {
+            NUM: {name: 'NUM', value: String(index), id: null}
+        }, `${blockId} preserves its value`);
+    });
+    t.end();
+});
+
 test('getExtensionIdForOpcode', t => {
     t.equal(sb3.getExtensionIdForOpcode('wedo_loopy'), 'wedo');
 
