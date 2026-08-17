@@ -37,6 +37,7 @@ import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
 import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {colorModeMap} from '../../lib/settings/color-mode/index.js';
+import {DEFAULT_FONT_SIZE} from '../../lib/settings/font-size/index.js';
 import {DEFAULT_THEME, themeMap} from '../../lib/settings/theme/index.js';
 import {PYTHON_EDITOR_MODE, SCRATCH_EDITOR_MODE, setEditorMode} from '../../reducers/mode';
 import {AccountMenuOptionsPropTypes} from '../../lib/account-menu-options';
@@ -215,6 +216,7 @@ const GUIComponent = props => {
         onSeeCommunity,
         onShare,
         onShowPrivacyPolicy,
+        onProjectFileUpload,
         onStartSelectingFileUpload,
         onTelemetryModalCancel,
         onTelemetryModalOptIn,
@@ -227,6 +229,7 @@ const GUIComponent = props => {
         targetIsStage,
         telemetryModalVisible,
         colorMode,
+        fontSize,
         theme,
         tipsLibraryVisible,
         useExternalPeripheralList,
@@ -247,6 +250,23 @@ const GUIComponent = props => {
     const pythonPanelResizeHandleRef = useRef(null);
     const removePythonPanelDragListenersRef = useRef(null);
     const [pythonPanelWidth, setPythonPanelWidth] = useState(null);
+
+    // 允许操作系统文件拖入积木区，同时阻止浏览器直接导航到被拖入的文件。
+    const handleProjectFileDragOver = useCallback(event => {
+        if (!event.dataTransfer || !Array.from(event.dataTransfer.types || []).includes('Files')) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+    }, []);
+
+    // 单次只接收一个工程文件，具体格式校验及替换流程交给上传 HOC。
+    const handleProjectFileDrop = useCallback(event => {
+        if (!event.dataTransfer || !Array.from(event.dataTransfer.types || []).includes('Files')) return;
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files || []);
+        if (files.length === 1 && onProjectFileUpload) {
+            onProjectFileUpload(files[0]);
+        }
+    }, [onProjectFileUpload]);
 
     // 根据分隔条横向位置计算 Python 区宽度，同时给左右两区保留最小操作空间。
     const resizePythonPanelAt = useCallback(clientX => {
@@ -299,6 +319,17 @@ const GUIComponent = props => {
     }, [isRtl]);
 
     useEffect(() => stopPythonPanelDragging, [stopPythonPanelDragging]);
+
+    // 根字号使用用户设置的具体像素值，所有 rem 布局随之统一缩放。
+    useEffect(() => {
+        const previousFontSize = document.documentElement.style.fontSize;
+        document.documentElement.style.fontSize = `${fontSize}px`;
+        window.dispatchEvent(new Event('resize'));
+        return () => {
+            document.documentElement.style.fontSize = previousFontSize;
+            window.dispatchEvent(new Event('resize'));
+        };
+    }, [fontSize]);
 
     // 宽度落到 DOM 后广播布局变化，让 Blockly、代码文本区和控制台同步重算尺寸。
     useEffect(() => {
@@ -599,6 +630,8 @@ const GUIComponent = props => {
                                         role="region"
                                         aria-label={intl.formatMessage(ariaMessages.codePanel)}
                                         element="section"
+                                        onDragOver={handleProjectFileDragOver}
+                                        onDrop={handleProjectFileDrop}
                                     >
                                         <Blocks
                                             key={`${blocksId}/${colorMode}/${theme}`}
@@ -807,6 +840,7 @@ GUIComponent.propTypes = {
     onSeeCommunity: PropTypes.func,
     onShare: PropTypes.func,
     onShowPrivacyPolicy: PropTypes.func,
+    onProjectFileUpload: PropTypes.func,
     onStartSelectingFileUpload: PropTypes.func,
     onTabSelect: PropTypes.func,
     onTelemetryModalCancel: PropTypes.func,
@@ -826,6 +860,7 @@ GUIComponent.propTypes = {
     targetIsStage: PropTypes.bool,
     telemetryModalVisible: PropTypes.bool,
     colorMode: PropTypes.string,
+    fontSize: PropTypes.number,
     theme: PropTypes.string,
     tipsLibraryVisible: PropTypes.bool,
     useExternalPeripheralList: PropTypes.bool, // true for CDM, false for normal Scratch Link
@@ -853,6 +888,7 @@ GUIComponent.defaultProps = {
     canShare: false,
     canUseCloud: false,
     enableCommunity: false,
+    fontSize: DEFAULT_FONT_SIZE,
     isCreating: false,
     isShared: false,
     isTotallyNormal: false,
@@ -869,6 +905,7 @@ const mapStateToProps = state => ({
     blocksId: state.scratchGui.timeTravel.year.toString(),
     stageSizeMode: state.scratchGui.stageSize.stageSize,
     colorMode: state.scratchGui.settings.colorMode,
+    fontSize: state.scratchGui.settings.fontSize,
     theme: state.scratchGui.settings.theme,
     editorMode: state.scratchGui.mode.editorMode,
     backpackConfigured: !!state.scratchGui.config.storage?.backpackStorage

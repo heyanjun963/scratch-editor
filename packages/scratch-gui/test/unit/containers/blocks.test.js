@@ -95,6 +95,39 @@ describe('Blocks container ensurePythonExtensions', () => {
     });
 });
 
+describe('Blocks container declarative project extension loading', () => {
+    test('restores a bundled product extension referenced by an SB3 project', async () => {
+        const extensionManager = {
+            registerExtensionObject: jest.fn().mockResolvedValue()
+        };
+        const instance = {
+            props: {
+                customExtensionLibraries: [],
+                vm: {extensionManager}
+            }
+        };
+
+        const loaded = await Blocks.prototype.loadDeclarativeExtensionId.call(instance, 'aiquadruped');
+
+        expect(loaded).toBe(true);
+        expect(extensionManager.registerExtensionObject).toHaveBeenCalledWith(
+            'aiquadruped',
+            expect.objectContaining({getInfo: expect.any(Function)})
+        );
+    });
+
+    test('leaves unknown extension IDs to the VM external extension loader', () => {
+        const instance = {
+            props: {
+                customExtensionLibraries: [],
+                vm: {extensionManager: {registerExtensionObject: jest.fn()}}
+            }
+        };
+
+        expect(Blocks.prototype.loadDeclarativeExtensionId.call(instance, 'unknownExtension')).toBe(false);
+    });
+});
+
 describe('Blocks container category selection', () => {
     test('defers a remote extension category until the toolbox contains it', () => {
         let categoryItem = null;

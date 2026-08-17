@@ -128,6 +128,7 @@ class Blocks extends React.Component {
             'handleExtensionAdded',
             'handleBlocksInfoUpdate',
             'ensurePythonExtensions',
+            'loadDeclarativeExtensionId',
             'refreshToolboxXML',
             'selectPendingCategory',
             'onTargetsUpdate',
@@ -234,6 +235,8 @@ class Blocks extends React.Component {
         this.workspace.getToolbox().selectItemByPosition(0);
 
         this.attachVM();
+        // SB3 反序列化会先按扩展 ID 恢复积木；这里把声明式产品包接入 VM，避免被误当成远程 JS。
+        this.props.vm.extensionManager.setExtensionIdLoader?.(this.loadDeclarativeExtensionId);
         this.ensurePythonExtensions();
         // Only update blocks/vm locale when visible to avoid sizing issues
         // If locale changes while not visible it will get handled in didUpdate
@@ -311,6 +314,7 @@ class Blocks extends React.Component {
     }
     componentWillUnmount () {
         this.detachVM();
+        this.props.vm.extensionManager.setExtensionIdLoader?.(null);
         // Hide any open field editor and move Blockly focus to the workspace
         // root before disposing. Without this, BlockSvg.dispose() detects the
         // focused element is inside a block and schedules a stale
@@ -764,6 +768,20 @@ class Blocks extends React.Component {
         if (toolboxXML) {
             this.props.updateToolboxState(toolboxXML);
         }
+    }
+    // 项目加载阶段按 ID 注册已启用用户包，内置产品快照作为离线兜底。
+    loadDeclarativeExtensionId (extensionId) {
+        const userLibrary = this.props.customExtensionLibraries.find(
+            library => library.enabled !== false && library.manifest.id === extensionId
+        );
+        const manifest = userLibrary ? userLibrary.manifest : builtinProductManifests[extensionId];
+        if (!manifest) return false;
+
+        registerPythonCodegenManifest(manifest);
+        return this.props.vm.extensionManager.registerExtensionObject(
+            extensionId,
+            manifestToExtensionObject(manifest)
+        ).then(() => true);
     }
     // 进入 Python 模式时自动加载基础 Python 拓展，并注册用户自定义拓展库。
     ensurePythonExtensions () {

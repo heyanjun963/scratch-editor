@@ -22,6 +22,8 @@ const languageMenu = defineMessage({
     description: 'accessibility label for language menu'
 });
 
+const enabledLocales = ['en', 'zh-cn'];
+
 const LanguageMenu = ({
     currentLocale,
     isRtl,
@@ -40,7 +42,7 @@ const LanguageMenu = ({
         menuRef
     } = useMenuNavigation({
         depth: depth ?? 1,
-        defaultIndexOnOpen: (Object.keys(locales).indexOf(currentLocale)),
+        defaultIndexOnOpen: enabledLocales.indexOf(currentLocale),
         isRtl
     });
 
@@ -90,7 +92,7 @@ const LanguageMenu = ({
                 place={isRtl ? 'left' : 'right'}
             >
                 {
-                    Object.keys(locales)
+                    enabledLocales
                         .map(locale => {
                             const isSelected = currentLocale === locale;
 

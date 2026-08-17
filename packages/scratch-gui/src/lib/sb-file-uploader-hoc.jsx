@@ -45,9 +45,11 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             bindAll(this, [
                 'createFileObjects',
                 'handleFinishedLoadingUpload',
+                'handleProjectFileUpload',
                 'handleStartSelectingFileUpload',
                 'handleChange',
                 'onload',
+                'requestProjectFileUpload',
                 'removeFileObjects'
             ]);
         }
@@ -62,6 +64,40 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         // step 1: this is where the upload process begins
         handleStartSelectingFileUpload () {
             this.createFileObjects(); // go to step 2
+        }
+        // 文件选择器和积木区拖放共用同一套替换确认及项目加载状态机。
+        requestProjectFileUpload (file) {
+            const {
+                intl,
+                isShowingWithoutId,
+                loadingState,
+                projectChanged,
+                userOwnsProject
+            } = this.props;
+            this.fileToUpload = file;
+
+            let uploadAllowed = true;
+            if (userOwnsProject || (projectChanged && isShowingWithoutId)) {
+                uploadAllowed = confirm( // eslint-disable-line no-alert
+                    intl.formatMessage(sharedMessages.replaceProjectWarning)
+                );
+            }
+            if (uploadAllowed) {
+                this.props.requestProjectUpload(loadingState);
+            } else {
+                this.removeFileObjects();
+            }
+        }
+        // 操作系统拖入的工程文件不经过 input，这里补齐 FileReader 后进入统一加载流程。
+        handleProjectFileUpload (file) {
+            if (!file || typeof file.name !== 'string' || !/\.sb(?:2|3)?$/i.test(file.name)) {
+                return false;
+            }
+            this.removeFileObjects();
+            this.fileReader = new FileReader();
+            this.fileReader.onload = this.onload;
+            this.requestProjectFileUpload(file);
+            return true;
         }
         // step 2: create a FileReader and an <input> element, and issue a
         // pseudo-click to it. That will open the file chooser dialog.
@@ -85,34 +121,9 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         // step 3: user has picked a file using the file chooser dialog.
         // We don't actually load the file here, we only decide whether to do so.
         handleChange (e) {
-            const {
-                intl,
-                isShowingWithoutId,
-                loadingState,
-                projectChanged,
-                userOwnsProject
-            } = this.props;
             const thisFileInput = e.target;
-            if (thisFileInput.files) { // Don't attempt to load if no file was selected
-                this.fileToUpload = thisFileInput.files[0];
-
-                // If user owns the project, or user has changed the project,
-                // we must confirm with the user that they really intend to
-                // replace it. (If they don't own the project and haven't
-                // changed it, no need to confirm.)
-                let uploadAllowed = true;
-                if (userOwnsProject || (projectChanged && isShowingWithoutId)) {
-                    uploadAllowed = confirm( // eslint-disable-line no-alert
-                        intl.formatMessage(sharedMessages.replaceProjectWarning)
-                    );
-                }
-                if (uploadAllowed) {
-                    // cues step 4
-                    this.props.requestProjectUpload(loadingState);
-                } else {
-                    // skips ahead to step 7
-                    this.removeFileObjects();
-                }
+            if (thisFileInput.files && thisFileInput.files[0]) { // Don't attempt to load if no file was selected
+                this.requestProjectFileUpload(thisFileInput.files[0]);
             }
         }
         // step 4 is below, in mapDispatchToProps
@@ -190,6 +201,7 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             return (
                 <React.Fragment>
                     <WrappedComponent
+                        onProjectFileUpload={this.handleProjectFileUpload}
                         onStartSelectingFileUpload={this.handleStartSelectingFileUpload}
                         {...componentProps}
                     />

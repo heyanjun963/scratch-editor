@@ -53,6 +53,11 @@ const messages = defineMessages({
         id: 'gui.pythonCoding.runFailed',
         defaultMessage: '[python] Run failed: {message}',
         description: 'Console message shown when Python cannot be started'
+    },
+    saveFailed: {
+        id: 'gui.pythonCoding.saveFailed',
+        defaultMessage: '[python] Save failed: {message}',
+        description: 'Console message shown when Python code cannot be saved'
     }
 });
 
@@ -77,6 +82,24 @@ const getDesktopTabId = () => {
 
 // 使用 ANSI 红色包装本地 Python 错误输出。
 const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
+
+// 浏览器环境通过临时 Blob 下载 Python 文件，桌面端则使用受限 IPC 保存。
+const downloadPythonCode = (code, suggestedName) => {
+    const safeBaseName = String(suggestedName || 'project')
+        .replace(/\.(?:py|sb|sb2|sb3)$/i, '')
+        .replace(/[<>:"/\\|?*\u0000-\u001F]/g, '_') || 'project';
+    const objectUrl = URL.createObjectURL(new Blob([code], {type: 'text/x-python;charset=utf-8'}));
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = `${safeBaseName}.py`;
+    document.body.appendChild(link);
+    try {
+        link.click();
+    } finally {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(objectUrl);
+    }
+};
 
 // Redux 历史达到上限后会从头部裁行，这里只提取裁剪后新增的尾部文本，避免重复写入 xterm。
 const getConsoleTextDelta = (previousText, currentText) => {
@@ -107,6 +130,7 @@ const PythonCodingPanel = props => {
         onSetExitCode,
         onSetRunning,
         onSetScriptPath,
+        projectTitle,
         scriptPath
     } = props;
     const terminalRef = useRef(null);
@@ -312,6 +336,29 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // 桌面端由主进程弹出保存对话框；普通浏览器使用标准文件下载。
+    const handleSave = useCallback(async () => {
+        if (!code.trim()) return;
+        try {
+            if (desktopPythonApi && typeof desktopPythonApi.save === 'function') {
+                await desktopPythonApi.save({code, suggestedName: projectTitle});
+            } else {
+                downloadPythonCode(code, projectTitle);
+            }
+        } catch (error_) {
+            const message = error_ && error_.message ? error_.message : String(error_);
+            onSetError(message);
+            writeTerminalLine(colorStderr(intl.formatMessage(messages.saveFailed, {message})));
+        }
+    }, [
+        code,
+        desktopPythonApi,
+        intl,
+        onSetError,
+        projectTitle,
+        writeTerminalLine
+    ]);
+
     // xterm 输入只在运行中转发给 PTY，避免空闲时误写。
     const handleTerminalInput = useCallback(data => {
         if (!desktopTerminalApi || !isRunning) return;
@@ -343,6 +390,7 @@ const PythonCodingPanel = props => {
             terminalRef={terminalRef}
             onClearConsole={handleClearConsole}
             onRun={handleRun}
+            onSave={handleSave}
             onStop={handleStop}
             onTerminalInput={handleTerminalInput}
             onTerminalResize={handleTerminalResize}
@@ -362,6 +410,7 @@ PythonCodingPanel.propTypes = {
     onSetExitCode: PropTypes.func.isRequired,
     onSetRunning: PropTypes.func.isRequired,
     onSetScriptPath: PropTypes.func.isRequired,
+    projectTitle: PropTypes.string,
     scriptPath: PropTypes.string
 };
 
@@ -372,6 +421,7 @@ const mapStateToProps = state => ({
     error: state.scratchGui.pythonCoding.error,
     isRunning: state.scratchGui.pythonCoding.isRunning,
     lastExitCode: state.scratchGui.pythonCoding.lastExitCode,
+    projectTitle: state.scratchGui.projectTitle,
     scriptPath: state.scratchGui.pythonCoding.scriptPath
 });
 
@@ -390,5 +440,6 @@ export default injectIntl(connect(
 )(PythonCodingPanel));
 
 export {
+    downloadPythonCode,
     getConsoleTextDelta
 };

@@ -87,6 +87,11 @@ const baseConfig = new ScratchWebpackConfigBuilder(
     .addPlugin(new CopyWebpackPlugin({
         patterns: [
             {
+                // 旧构建和 blocks-only 入口仍从根目录取内置图标，保留默认主题资源兼容路径。
+                from: '../../node_modules/scratch-blocks/media',
+                to: 'static/blocks-media'
+            },
+            {
                 from: '../../node_modules/scratch-blocks/media',
                 to: 'static/blocks-media/default'
             },

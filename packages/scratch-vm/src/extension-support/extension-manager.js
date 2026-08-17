@@ -96,6 +96,13 @@ class ExtensionManager {
         this._loadedExtensions = new Map();
 
         /**
+         * Optional host loader for declarative extensions which are identified by ID in project files.
+         * @type {?Function}
+         * @private
+         */
+        this._extensionIdLoader = null;
+
+        /**
          * Keep a reference to the runtime so we can construct internal extension objects.
          * TODO: remove this in favor of extensions accessing the runtime as a service.
          * @type {Runtime}
@@ -116,6 +123,17 @@ class ExtensionManager {
      */
     isExtensionLoaded (extensionID) {
         return this._loadedExtensions.has(extensionID);
+    }
+
+    /**
+     * Set a host-provided loader for extension IDs which are not built into the VM.
+     * @param {?Function} loader receives an extension ID and returns true/false or a Promise of true/false
+     */
+    setExtensionIdLoader (loader) {
+        if (loader !== null && typeof loader !== 'function') {
+            throw new TypeError('Extension ID loader must be a function or null.');
+        }
+        this._extensionIdLoader = loader;
     }
 
     /**
@@ -163,6 +181,20 @@ class ExtensionManager {
             return Promise.resolve();
         }
 
+        // 公司声明式拓展在 SB3 中只保存 ID，由 GUI 在反序列化阶段提供对应 manifest。
+        if (this._extensionIdLoader && !/^(?:https?:|file:|data:|blob:)/i.test(extensionURL)) {
+            return Promise.resolve()
+                .then(() => this._extensionIdLoader(extensionURL))
+                .then(loaded => {
+                    if (loaded || this.isExtensionLoaded(extensionURL)) return;
+                    return this._loadExtensionWorker(extensionURL);
+                });
+        }
+
+        return this._loadExtensionWorker(extensionURL);
+    }
+
+    _loadExtensionWorker (extensionURL) {
         return new Promise((resolve, reject) => {
             // If we `require` this at the global level it breaks non-webpack targets, including tests
             const worker = new Worker('./extension-worker.js');

@@ -394,15 +394,11 @@ class MenuBar extends React.Component {
                                 />
                             </button>
                         )}
-                        {(this.props.canChangeColorMode || this.props.canChangeLanguage || this.props.canChangeTheme) &&
-                        (<SettingsMenu
+                        <SettingsMenu
                             canChangeLanguage={this.props.canChangeLanguage}
-                            canChangeColorMode={this.props.canChangeColorMode}
-                            canChangeTheme={this.props.canChangeTheme}
-                            hasActiveMembership={this.props.hasActiveMembership}
                             isRtl={this.props.isRtl}
                             depth={1}
-                        />)}
+                        />
                         {(this.props.canManageFiles) && (<FileMenu
                             onStartSelectingFileUpload={this.props.onStartSelectingFileUpload}
                             onClickNew={this.handleClickNew}

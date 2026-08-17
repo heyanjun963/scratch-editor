@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const {pathToFileURL} = require('url');
 const PythonRunner = require('./python-runner');
+const {savePythonFile} = require('./python-file-saver');
 const {selectPreferredSerialPort} = require('./serial-port-selection');
 const TerminalRunner = require('./terminal-runner');
 
@@ -568,6 +569,17 @@ const registerPythonIpc = () => {
     });
     ipcMain.handle('python:stop', event => pythonRunner.stop(getSenderTabId(event)));
     ipcMain.handle('python:status', event => pythonRunner.getStatus(getSenderTabId(event)));
+    // 保存调用只接受编辑器 tab，并由主进程选择目标路径，渲染进程不能直接写任意文件。
+    ipcMain.handle('python:save', (event, options = {}) => {
+        getSenderTabId(event);
+        const saveOptions = options && typeof options === 'object' ? options : {};
+        return savePythonFile({
+            browserWindow: mainWindow,
+            code: saveOptions.code,
+            dialog,
+            suggestedName: saveOptions.suggestedName
+        });
+    });
 };
 
 // 交互式终端通道，前端 xterm 的输入、resize 和停止都会走这里。

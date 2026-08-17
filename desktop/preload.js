@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('scratchDesktopEditor', {
 // 非交互 Python 通道，保留给没有 PTY 能力的降级运行方式。
 contextBridge.exposeInMainWorld('scratchDesktopPython', {
     run: options => ipcRenderer.invoke('python:run', options),
+    save: options => ipcRenderer.invoke('python:save', options),
     stop: tabId => ipcRenderer.invoke('python:stop', tabId),
     getStatus: tabId => ipcRenderer.invoke('python:status', tabId),
     onOutput: handler => {

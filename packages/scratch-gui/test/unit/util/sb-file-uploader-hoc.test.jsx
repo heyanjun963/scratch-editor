@@ -2,6 +2,7 @@ import 'web-audio-test-api';
 
 import React from 'react';
 import configureStore from 'redux-mock-store';
+import {act} from '@testing-library/react';
 import {renderWithIntl} from '../../helpers/intl-helpers.jsx';
 import {LoadingState} from '../../../src/reducers/project-state';
 import VM from '@scratch/scratch-vm';
@@ -97,5 +98,67 @@ describe('SBFileUploaderHOC', () => {
             </IntlProvider>
         );
         expect(mockedCancelFileUpload).toHaveBeenCalled();
+    });
+
+    test('starts the existing project upload flow for a dropped Scratch project file', () => {
+        let uploaderProps;
+        const requestProjectUpload = jest.fn();
+        const Component = props => {
+            uploaderProps = props;
+            return <div />;
+        };
+        const WrappedComponent = SBFileUploaderHOC(Component);
+        renderWithIntl(
+            <WrappedComponent
+                canSave={false}
+                cancelFileUpload={jest.fn()}
+                isLoadingUpload={false}
+                projectChanged={false}
+                requestProjectUpload={requestProjectUpload}
+                store={store}
+                userOwnsProject={false}
+                vm={vm}
+                onLoadingFinished={jest.fn()}
+                onLoadingStarted={jest.fn()}
+                onSetProjectTitle={jest.fn()}
+            />
+        );
+
+        act(() => {
+            uploaderProps.onProjectFileUpload(new File(['project'], 'dropped.sb3'));
+        });
+
+        expect(requestProjectUpload).toHaveBeenCalledWith(LoadingState.SHOWING_WITHOUT_ID);
+    });
+
+    test('ignores a dropped file that is not a Scratch project', () => {
+        let uploaderProps;
+        const requestProjectUpload = jest.fn();
+        const Component = props => {
+            uploaderProps = props;
+            return <div />;
+        };
+        const WrappedComponent = SBFileUploaderHOC(Component);
+        renderWithIntl(
+            <WrappedComponent
+                canSave={false}
+                cancelFileUpload={jest.fn()}
+                isLoadingUpload={false}
+                projectChanged={false}
+                requestProjectUpload={requestProjectUpload}
+                store={store}
+                userOwnsProject={false}
+                vm={vm}
+                onLoadingFinished={jest.fn()}
+                onLoadingStarted={jest.fn()}
+                onSetProjectTitle={jest.fn()}
+            />
+        );
+
+        act(() => {
+            uploaderProps.onProjectFileUpload(new File(['text'], 'notes.txt'));
+        });
+
+        expect(requestProjectUpload).not.toHaveBeenCalled();
     });
 });

@@ -105,9 +105,7 @@ const colorStderr = text => `\u001b[31m${text}\u001b[0m`;
 const PythonMenuBar = ({
     ariaLabel,
     ariaRole,
-    canChangeColorMode,
     canChangeLanguage,
-    canChangeTheme,
     canCreateCopy,
     canManageFiles,
     canRemix,
@@ -116,7 +114,6 @@ const PythonMenuBar = ({
     depth,
     getSaveToComputerHandler,
     handleClickNew,
-    hasActiveMembership,
     isRtl,
     intl,
     onClickRemix,
@@ -394,16 +391,11 @@ const PythonMenuBar = ({
         >
             <div className={styles.mainMenu}>
                 <div className={styles.fileGroup}>
-                    {(canChangeColorMode || canChangeLanguage || canChangeTheme) && (
-                        <SettingsMenu
-                            canChangeLanguage={canChangeLanguage}
-                            canChangeColorMode={canChangeColorMode}
-                            canChangeTheme={canChangeTheme}
-                            hasActiveMembership={hasActiveMembership}
-                            isRtl={isRtl}
-                            depth={depth}
-                        />
-                    )}
+                    <SettingsMenu
+                        canChangeLanguage={canChangeLanguage}
+                        isRtl={isRtl}
+                        depth={depth}
+                    />
                     {canManageFiles && (
                         <FileMenu
                             onStartSelectingFileUpload={onStartSelectingFileUpload}

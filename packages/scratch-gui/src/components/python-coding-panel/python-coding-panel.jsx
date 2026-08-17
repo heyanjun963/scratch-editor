@@ -29,6 +29,7 @@ const PythonCodingPanel = ({
     onTerminalInput,
     onTerminalResize,
     onRun,
+    onSave,
     onStop,
     scriptPath,
     terminalRef
@@ -107,6 +108,18 @@ const PythonCodingPanel = ({
                     />
                 </span>
                 <Box className={styles.editorActions}>
+                    <button
+                        className={styles.actionButton}
+                        disabled={!code.trim()}
+                        type="button"
+                        onClick={onSave}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Save"
+                            description="Button to save generated Python code"
+                            id="gui.pythonCoding.save"
+                        />
+                    </button>
                     <button
                         className={styles.actionButton}
                         disabled={!desktopApiAvailable || isRunning || !code.trim()}
@@ -239,6 +252,7 @@ PythonCodingPanel.propTypes = {
     onTerminalInput: PropTypes.func,
     onTerminalResize: PropTypes.func,
     onRun: PropTypes.func,
+    onSave: PropTypes.func,
     onStop: PropTypes.func,
     scriptPath: PropTypes.string,
     terminalRef: PropTypes.shape({
@@ -257,6 +271,7 @@ PythonCodingPanel.defaultProps = {
     onTerminalInput: null,
     onTerminalResize: null,
     onRun: null,
+    onSave: null,
     onStop: null,
     scriptPath: null,
     terminalRef: null
