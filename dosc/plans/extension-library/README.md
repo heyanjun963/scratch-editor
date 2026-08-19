@@ -29,7 +29,7 @@
 | [23 AiDoggy 积木与 Python 迁移记录](./23-aidoggy-block-python-migration-progress.md) | 记录从旧 VM 和旧 Python generator 提取 AiDoggy 的 17 个积木、运动菜单及最终代码生成规则 |
 | [24 Mind+ 用户库格式兼容方案](./24-mindplus-package-compatibility-research.md) | 对比 Mind+ 与现有 SBEXT 的目录、字段和生成器能力，定义安全兼容子集、测试包和实施顺序 |
 | [25 Mind+ 产品仓库迁移进度](./25-mindplus-product-repository-migration-progress.md) | 记录 AiDoggy、miniHexa 产品源码迁移、MPEXT 发布包、catalog 同步、自动验证和人工发版待办 |
-| [26 Mind+ 产品远程发布指南](./26-mindplus-product-release-guide.md) | 指导单人维护者升级版本、生成包、推送 GitHub/Gitee、创建 Release、开放 catalog 和验证离线缓存 |
+| [26 Mind+ 产品远程发布指南](./26-mindplus-product-release-guide.md) | 指导单人维护者按产品独立版本批量生成包、使用统一 Release/tag、推送 GitHub/Gitee、开放 catalog 和验证离线缓存 |
 | [27 AI机甲双驱车积木与 Python 迁移记录](./27-aimech-block-python-migration-progress.md) | 记录 aimech 40 个积木、11 个菜单、远程可安装卡片和 IMU 强制变量覆盖的迁移结果 |
 | [28 AI机甲四足机器人积木与 Python 迁移记录](./28-aiquadruped-block-python-migration-progress.md) | 记录 aiquadruped 38 个启用积木、10 个菜单、四足运动生成规则和本地内置快照 |
 | [29 AI机甲四足竞赛版积木与 Python 迁移记录](./29-aiquadrupedpro-block-python-migration-progress.md) | 记录 aiquadrupedpro 44 个启用积木、10 个菜单、三自由度运动分支和本地内置快照 |

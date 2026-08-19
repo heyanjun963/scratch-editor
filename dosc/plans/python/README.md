@@ -8,5 +8,6 @@
 | [02 阶段 B：Python 文件生成与本机运行](./02-phase-b-python-file-and-run-plan.md) | 生成 `.py` + 本机执行 | Electron 主进程 spawn 本机 Python |
 | [03 阶段 C：Python Terminal 产品化](./03-phase-c-terminal-productization-plan.md) | xterm.js + node-pty | C1 输出终端、C2 交互终端 |
 | [04 Python 积木分类和语法完善](./04-python-block-category-and-syntax-plan.md) | 积木分类体系 | 从单一 Python 分类拆成教学分类 |
+| [05 网络源、Python 加载与串口优化需求](./05-network-source-python-load-and-serial-upload-requirements.md) | 后续需求记录 | 自动选源、加载 `.py`、串口上传优化 |
 
 > 整体完成度与商用差距见 [../../progress](../../progress/project-progress-and-commercial-gap.md)（阶段 B/C 及 Python 相关缺口）。

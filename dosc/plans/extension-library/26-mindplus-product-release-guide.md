@@ -19,7 +19,17 @@
 | AI 机甲四足竞赛版 | `1.0.0` | `1.0.0` | `draft`（仅本地内置测试） |
 | miniHexa | `0.1.1` | `0.1.1` | `published` |
 
-新版本必须高于远程当前版本，并且对应标签不存在。禁止覆盖已有标签或 Release；同版本发布文件必须保持不可变。
+每个产品的新 `version` 必须高于该产品在远程 catalog 中的版本。一次发布批次使用一个统一 `releaseTag`，它只标识 Release，不参与产品版本比较。禁止覆盖已有标签或 Release；同版本发布文件必须保持不可变。
+
+产品仓库的 `product-extension-registry.json` 必须配置本批统一标签：
+
+```json
+{
+  "releaseTag": "python-blocks-v1.0.0"
+}
+```
+
+`python-blocks-v1.0.0` 代表一批产品包。下一批使用新的批次标签，例如 `python-blocks-v1.1.0`，不要修改历史 Release。
 
 ## 1. 升级产品版本
 
@@ -49,6 +59,8 @@ npm run sync:product-extensions
 
 - `asset` 必须是对应版本的 `.mpext`。
 - `sha256` 必须与 `dist` 文件一致。
+- 所有本轮产品条目的 `tag` 必须相同，并等于 `product-extension-registry.json` 的 `releaseTag`。
+- `version` 仍然来自各产品自己的 `config.json`，不能为了统一 Release 而改成相同版本。
 - `status` 此时必须保持 `draft`。
 
 远程更新测试阶段不要运行 `npm run sync:builtin-product-snapshots`。内置版本必须低于远程版本。
@@ -68,12 +80,10 @@ git push gitee main
 
 ## 4. 创建标签
 
-一次只为本轮实际发布的产品创建标签：
+为本轮所有产品包创建一个统一标签：
 
 ```powershell
-$productId = "产品ID"
-$version = "新版本"
-$tag = "${productId}-v${version}"
+$tag = "python-blocks-v1.0.0"
 git tag --list $tag
 git tag $tag
 git push origin $tag
@@ -84,9 +94,9 @@ git push gitee $tag
 
 ## 5. 创建 GitHub 和 Gitee Release
 
-在 GitHub 和 Gitee 为 `<产品ID>-v<版本>` 分别创建 Release，只上传匹配的 `dist/<产品ID>-<版本>.mpext`。
+在 GitHub 和 Gitee 使用同一个 `$tag` 分别创建 Release，并一次上传本轮所有已迁移产品的 `.mpext` 文件，例如 `dist/aihexa-1.0.0.mpext` 和 `dist/aiquadrupedpro-1.0.0.mpext`。每个 catalog 条目的 `releaseDownloadUrl` 都指向这个统一 Release 下对应的 asset。
 
-GitHub 自动生成的 **Source code** 不是积木包。Release 标题建议使用“产品名 + 版本”，说明中列出积木变化、Python 变化和兼容性。
+GitHub 自动生成的 **Source code** 不是积木包。Release 标题建议使用“Mind+ 产品积木包 + 批次标签”，说明中列出本批包含的产品、积木变化、Python 变化和兼容性。
 
 ## 6. 开放 catalog
 

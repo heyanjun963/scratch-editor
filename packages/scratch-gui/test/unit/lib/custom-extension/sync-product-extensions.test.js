@@ -39,7 +39,8 @@ describe('product extension repository sync', () => {
             provider: 'github',
             repository: 'company/scratch-product-extensions',
             packageDownloadBaseUrl: 'https://raw.githubusercontent.com/company/scratch-product-extensions/main/dist',
-            releaseDownloadBaseUrl: 'https://github.com/company/scratch-product-extensions/releases/download'
+            releaseDownloadBaseUrl: 'https://github.com/company/scratch-product-extensions/releases/download',
+            releaseTag: 'python-blocks-v1.0.0'
         }));
         fs.writeFileSync(path.join(targetDirectory, 'catalog.json'), JSON.stringify({
             formatVersion: 1,
@@ -75,10 +76,15 @@ describe('product extension repository sync', () => {
         });
         expect(mindPlusEntry).toMatchObject({
             asset: 'aidoggy-0.1.0.mpext',
-            tag: 'aidoggy-v0.1.0',
+            version: '0.1.0',
+            tag: 'python-blocks-v1.0.0',
+            releaseDownloadUrl: 'https://github.com/company/scratch-product-extensions/releases/download/python-blocks-v1.0.0/aidoggy-0.1.0.mpext',
             sha256: createHash('sha256').update(mindPlusAsset).digest('hex'),
             status: 'draft'
         });
+        expect(new Set(catalog.packages
+            .filter(entry => entry.packageId === 'legacyproduct' || entry.packageId === 'aidoggy')
+            .map(entry => entry.tag))).toEqual(new Set(['python-blocks-v1.0.0']));
 
         execFileSync(process.execPath, [syncScript, '--target', targetDirectory]);
         expect(fs.readFileSync(path.join(targetDirectory, 'catalog.json'), 'utf8')).toBe(firstCatalog);
@@ -120,5 +126,15 @@ describe('product extension repository sync', () => {
             asset: 'aidoggy-0.1.0.mpext',
             status: 'draft'
         });
+    });
+
+    test('requires one release tag for the whole publication batch', () => {
+        const configPath = path.join(targetDirectory, 'product-extension-registry.json');
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        delete config.releaseTag;
+        fs.writeFileSync(configPath, JSON.stringify(config));
+
+        expect(() => execFileSync(process.execPath, [syncScript, '--target', targetDirectory]))
+            .toThrow(/releaseTag/);
     });
 });

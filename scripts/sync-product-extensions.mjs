@@ -68,12 +68,17 @@ const getRegistryConfig = targetDirectory => {
     if (config.formatVersion !== 1 || config.repositoryType !== REGISTRY_TYPE) {
         throw new Error(`目标目录不是受支持的产品配置仓库: ${targetDirectory}`);
     }
-    if (!config.provider || !config.repository || !config.packageDownloadBaseUrl || !config.releaseDownloadBaseUrl) {
+    if (!config.provider || !config.repository || !config.packageDownloadBaseUrl || !config.releaseDownloadBaseUrl ||
+        typeof config.releaseTag !== 'string' || !config.releaseTag.trim()) {
         throw new Error(
-            `${REGISTRY_CONFIG_FILE} 缺少 provider、repository、packageDownloadBaseUrl 或 releaseDownloadBaseUrl`
+            `${REGISTRY_CONFIG_FILE} 缺少 provider、repository、packageDownloadBaseUrl、releaseDownloadBaseUrl 或 releaseTag`
         );
     }
-    return config;
+    return {
+        ...config,
+        // 一个 releaseTag 对应一次批量发布，包版本仍由各自源配置维护。
+        releaseTag: config.releaseTag.trim()
+    };
 };
 
 const validateProductId = (id, directoryName) => {
@@ -146,7 +151,8 @@ const syncPackage = (sourcePackage, targetDirectory, registryConfig, previousEnt
     }
     const asset = `${sourcePackage.id}-${sourcePackage.version}.${sourcePackage.packageExtension}`;
     const outputFile = path.join(targetDirectory, 'dist', asset);
-    const tag = `${sourcePackage.id}-v${sourcePackage.version}`;
+    // Release tag 代表发布批次，不参与单个产品的版本比较。
+    const tag = registryConfig.releaseTag;
     fs.mkdirSync(path.dirname(outputFile), {recursive: true});
     execFileSync(process.execPath, [sourcePackage.packScript, sourcePackage.sourceDirectory, outputFile], {
         stdio: 'inherit'

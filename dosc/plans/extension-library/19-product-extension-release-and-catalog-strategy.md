@@ -75,11 +75,18 @@ npm run sync:product-extensions
 ```text
 读取内置产品源目录
   -> 复制到 D:\code\scratch-product-extensions\products\<产品ID>
-  -> 生成 dist\<产品ID>-<版本>.sbext
+  -> 生成 dist\<产品ID>-<版本>.sbext 或 .mpext
   -> 计算 SHA256
   -> 更新 catalog.json
   -> 新版本状态写为 draft
 ```
+
+发布标识分为两层：
+
+- `version` 是每个产品自己的语义化版本，客户端用它判断是否有更新。
+- `tag` 是一次批量 Release 的统一标签，只用于定位 Release 下的 asset。
+
+在产品仓库的 `product-extension-registry.json` 中配置统一 `releaseTag`，例如 `python-blocks-v1.0.0`。本次同步生成的所有 catalog 条目都使用该值；产品文件名仍保留各自版本，例如 `aihexa-1.0.0.mpext`。
 
 同步后在产品总仓库检查：
 
@@ -89,38 +96,38 @@ git status --short
 git diff --check
 ```
 
-并人工核对 `catalog.json` 中的 `packageId`、`version`、`tag`、`asset`、`downloadUrl`、`sha256` 和 `status`。
+并人工核对 `catalog.json` 中的 `packageId`、`version`、`tag`、`asset`、`downloadUrl`、`releaseDownloadUrl`、`sha256` 和 `status`。确认本轮所有条目的 `tag` 相同，但 `version` 仍按产品分别记录。
 
 ### 4. 提交并推送待发布文件
 
 在 `D:\code\scratch-product-extensions` 提交以下内容：
 
 - `products/<产品ID>/` 源配置。
-- `dist/<产品ID>-<版本>.sbext`。
+- `dist/<产品ID>-<版本>.sbext` 或 `.mpext`。
 - `catalog.json` 中状态为 `draft` 的新版本信息。
 
 提交标题示例：
 
 ```text
-feat: 发布 AI机甲麦轮车积木 0.3.0
+feat: 发布 Mind+ 产品积木批次 python-blocks-v1.0.0
 ```
 
-推送 `main` 后，先确认 Raw 地址可以下载新的 `.sbext`。
+推送 `main` 后，先确认 Raw 地址可以下载新的产品包。
 
 ### 5. 人工创建 GitHub Release
 
 在 GitHub 仓库页面执行：
 
 1. 打开 **Releases**，选择 **Draft a new release**。
-2. 创建 `catalog.json` 中指定的标签，例如 `aimecanum-v0.3.0`。
+2. 创建 `product-extension-registry.json` 中指定的统一标签，例如 `python-blocks-v1.0.0`。
 3. 标签目标选择刚推送产品包的 `main` 提交。
-4. Release 标题写产品名和版本，正文列出新增、修复、兼容影响和真机验证情况。
-5. 只上传 `dist/aimecanum-0.3.0.sbext`，不要上传 GitHub 自动生成的源码包作为产品包。
-6. 发布 Release，并从 Assets 重新下载一次文件核对 SHA256。
+4. Release 正文列出本批包含的产品、各自版本、积木变化、兼容影响和真机验证情况。
+5. 一次上传本批所有 `dist/*.mpext` 或 `dist/*.sbext` 产品包，不要上传 GitHub 自动生成的源码包作为产品包。
+6. 发布 Release，并从 Assets 重新下载每个文件核对 SHA256。
 
 ### 6. 开放给客户端
 
-Release 和 Raw 文件都确认可用后，将该产品在 `catalog.json` 中的 `status` 从 `draft` 改为 `published`，再提交并推送 `main`。
+Release 和 Raw 文件都确认可用后，将本批已验证产品在 `catalog.json` 中的 `status` 从 `draft` 改为 `published`，再提交并推送 `main`。
 
 不要在文件尚未上传或 SHA256 尚未验证时提前设为 `published`。客户端只读取 `published` 条目，该状态是正式开放更新的开关。
 
