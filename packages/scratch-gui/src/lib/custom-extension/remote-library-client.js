@@ -20,6 +20,10 @@ const SHA256_PATTERN = /^[a-f0-9]{64}$/i;
 const MAX_REMOTE_PACKAGE_SIZE = 10 * 1024 * 1024;
 const MAX_REMOTE_CATALOG_SIZE = 1024 * 1024;
 const GITEE_API_ROOT = 'https://gitee.com/api/v5';
+const REMOTE_SOURCE_SELECTION_TTL = 5 * 60 * 1000;
+const REMOTE_SOURCE_PROBE_TIMEOUT = 4000;
+
+let remoteSourceSelectionCache = null;
 
 // 外部目录和包直链只允许 HTTPS，避免更新流程降级到明文传输。
 const validateHttpsUrl = (value, label) => {
@@ -80,6 +84,30 @@ const normalizeRemoteSource = source => {
 const describeRemoteSource = source => source.type === 'gitee-contents' ?
     `${source.provider}:${source.repository}/${source.path}` :
     `${source.provider}:${source.url}`;
+
+const getRemoteSourceKey = source => JSON.stringify([
+    source.type,
+    source.provider,
+    source.repository,
+    source.ref,
+    source.path,
+    source.url
+]);
+
+// 网络探测只使用真实目录请求；超时后释放本次请求，避免慢源阻塞整个拓展库。
+const fetchWithTimeout = (fetchImpl, url, requestOptions, timeoutMs) => {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    let timer;
+    const options = controller ? {...requestOptions, signal: controller.signal} : requestOptions;
+    const request = Promise.resolve().then(() => fetchImpl(url, options));
+    const timeout = new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+            if (controller) controller.abort();
+            reject(new Error(`远程拓展来源请求超过 ${timeoutMs}ms`));
+        }, timeoutMs);
+    });
+    return Promise.race([request, timeout]).finally(() => clearTimeout(timer));
+};
 
 // Contents 的 Base64 文本按原始字节解码，SBEXT 不经过字符串编码转换。
 const decodeBase64 = content => {
@@ -215,19 +243,30 @@ const validateRemotePackage = remotePackage => {
     };
 };
 
-// 从 Gitee 读取 catalog 时，同仓库 dist 文件作为第一包源，原 downloadUrl 保留为备用。
-const addCatalogSourceToPackage = (remotePackage, catalogSource) => {
-    if (catalogSource.type !== 'gitee-contents') return remotePackage;
-    const pathPrefix = catalogSource.packagePathPrefix.replace(/^\/+|\/+$/g, '');
+// 按测速后的来源顺序补齐包下载地址，保留失败回退和 SHA256 校验链路。
+const addCatalogSourcesToPackage = (remotePackage, catalogSources) => {
+    const preferredSource = catalogSources[0];
+    const directPackageSource = preferredSource && preferredSource.type === 'direct' && remotePackage.downloadUrl ? [{
+        type: 'direct',
+        provider: remotePackage.provider || preferredSource.provider,
+        repository: remotePackage.repository || preferredSource.repository,
+        url: remotePackage.downloadUrl
+    }] : [];
+    const giteeSources = catalogSources
+        .filter(catalogSource => catalogSource.type === 'gitee-contents')
+        .map(catalogSource => {
+            const pathPrefix = catalogSource.packagePathPrefix.replace(/^\/+|\/+$/g, '');
+            return {
+                type: catalogSource.type,
+                provider: catalogSource.provider,
+                repository: catalogSource.repository,
+                ref: catalogSource.ref,
+                path: `${pathPrefix}/${remotePackage.asset}`
+            };
+        });
     return {
         ...remotePackage,
-        sources: [{
-            type: 'gitee-contents',
-            provider: catalogSource.provider,
-            repository: catalogSource.repository,
-            ref: catalogSource.ref,
-            path: `${pathPrefix}/${remotePackage.asset}`
-        }, ...(Array.isArray(remotePackage.sources) ? remotePackage.sources : [])]
+        sources: [...directPackageSource, ...giteeSources, ...(Array.isArray(remotePackage.sources) ? remotePackage.sources : [])]
     };
 };
 
@@ -246,26 +285,72 @@ const loadCatalogFromSource = async (source, fetchImpl) => {
     return response.json();
 };
 
+const selectRemoteCatalogSources = async (catalogSources, fetchImpl, options = {}) => {
+    const normalizedSources = catalogSources.map(normalizeRemoteSource);
+    const cacheKey = normalizedSources.map(getRemoteSourceKey).join('|');
+    const now = Date.now();
+    if (remoteSourceSelectionCache && remoteSourceSelectionCache.cacheKey === cacheKey &&
+        remoteSourceSelectionCache.expiresAt > now) {
+        const sourceByKey = new Map(normalizedSources.map(source => [getRemoteSourceKey(source), source]));
+        const cachedSources = remoteSourceSelectionCache.sourceKeys
+            .map(key => sourceByKey.get(key))
+            .filter(Boolean);
+        return {sources: cachedSources};
+    }
+
+    const timeoutMs = Number.isFinite(options.sourceProbeTimeoutMs) ?
+        Math.max(1, options.sourceProbeTimeoutMs) : REMOTE_SOURCE_PROBE_TIMEOUT;
+    const probes = normalizedSources.map(source => loadCatalogFromSource(
+        source,
+        (url, requestOptions) => fetchWithTimeout(fetchImpl, url, requestOptions, timeoutMs)
+    ).then(catalog => ({source, catalog})));
+    let winner;
+    try {
+        winner = await Promise.any(probes);
+    } catch {
+        return {sources: normalizedSources};
+    }
+    const winnerKey = getRemoteSourceKey(winner.source);
+    const orderedSources = [winner.source, ...normalizedSources.filter(source =>
+        getRemoteSourceKey(source) !== winnerKey)];
+    remoteSourceSelectionCache = {
+        cacheKey,
+        expiresAt: now + (Number.isFinite(options.sourceSelectionTtlMs) ?
+            Math.max(1, options.sourceSelectionTtlMs) : REMOTE_SOURCE_SELECTION_TTL),
+        sourceKeys: orderedSources.map(getRemoteSourceKey)
+    };
+    return {sources: orderedSources, catalog: winner.catalog};
+};
+
 // 只接收 published 条目；draft 包不会进入普通用户的版本检查结果。
 const loadRemoteLibraryCatalog = async (options = {}) => {
     const fetchImpl = options.fetchImpl || globalThis.fetch;
     if (typeof fetchImpl !== 'function') throw new Error('当前环境不支持网络请求');
-    const catalogSources = options.catalogSources || (options.catalogUrl ? [{
+    const hasExplicitSources = Boolean(options.catalogSources || options.catalogUrl);
+    const configuredSources = options.catalogSources || (options.catalogUrl ? [{
         type: 'direct',
         provider: 'direct',
         url: options.catalogUrl
     }] : DEFAULT_REMOTE_CATALOG_SOURCES);
+    const autoSelectSource = options.autoSelectSource !== false && !hasExplicitSources;
+    const selection = autoSelectSource ? await selectRemoteCatalogSources(
+        configuredSources,
+        fetchImpl,
+        options
+    ) : {sources: configuredSources};
+    const catalogSources = selection.sources;
     const failures = [];
     for (let index = 0; index < catalogSources.length; index++) {
         const source = normalizeRemoteSource(catalogSources[index]);
         try {
-            const catalog = await loadCatalogFromSource(source, fetchImpl);
+            const catalog = index === 0 && selection.catalog ? selection.catalog :
+                await loadCatalogFromSource(source, fetchImpl);
             if (!catalog || catalog.formatVersion !== 1 || !Array.isArray(catalog.packages)) {
                 throw new Error('远程拓展目录格式不受支持');
             }
             return catalog.packages
                 .filter(remotePackage => remotePackage.status === 'published')
-                .map(remotePackage => validateRemotePackage(addCatalogSourceToPackage(remotePackage, source)));
+                .map(remotePackage => validateRemotePackage(addCatalogSourcesToPackage(remotePackage, catalogSources)));
         } catch (error) {
             failures.push(`${describeRemoteSource(source)}: ${error.message}`);
             if (index < catalogSources.length - 1) {
@@ -275,6 +360,10 @@ const loadRemoteLibraryCatalog = async (options = {}) => {
         }
     }
     throw new Error(`远程拓展目录所有来源均失败: ${failures.join('; ')}`);
+};
+
+const clearRemoteSourceSelectionCache = () => {
+    remoteSourceSelectionCache = null;
 };
 
 const calculateSha256 = async data => {
@@ -329,6 +418,7 @@ export {
     DEFAULT_REMOTE_CATALOG_URL,
     DEFAULT_REMOTE_CATALOG_SOURCES,
     MAX_REMOTE_PACKAGE_SIZE,
+    clearRemoteSourceSelectionCache,
     compareVersions,
     downloadRemoteLibraryPackage,
     loadRemoteLibraryCatalog

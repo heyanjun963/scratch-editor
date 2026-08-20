@@ -7,8 +7,10 @@ import PythonCodingPanelComponent from '../components/python-coding-panel/python
 import intlShape from '../lib/intlShape.js';
 import {
     clearPythonConsole,
+    loadPythonCode,
     setPythonError,
     setPythonExitCode,
+    setPythonCodeSource,
     setPythonRunning,
     setPythonScriptPath
 } from '../reducers/python-coding';
@@ -58,8 +60,20 @@ const messages = defineMessages({
         id: 'gui.pythonCoding.saveFailed',
         defaultMessage: '[python] Save failed: {message}',
         description: 'Console message shown when Python code cannot be saved'
+    },
+    loadFailed: {
+        id: 'gui.pythonCoding.loadFailed',
+        defaultMessage: '[python] Load failed: {message}',
+        description: 'Console message shown when a Python file cannot be loaded'
+    },
+    loaded: {
+        id: 'gui.pythonCoding.loaded',
+        defaultMessage: '[python] Loaded {fileName}; blocks were not changed.',
+        description: 'Console message shown after loading a Python file without changing blocks'
     }
 });
+
+const MAX_PYTHON_FILE_SIZE = 5 * 1024 * 1024;
 
 // 通过 preload 暴露的非交互 Python API；浏览器环境下不存在。
 const getDesktopPythonApi = () => {
@@ -101,6 +115,19 @@ const downloadPythonCode = (code, suggestedName) => {
     }
 };
 
+// 只读取 UTF-8 Python 文本，不解析语法，也不触碰中间积木工作区。
+const readPythonFile = async file => {
+    if (!file || typeof file.arrayBuffer !== 'function') throw new Error('A Python file is required.');
+    if (file.size > MAX_PYTHON_FILE_SIZE) throw new Error('The Python file is larger than 5 MiB.');
+    const data = await file.arrayBuffer();
+    if (data.byteLength > MAX_PYTHON_FILE_SIZE) throw new Error('The Python file is larger than 5 MiB.');
+    try {
+        return new TextDecoder('utf-8', {fatal: true}).decode(data);
+    } catch {
+        throw new Error('The Python file must use UTF-8 encoding.');
+    }
+};
+
 // Redux 历史达到上限后会从头部裁行，这里只提取裁剪后新增的尾部文本，避免重复写入 xterm。
 const getConsoleTextDelta = (previousText, currentText) => {
     if (!previousText) return currentText;
@@ -120,6 +147,7 @@ const getConsoleTextDelta = (previousText, currentText) => {
 const PythonCodingPanel = props => {
     const {
         code,
+        codeSource,
         consoleText,
         error,
         intl,
@@ -128,6 +156,8 @@ const PythonCodingPanel = props => {
         onClearConsole,
         onSetError,
         onSetExitCode,
+        onLoadPythonCode,
+        onSetCodeSource,
         onSetRunning,
         onSetScriptPath,
         projectTitle,
@@ -359,6 +389,32 @@ const PythonCodingPanel = props => {
         writeTerminalLine
     ]);
 
+    // 加载 Python 文件只替换代码区内容，明确保持当前积木工作区不变。
+    const handleLoad = useCallback(async file => {
+        if (!file) return;
+        try {
+            const loadedCode = await readPythonFile(file);
+            onSetError(null);
+            onLoadPythonCode(loadedCode);
+            writeTerminalLine(intl.formatMessage(messages.loaded, {fileName: file.name || 'Python file'}));
+        } catch (error_) {
+            const message = error_ && error_.message ? error_.message : String(error_);
+            onSetError(message);
+            writeTerminalLine(colorStderr(intl.formatMessage(messages.loadFailed, {message})));
+        }
+    }, [
+        intl,
+        onLoadPythonCode,
+        onSetError,
+        writeTerminalLine
+    ]);
+
+    // 用户明确选择回到积木生成结果，避免 loaded 代码被静默覆盖。
+    const handleUseBlocks = useCallback(() => {
+        onSetCodeSource('generated');
+        onSetError(null);
+    }, [onSetCodeSource, onSetError]);
+
     // xterm 输入只在运行中转发给 PTY，避免空闲时误写。
     const handleTerminalInput = useCallback(data => {
         if (!desktopTerminalApi || !isRunning) return;
@@ -381,6 +437,7 @@ const PythonCodingPanel = props => {
     return (
         <PythonCodingPanelComponent
             code={code}
+            codeSource={codeSource}
             desktopApiAvailable={desktopApiAvailable}
             error={error}
             hasConsoleOutput={hasConsoleOutput}
@@ -389,9 +446,11 @@ const PythonCodingPanel = props => {
             scriptPath={scriptPath}
             terminalRef={terminalRef}
             onClearConsole={handleClearConsole}
+            onLoad={handleLoad}
             onRun={handleRun}
             onSave={handleSave}
             onStop={handleStop}
+            onUseBlocks={handleUseBlocks}
             onTerminalInput={handleTerminalInput}
             onTerminalResize={handleTerminalResize}
         />
@@ -400,13 +459,16 @@ const PythonCodingPanel = props => {
 
 PythonCodingPanel.propTypes = {
     code: PropTypes.string,
+    codeSource: PropTypes.oneOf(['generated', 'loaded']),
     consoleText: PropTypes.string,
     error: PropTypes.string,
     intl: intlShape.isRequired,
     isRunning: PropTypes.bool,
     lastExitCode: PropTypes.number,
     onClearConsole: PropTypes.func.isRequired,
+    onLoadPythonCode: PropTypes.func.isRequired,
     onSetError: PropTypes.func.isRequired,
+    onSetCodeSource: PropTypes.func.isRequired,
     onSetExitCode: PropTypes.func.isRequired,
     onSetRunning: PropTypes.func.isRequired,
     onSetScriptPath: PropTypes.func.isRequired,
@@ -417,6 +479,7 @@ PythonCodingPanel.propTypes = {
 // 从 Redux 读取生成代码、轻量控制台历史和本地 Python 运行状态。
 const mapStateToProps = state => ({
     code: state.scratchGui.pythonCoding.code,
+    codeSource: state.scratchGui.pythonCoding.codeSource,
     consoleText: state.scratchGui.pythonCoding.consoleText,
     error: state.scratchGui.pythonCoding.error,
     isRunning: state.scratchGui.pythonCoding.isRunning,
@@ -428,7 +491,9 @@ const mapStateToProps = state => ({
 // 把控制台与运行结果操作转换成 Redux 状态更新。
 const mapDispatchToProps = dispatch => ({
     onClearConsole: () => dispatch(clearPythonConsole()),
+    onLoadPythonCode: code => dispatch(loadPythonCode(code)),
     onSetError: error => dispatch(setPythonError(error)),
+    onSetCodeSource: source => dispatch(setPythonCodeSource(source)),
     onSetExitCode: exitCode => dispatch(setPythonExitCode(exitCode)),
     onSetRunning: isRunning => dispatch(setPythonRunning(isRunning)),
     onSetScriptPath: scriptPath => dispatch(setPythonScriptPath(scriptPath))
@@ -441,5 +506,6 @@ export default injectIntl(connect(
 
 export {
     downloadPythonCode,
-    getConsoleTextDelta
+    getConsoleTextDelta,
+    readPythonFile
 };

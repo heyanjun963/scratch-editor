@@ -1,6 +1,6 @@
 import {TextDecoder, TextEncoder} from 'util';
 
-import {restartMicroPython, uploadMicroPythonFile} from '../../../src/lib/serial-repl-uploader';
+import {resolveChunkSize, restartMicroPython, uploadMicroPythonFile} from '../../../src/lib/serial-repl-uploader';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -58,6 +58,18 @@ describe('MicroPython serial uploader', () => {
         global.TextEncoder = originalTextEncoder;
     });
 
+    test('selects a conservative automatic chunk size by file size', () => {
+        expect(resolveChunkSize(1024, 'auto')).toBe(256);
+        expect(resolveChunkSize(1025, 'auto')).toBe(512);
+        expect(resolveChunkSize(8192, 'auto')).toBe(512);
+        expect(resolveChunkSize(8193, 'auto')).toBe(1024);
+    });
+
+    test('keeps an explicitly requested chunk size', () => {
+        expect(resolveChunkSize(20000, 128)).toBe(128);
+        expect(resolveChunkSize(20000, 0)).toBe(1024);
+    });
+
     test('enters Raw REPL without requiring a friendly prompt and verifies main.py size', async () => {
         const code = "print('uploaded')\n";
         const protocol = createProtocol({
@@ -83,6 +95,22 @@ describe('MicroPython serial uploader', () => {
         expect(writtenText).toContain("os.stat('main.py')[6]");
         expect(Array.from(session.write.mock.calls[0][0])).toEqual([0x04]);
         expect(protocol.readUntil.mock.calls.some(call => call[0] === '>>>')).toBe(false);
+    });
+
+    test('reports upload phases and completion progress', async () => {
+        const code = "print('uploaded')\n";
+        const protocol = createProtocol({expectedSize: encode(code).byteLength});
+        const session = {
+            runProtocol: callback => callback(protocol),
+            write: jest.fn(() => Promise.resolve())
+        };
+        const onProgress = jest.fn();
+
+        await uploadMicroPythonFile(session, code, {onProgress});
+
+        expect(onProgress.mock.calls.map(call => call[0])).toEqual([0, 5, 10, 85, 90, 100]);
+        expect(onProgress.mock.calls[0][1]).toMatchObject({phase: 'preparing'});
+        expect(onProgress.mock.calls[5][1]).toMatchObject({phase: 'completed'});
     });
 
     test('ignores a delayed friendly prompt before the Raw REPL banner', async () => {

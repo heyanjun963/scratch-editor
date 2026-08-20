@@ -1,4 +1,6 @@
 const UPDATE_PYTHON_CODE = 'scratch-gui/python-coding/UPDATE_PYTHON_CODE';
+const LOAD_PYTHON_CODE = 'scratch-gui/python-coding/LOAD_PYTHON_CODE';
+const SET_PYTHON_CODE_SOURCE = 'scratch-gui/python-coding/SET_PYTHON_CODE_SOURCE';
 const APPEND_PYTHON_CONSOLE = 'scratch-gui/python-coding/APPEND_PYTHON_CONSOLE';
 const CLEAR_PYTHON_CONSOLE = 'scratch-gui/python-coding/CLEAR_PYTHON_CONSOLE';
 const SET_PYTHON_RUNNING = 'scratch-gui/python-coding/SET_PYTHON_RUNNING';
@@ -17,6 +19,7 @@ const maxConsoleLines = 200;
 // Python 编码模式状态：代码文本、运行状态、脚本路径、串口选择都集中在这里。
 const initialState = {
     code: '',
+    codeSource: 'generated',
     consoleText: '',
     isRunning: false,
     scriptPath: null,
@@ -35,7 +38,19 @@ const reducer = function (state, action) {
     switch (action.type) {
     case UPDATE_PYTHON_CODE:
         return Object.assign({}, state, {
-            code: action.code
+            code: action.code,
+            codeSource: 'generated'
+        });
+    case LOAD_PYTHON_CODE:
+        return Object.assign({}, state, {
+            code: action.code,
+            codeSource: 'loaded',
+            scriptPath: null,
+            lastExitCode: null
+        });
+    case SET_PYTHON_CODE_SOURCE:
+        return Object.assign({}, state, {
+            codeSource: action.source
         });
     case APPEND_PYTHON_CONSOLE: {
         const nextConsoleText = [
@@ -100,6 +115,20 @@ const updatePythonCode = function (code) {
     return {
         type: UPDATE_PYTHON_CODE,
         code
+    };
+};
+
+const loadPythonCode = function (code) {
+    return {
+        type: LOAD_PYTHON_CODE,
+        code
+    };
+};
+
+const setPythonCodeSource = function (source) {
+    return {
+        type: SET_PYTHON_CODE_SOURCE,
+        source
     };
 };
 
@@ -183,6 +212,8 @@ export {
     reducer as default,
     initialState as pythonCodingInitialState,
     updatePythonCode,
+    loadPythonCode,
+    setPythonCodeSource,
     appendPythonConsole,
     clearPythonConsole,
     setPythonRunning,

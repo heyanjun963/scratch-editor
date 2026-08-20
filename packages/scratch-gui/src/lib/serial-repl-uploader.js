@@ -3,6 +3,18 @@ const CONTROL_B = new Uint8Array([0x02]);
 const CONTROL_D = new Uint8Array([0x04]);
 const OK_RESPONSE = 'OK';
 const DEFAULT_CHUNK_SIZE = 256;
+const AUTO_CHUNK_THRESHOLDS = Object.freeze([
+    {maxBytes: 1024, chunkSize: 256},
+    {maxBytes: 8192, chunkSize: 512},
+    {maxBytes: Number.POSITIVE_INFINITY, chunkSize: 1024}
+]);
+
+// 根据代码体积选择传输分块；小文件保持保守设置，大文件减少串口往返次数。
+const resolveChunkSize = (fileSize, chunkSize) => {
+    if (Number.isInteger(chunkSize) && chunkSize > 0) return chunkSize;
+    const threshold = AUTO_CHUNK_THRESHOLDS.find(item => fileSize <= item.maxBytes);
+    return threshold ? threshold.chunkSize : DEFAULT_CHUNK_SIZE;
+};
 
 // 提供上传状态切换所需的异步短延时。
 const sleep = delay => new Promise(resolve => setTimeout(resolve, delay));
@@ -81,7 +93,7 @@ const enterRawRepl = async protocol => {
 
 // 通过 Raw REPL 分块写入目标文件，并以设备端文件大小作为成功返回前的校验条件。
 const uploadMicroPythonFile = async (session, code, {
-    chunkSize = DEFAULT_CHUNK_SIZE,
+    chunkSize = 'auto',
     fileName = 'main.py',
     onProgress = () => {}
 } = {}) => {
@@ -90,28 +102,36 @@ const uploadMicroPythonFile = async (session, code, {
     }
     const fileData = encode(String(code || ''));
     if (!fileData.byteLength) throw new Error('没有可上传的 Python 代码');
+    const resolvedChunkSize = resolveChunkSize(fileData.byteLength, chunkSize);
     const fileLiteral = pythonStringLiteral(fileName);
+    const reportProgress = (progress, phase) => onProgress(progress, {
+        phase,
+        bytes: fileData.byteLength,
+        fileName
+    });
 
     // 上传期间独占普通日志 reader，避免协议响应被控制台提前消费。
     const result = await session.runProtocol(async protocol => {
         let rawReplEntered = false;
         try {
-            onProgress(0);
+            reportProgress(0, 'preparing');
             await enterRawRepl(protocol);
             rawReplEntered = true;
+            reportProgress(5, 'entering-repl');
             await rawExec(protocol, `f = open(${fileLiteral}, 'wb')`);
-            for (let offset = 0; offset < fileData.byteLength; offset += chunkSize) {
-                const chunk = fileData.slice(offset, offset + chunkSize);
+            reportProgress(10, 'writing');
+            for (let offset = 0; offset < fileData.byteLength; offset += resolvedChunkSize) {
+                const chunk = fileData.slice(offset, offset + resolvedChunkSize);
                 await rawExec(protocol, `_ = f.write(${bytesToPythonLiteral(chunk)})`);
-                onProgress(Math.min(90, Math.floor(((offset + chunk.byteLength) / fileData.byteLength) * 90)));
+                reportProgress(Math.min(85, 10 + Math.floor(((offset + chunk.byteLength) / fileData.byteLength) * 75)), 'writing');
             }
+            reportProgress(90, 'verifying');
             await rawExec(protocol, 'f.flush(); f.close()');
             const sizeOutput = await rawExec(protocol, `import os; print(os.stat(${fileLiteral})[6])`);
             const uploadedSize = Number.parseInt(sizeOutput.trim(), 10);
             if (uploadedSize !== fileData.byteLength) {
                 throw new Error(`main.py 校验失败: 期望 ${fileData.byteLength} 字节，设备返回 ${sizeOutput.trim()}`);
             }
-            onProgress(100);
             return {
                 bytes: fileData.byteLength,
                 fileName
@@ -130,6 +150,11 @@ const uploadMicroPythonFile = async (session, code, {
 
     // 回到友好 REPL 后软复位，让设备重新执行 boot.py/main.py，启动日志继续进入控制台。
     await session.write(CONTROL_D);
+    onProgress(100, {
+        phase: 'completed',
+        bytes: result.bytes,
+        fileName: result.fileName
+    });
     return result;
 };
 
@@ -144,6 +169,7 @@ const restartMicroPython = async (session, {delayMs = 100} = {}) => {
 };
 
 export {
+    resolveChunkSize,
     restartMicroPython,
     uploadMicroPythonFile
 };

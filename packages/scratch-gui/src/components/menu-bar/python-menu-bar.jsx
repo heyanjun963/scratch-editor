@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {defineMessages, FormattedMessage, injectIntl} from 'react-intl';
 
 import Box from '../box/box.jsx';
@@ -140,6 +140,7 @@ const PythonMenuBar = ({
     const serialOutputMonitorRef = useRef(null);
     const serialPortPathRef = useRef(serialPortPath);
     const selectedPortLabelRef = useRef('');
+    const [uploadProgress, setUploadProgress] = useState(null);
 
     // 串口错误统一写入 Python 控制台，并用 ANSI 红色显示。
     const writeSerialError = useCallback((message, values) => {
@@ -356,7 +357,10 @@ const PythonMenuBar = ({
         onSetSerialBusy(true);
         onWriteConsoleLine(intl.formatMessage(messages.serialUploading));
         try {
-            const result = await uploadMicroPythonFile(outputMonitor, pythonCode);
+            setUploadProgress(0);
+            const result = await uploadMicroPythonFile(outputMonitor, pythonCode, {
+                onProgress: progress => setUploadProgress(progress)
+            });
             onWriteConsoleLine(intl.formatMessage(messages.serialUploaded, {
                 bytes: result.bytes,
                 path: selectedPortLabelRef.current || serialPortPath || 'serial port'
@@ -369,6 +373,7 @@ const PythonMenuBar = ({
             writeSerialError(messages.serialFailed, {message});
         } finally {
             onSetSerialBusy(false);
+            setUploadProgress(null);
         }
     }, [
         intl,
@@ -485,7 +490,20 @@ const PythonMenuBar = ({
                         type="button"
                         onClick={handleSerialUpload}
                     >
-                        Upload
+                        {uploadProgress === null ? (
+                            <FormattedMessage
+                                defaultMessage="Upload"
+                                description="Button to upload Python code to the connected device"
+                                id="gui.pythonCoding.serialUpload"
+                            />
+                        ) : (
+                            <FormattedMessage
+                                defaultMessage="Upload {progress}%"
+                                description="Progress shown on the serial upload button"
+                                id="gui.pythonCoding.serialUploadButtonProgress"
+                                values={{progress: uploadProgress}}
+                            />
+                        )}
                     </button>
                 </div>
             </div>

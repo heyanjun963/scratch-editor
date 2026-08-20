@@ -2,9 +2,13 @@ import {fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React from 'react';
 import {IntlProvider} from 'react-intl';
+import {TextDecoder, TextEncoder} from 'util';
 
 import PythonCodingPanel from '../../../src/components/python-coding-panel/python-coding-panel.jsx';
-import {downloadPythonCode, getConsoleTextDelta} from '../../../src/containers/python-coding-panel.jsx';
+import {downloadPythonCode, getConsoleTextDelta, readPythonFile} from '../../../src/containers/python-coding-panel.jsx';
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 jest.mock('../../../src/components/python-terminal/python-terminal.jsx', () => {
     const MockPythonTerminal = () => <div data-testid="python-terminal" />;
@@ -27,9 +31,28 @@ describe('PythonCodingPanel actions', () => {
         const {getAllByRole, getByRole} = renderPanel({onSave});
         const actionLabels = getAllByRole('button').map(button => button.textContent);
 
-        expect(actionLabels.slice(0, 2)).toEqual(['Save', 'Run']);
+        expect(actionLabels.slice(0, 3)).toEqual(['Load', 'Save', 'Run']);
         fireEvent.click(getByRole('button', {name: 'Save'}));
         expect(onSave).toHaveBeenCalledTimes(1);
+    });
+
+    test('passes a selected Python file to the load callback', () => {
+        const onLoad = jest.fn();
+        const {getByLabelText} = renderPanel({onLoad});
+        const file = {name: 'main.py', size: 12, arrayBuffer: () => Promise.resolve(new ArrayBuffer(12))};
+
+        fireEvent.change(getByLabelText('Load Python file'), {target: {files: [file]}});
+
+        expect(onLoad).toHaveBeenCalledWith(file);
+    });
+
+    test('shows the explicit switch back to blocks for loaded code', () => {
+        const onUseBlocks = jest.fn();
+        const {getByRole} = renderPanel({codeSource: 'loaded', onUseBlocks});
+
+        fireEvent.click(getByRole('button', {name: 'Use blocks code'}));
+
+        expect(onUseBlocks).toHaveBeenCalledTimes(1);
     });
 
     test('disables Save when generated code is empty', () => {
@@ -100,6 +123,23 @@ describe('Python console history synchronization', () => {
 });
 
 describe('Python code browser download', () => {
+    test('reads UTF-8 Python files without parsing them', async () => {
+        const bytes = new TextEncoder().encode('print("中文")\n');
+        const code = await readPythonFile({
+            size: bytes.byteLength,
+            arrayBuffer: () => Promise.resolve(bytes.buffer)
+        });
+
+        expect(code).toBe('print("中文")\n');
+    });
+
+    test('rejects Python files larger than 5 MiB', async () => {
+        await expect(readPythonFile({
+            size: 5 * 1024 * 1024 + 1,
+            arrayBuffer: () => Promise.resolve(new ArrayBuffer(0))
+        })).rejects.toThrow('larger than 5 MiB');
+    });
+
     test('downloads generated code as a Python file and releases the object URL', () => {
         const createObjectURL = jest.fn(() => 'blob:python-code');
         const revokeObjectURL = jest.fn();

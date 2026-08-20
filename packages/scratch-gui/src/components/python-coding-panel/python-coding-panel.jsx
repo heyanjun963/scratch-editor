@@ -20,21 +20,25 @@ const clampConsoleHeight = (panelRect, requestedHeight) => Math.min(
 // 展示 Python 代码、运行状态和可调节高度的 xterm 控制台。
 const PythonCodingPanel = ({
     code,
+    codeSource,
     desktopApiAvailable,
     error,
     hasConsoleOutput,
     isRunning,
     lastExitCode,
     onClearConsole,
+    onLoad,
     onTerminalInput,
     onTerminalResize,
     onRun,
     onSave,
     onStop,
+    onUseBlocks,
     scriptPath,
     terminalRef
 }) => {
     const panelRef = useRef(null);
+    const fileInputRef = useRef(null);
     const removeDragListenersRef = useRef(null);
     const [consoleHeight, setConsoleHeight] = useState(null);
 
@@ -90,6 +94,12 @@ const PythonCodingPanel = ({
         height: `${consoleHeight}px`
     };
 
+    const handleLoadInputChange = event => {
+        const file = event.target.files && event.target.files[0];
+        event.target.value = '';
+        if (file) onLoad(file);
+    };
+
     return (
         <Box
             aria-labelledby="python-code-header"
@@ -108,6 +118,38 @@ const PythonCodingPanel = ({
                     />
                 </span>
                 <Box className={styles.editorActions}>
+                    <button
+                        className={styles.actionButton}
+                        type="button"
+                        onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Load"
+                            description="Button to load a Python file into the code area"
+                            id="gui.pythonCoding.load"
+                        />
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        accept=".py,text/x-python"
+                        aria-label="Load Python file"
+                        className={styles.hiddenFileInput}
+                        type="file"
+                        onChange={handleLoadInputChange}
+                    />
+                    {codeSource === 'loaded' && (
+                        <button
+                            className={styles.actionButton}
+                            type="button"
+                            onClick={onUseBlocks}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Use blocks code"
+                                description="Button to switch the Python code area back to generated blocks code"
+                                id="gui.pythonCoding.useBlocks"
+                            />
+                        </button>
+                    )}
                     <button
                         className={styles.actionButton}
                         disabled={!code.trim()}
@@ -192,6 +234,12 @@ const PythonCodingPanel = ({
                         id="gui.pythonCoding.scriptPathStatus"
                         values={{scriptPath}}
                     />
+                ) : codeSource === 'loaded' ? (
+                    <FormattedMessage
+                        defaultMessage="Loaded Python file; blocks are unchanged."
+                        description="Status shown when Python code came from a loaded file"
+                        id="gui.pythonCoding.loadedStatus"
+                    />
                 ) : (
                     <FormattedMessage
                         defaultMessage="Ready"
@@ -243,17 +291,20 @@ const PythonCodingPanel = ({
 
 PythonCodingPanel.propTypes = {
     code: PropTypes.string,
+    codeSource: PropTypes.oneOf(['generated', 'loaded']),
     desktopApiAvailable: PropTypes.bool,
     error: PropTypes.string,
     hasConsoleOutput: PropTypes.bool,
     isRunning: PropTypes.bool,
     lastExitCode: PropTypes.number,
     onClearConsole: PropTypes.func,
+    onLoad: PropTypes.func,
     onTerminalInput: PropTypes.func,
     onTerminalResize: PropTypes.func,
     onRun: PropTypes.func,
     onSave: PropTypes.func,
     onStop: PropTypes.func,
+    onUseBlocks: PropTypes.func,
     scriptPath: PropTypes.string,
     terminalRef: PropTypes.shape({
         current: PropTypes.any
@@ -262,17 +313,20 @@ PythonCodingPanel.propTypes = {
 
 PythonCodingPanel.defaultProps = {
     code: '',
+    codeSource: 'generated',
     desktopApiAvailable: false,
     error: null,
     hasConsoleOutput: false,
     isRunning: false,
     lastExitCode: null,
     onClearConsole: null,
+    onLoad: null,
     onTerminalInput: null,
     onTerminalResize: null,
     onRun: null,
     onSave: null,
     onStop: null,
+    onUseBlocks: null,
     scriptPath: null,
     terminalRef: null
 };

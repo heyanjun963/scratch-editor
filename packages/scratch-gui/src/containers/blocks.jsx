@@ -261,7 +261,8 @@ class Blocks extends React.Component {
             this.props.customExtensionIds !== nextProps.customExtensionIds ||
             this.props.locale !== nextProps.locale ||
             this.props.anyModalVisible !== nextProps.anyModalVisible ||
-            this.props.stageSize !== nextProps.stageSize
+            this.props.stageSize !== nextProps.stageSize ||
+            this.props.pythonCodeSource !== nextProps.pythonCodeSource
         );
     }
     componentDidUpdate (prevProps) {
@@ -273,6 +274,11 @@ class Blocks extends React.Component {
         if (this.props.editorMode !== prevProps.editorMode) {
             this.ensurePythonExtensions();
             this.requestToolboxUpdate();
+            this.onPythonWorkspaceChange();
+        }
+
+        if (this.props.pythonCodeSource !== prevProps.pythonCodeSource &&
+            this.props.pythonCodeSource === 'generated') {
             this.onPythonWorkspaceChange();
         }
 
@@ -671,6 +677,7 @@ class Blocks extends React.Component {
     // Python 模式下工作区有变化就重新生成右侧代码文本。
     onPythonWorkspaceChange () {
         if (this.props.editorMode !== PYTHON_EDITOR_MODE) return;
+        if (this.props.pythonCodeSource === 'loaded') return;
         const code = generatePythonCode(this.workspace);
         this.props.updatePythonCodeState(code);
     }
@@ -1009,6 +1016,7 @@ Blocks.propTypes = {
     stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired,
     colorMode: PropTypes.oneOf(Object.keys(colorModeMap)),
     editorMode: PropTypes.string,
+    pythonCodeSource: PropTypes.oneOf(['generated', 'loaded']),
     toolboxXML: PropTypes.string,
     updateMetrics: PropTypes.func,
     updateToolboxState: PropTypes.func,
@@ -1064,6 +1072,7 @@ const mapStateToProps = state => {
         messages: state.locales.messages,
         toolboxXML: state.scratchGui.toolbox.toolboxXML,
         editorMode: state.scratchGui.mode.editorMode,
+        pythonCodeSource: state.scratchGui.pythonCoding.codeSource,
         customExtensionIds: customExtensionLibraries
             .map(library => library.manifest.id)
             .join(','),

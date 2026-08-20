@@ -3,6 +3,7 @@ import {TextDecoder} from 'util';
 import {
     DEFAULT_REMOTE_CATALOG_SOURCES,
     MAX_REMOTE_PACKAGE_SIZE,
+    clearRemoteSourceSelectionCache,
     compareVersions,
     downloadRemoteLibraryPackage,
     loadRemoteLibraryCatalog
@@ -21,6 +22,10 @@ const remotePackage = {
 };
 
 describe('remote product extension client', () => {
+    beforeEach(() => {
+        clearRemoteSourceSelectionCache();
+    });
+
     test('compares stable and prerelease semantic versions', () => {
         expect(compareVersions('0.3.0', '0.2.1')).toBe(1);
         expect(compareVersions('1.0.0-beta.2', '1.0.0-beta.1')).toBe(1);
@@ -110,7 +115,7 @@ describe('remote product extension client', () => {
                 json: () => Promise.resolve({formatVersion: 1, packages: [remotePackage]})
             });
 
-        await expect(loadRemoteLibraryCatalog({fetchImpl})).resolves.toEqual([
+        await expect(loadRemoteLibraryCatalog({fetchImpl, autoSelectSource: false})).resolves.toEqual([
             expect.objectContaining({packageId: 'aimecanum'})
         ]);
         expect(fetchImpl).toHaveBeenCalledTimes(2);
@@ -119,6 +124,49 @@ describe('remote product extension client', () => {
             expect.any(Error)
         );
         warn.mockRestore();
+    });
+
+    test('selects the faster catalog source and caches the order for the session', async () => {
+        const catalog = {formatVersion: 1, packages: [remotePackage]};
+        const fetchImpl = jest.fn((url, requestOptions = {}) => {
+            expect(requestOptions.signal).toBeDefined();
+            if (url.includes('gitee.com')) {
+                return new Promise(resolve => setTimeout(() => resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        type: 'file',
+                        encoding: 'base64',
+                        content: btoa(JSON.stringify(catalog)),
+                        size: JSON.stringify(catalog).length
+                    })
+                }), 25));
+            }
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve(catalog)
+            });
+        });
+
+        const selectedPackages = await loadRemoteLibraryCatalog({fetchImpl});
+        expect(selectedPackages).toEqual([
+            expect.objectContaining({packageId: 'aimecanum'})
+        ]);
+        expect(selectedPackages[0].sources).toEqual([
+            expect.objectContaining({type: 'direct', url: remotePackage.downloadUrl}),
+            expect.objectContaining({type: 'gitee-contents'})
+        ]);
+        expect(fetchImpl.mock.calls[0][0]).toContain('gitee.com');
+        expect(fetchImpl.mock.calls[1][0]).toContain('raw.githubusercontent.com');
+
+        const cachedFetch = jest.fn((url, requestOptions = {}) => {
+            expect(requestOptions.signal).toBeUndefined();
+            if (!url.includes('raw.githubusercontent.com')) throw new Error('不应重新探测 Gitee');
+            return Promise.resolve({ok: true, json: () => Promise.resolve(catalog)});
+        });
+        await expect(loadRemoteLibraryCatalog({fetchImpl: cachedFetch})).resolves.toEqual([
+            expect.objectContaining({packageId: 'aimecanum'})
+        ]);
+        expect(cachedFetch).toHaveBeenCalledTimes(1);
     });
 
     test('rejects a downloaded package when SHA256 does not match', async () => {

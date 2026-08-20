@@ -464,13 +464,14 @@ desktop/security.md
 | Python 代码生成 | Demo | 可维护 generator，覆盖核心语法 | P0 |
 | Python 积木分类 | Demo | 控制、运算符、文本、变量、列表、Python 等分类 | P0 |
 | Python 文件输出 | 已实现初版 | 生成并保存 `.py`，后续接项目保存 | P0 |
+| Python 文件加载 | 已实现初版 | 加载 UTF-8 `.py` 到代码区且不反向转换积木，项目保存时的代码来源锁定仍待接入 | P1 |
 | 本机 Python 执行 | 已实现初版 | Electron 主进程运行 Python，待人工验证 | P0 |
 | Terminal | C2 待验证 | xterm.js 已接入，node-pty 交互终端已完成代码接入，待人工验证 input/Ctrl+C/打包版 | P0 |
 | 项目保存恢复 | 待验证原版能力 | 复用 `.sb3` 保存/加载，必要时扩展 metadata | P0 |
 | 函数折叠 | MVP 实现中 | 已补 Python 函数积木和函数定义块右键折叠入口，待人工验证 | P0 |
 | 工具栏积木禁拖 | MVP 实现中 | 已用 Python `current time` 做禁用样例，后续需接产品配置/设备状态 | P0 |
-| 串口和上传代码 | Web Serial 输出和 Raw REPL 上传已接入 | 待真机验证文件内容、执行结果、拔线和大文件稳定性 | P1 |
-| 自定义扩展库/自定义积木 | 已提交 MVP | 已有用户拓展管理和 SBEXT；来源模型规定已校验远程缓存离线优先、内置默认最后兜底，待实现真实缓存和项目版本锁定 | P1 |
+| 串口和上传代码 | Web Serial 输出、Raw REPL 上传、阶段进度和按文件体积动态分块已接入 | 代码测试已通过，未人工检验（暂无测试机器）；待验证文件内容、执行结果、拔线和大文件稳定性；Raw-Paste 尚未接入 | P1 |
+| 自定义扩展库/自定义积木 | 已提交 MVP | 已有用户拓展管理和 SBEXT；远程目录支持 Gitee/GitHub 自动测速、短期缓存和 SHA256 回退，项目版本锁定仍待补齐 | P1 |
 | 自定义扩展 | Demo | 公司规范扩展包 | P1 |
 | 硬件连接 | Web Serial MVP | 待真机验证和正式烧录能力 | P1 |
 | 安全 IPC | Demo | 白名单和参数校验 | P0 |
@@ -716,7 +717,7 @@ current time 积木出现红色禁止样式
 
 ### 阶段 G：串口和上传代码
 
-当前状态：Web Serial 连接、硬件输出、指定端口选择和 MicroPython Raw REPL `main.py` 上传已接入，待真机完整回归。
+当前状态：Web Serial 连接、硬件输出、指定端口选择和 MicroPython Raw REPL `main.py` 上传已接入；代码测试已通过，未人工检验（暂无测试机器），待真机完整回归。
 
 静态审查记录：[2026-07-15 串口上传代码静态审查](./2026-07-15-serial-upload-code-review.md)。
 
