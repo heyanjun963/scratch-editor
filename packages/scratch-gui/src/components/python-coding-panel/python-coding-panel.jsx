@@ -4,6 +4,7 @@ import {FormattedMessage} from 'react-intl';
 
 import Box from '../box/box.jsx';
 import PythonTerminal from '../python-terminal/python-terminal.jsx';
+import PythonSyntaxHighlight from './python-syntax-highlight.jsx';
 
 import styles from './python-coding-panel.css';
 
@@ -248,12 +249,7 @@ const PythonCodingPanel = ({
                     />
                 )}
             </Box>
-            <textarea
-                readOnly
-                className={styles.codeArea}
-                spellCheck={false}
-                value={code}
-            />
+            <PythonSyntaxHighlight code={code} />
             <Box
                 aria-labelledby="python-console-header"
                 className={styles.consolePane}

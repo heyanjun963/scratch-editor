@@ -6,6 +6,7 @@ import {TextDecoder, TextEncoder} from 'util';
 
 import PythonCodingPanel from '../../../src/components/python-coding-panel/python-coding-panel.jsx';
 import {downloadPythonCode, getConsoleTextDelta, readPythonFile} from '../../../src/containers/python-coding-panel.jsx';
+import {tokenizePython} from '../../../src/components/python-coding-panel/python-syntax-highlight.jsx';
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
@@ -59,6 +60,47 @@ describe('PythonCodingPanel actions', () => {
         const {getByRole} = renderPanel({code: '   ', onSave: jest.fn()});
 
         expect(getByRole('button', {name: 'Save'})).toBeDisabled();
+    });
+});
+
+describe('Python syntax highlighting', () => {
+    test('preserves source text while classifying Python tokens', () => {
+        const code = '# 注释\ndef greet(name):\n    return print("hello", name, 42, True)\n';
+        const tokens = tokenizePython(code);
+
+        expect(tokens.map(token => token.value).join('')).toBe(code);
+        expect(tokens.filter(token => token.type === 'comment').map(token => token.value)).toEqual(['# 注释']);
+        expect(tokens.filter(token => token.type === 'keyword').map(token => token.value)).toEqual(['def', 'return']);
+        expect(tokens.filter(token => token.type === 'string').map(token => token.value)).toEqual(['"hello"']);
+        expect(tokens.filter(token => token.type === 'number').map(token => token.value)).toEqual(['42']);
+        expect(tokens.filter(token => token.type === 'boolean').map(token => token.value)).toEqual(['True']);
+        expect(tokens.filter(token => token.type === 'function').map(token => token.value)).toEqual(['greet']);
+        expect(tokens.filter(token => token.type === 'builtin').map(token => token.value)).toEqual(['print']);
+    });
+
+    test('renders highlighted code without changing selectable text', () => {
+        const code = 'value = "中文" # comment\n';
+        const {getByTestId} = renderPanel({code});
+        const codeElement = getByTestId('python-code');
+
+        expect(codeElement.textContent).toBe(code);
+        expect(codeElement.querySelector('[data-token-type="string"]')).toHaveTextContent('"中文"');
+        expect(codeElement.querySelector('[data-token-type="comment"]')).toHaveTextContent('# comment');
+    });
+
+    test('keeps multiline strings in one string token', () => {
+        const tokens = tokenizePython('text = """line 1\nline 2"""\n');
+
+        expect(tokens.filter(token => token.type === 'string').map(token => token.value)).toEqual([
+            '"""line 1\nline 2"""'
+        ]);
+    });
+
+    test('falls back to plain tokens for an unterminated string', () => {
+        const tokens = tokenizePython('print("unfinished\nreturn 1');
+
+        expect(tokens.some(token => token.type === 'string')).toBe(false);
+        expect(tokens.filter(token => token.type === 'keyword').map(token => token.value)).toEqual(['return']);
     });
 });
 
