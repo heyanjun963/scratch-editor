@@ -465,6 +465,7 @@ desktop/security.md
 | Python 积木分类 | Demo | 控制、运算符、文本、变量、列表、Python 等分类 | P0 |
 | Python 文件输出 | 已实现初版 | 生成并保存 `.py`，后续接项目保存 | P0 |
 | Python 文件加载 | 已实现初版 | 加载 UTF-8 `.py` 到代码区且不反向转换积木，项目保存时的代码来源锁定仍待接入 | P1 |
+| Python 代码编辑器高亮 | 需求已记录 | 代码区增加类似编辑器的 Python 词法高亮，保持文本内容、加载、保存和运行行为不变 | P1 |
 | 本机 Python 执行 | 已实现初版 | Electron 主进程运行 Python，待人工验证 | P0 |
 | Terminal | C2 待验证 | xterm.js 已接入，node-pty 交互终端已完成代码接入，待人工验证 input/Ctrl+C/打包版 | P0 |
 | 项目保存恢复 | 待验证原版能力 | 复用 `.sb3` 保存/加载，必要时扩展 metadata | P0 |
@@ -478,6 +479,12 @@ desktop/security.md
 | 自动更新 | 未开始 | 版本分发 | P2 |
 | 测试体系 | 不足 | 单测 + E2E + 打包 smoke | P0 |
 | UI 设计 polish | Demo | 产品级视觉和交互 | P1 |
+
+## 新增功能与交互优化需求
+
+2026-08-20 调研形成 10 项跨模块需求，覆盖项目生命周期、SB3 导入、串口可靠性、Python 代码体验、扩展版本管理、远程来源、设置、诊断和积木资源质量。
+
+完整清单、优先级和验收边界见：[产品功能与交互优化需求清单](../plans/editor/03-product-feature-and-interaction-optimization-backlog.md)。当前均为需求记录，不代表已经实现或人工验证。
 
 ## 下一阶段推荐路线
 

@@ -24,6 +24,7 @@
 
 - [01 编辑器模式首页与顶部标签页](./editor/01-editor-mode-tabs-implementation-plan.md)（部分已被 desktop/03、04 覆盖）
 - [02 阶段 D：项目保存和恢复](./editor/02-phase-d-project-save-restore-plan.md)
+- [03 产品功能与交互优化需求清单](./editor/03-product-feature-and-interaction-optimization-backlog.md)
 
 ### [extension-library/](./extension-library/) — 自定义积木拓展库
 
